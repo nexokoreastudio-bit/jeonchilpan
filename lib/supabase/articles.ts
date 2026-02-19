@@ -95,27 +95,24 @@ export async function getLatestArticle(): Promise<EditionArticle | null> {
     const allInsights = await getInsights(undefined, false)
     
     if (allInsights && allInsights.length > 0) {
-      // published_at이 있는 인사이트 중 가장 최신 것 찾기
-      const insightsWithDate = allInsights.filter(insight => {
-        return insight.published_at !== null && 
-               insight.published_at !== undefined && 
-               insight.created_at !== null && 
-               insight.created_at !== undefined
-      }) as Array<{
+      // 모든 발행된 인사이트 중 가장 최신 것 찾기 (published_at 없으면 created_at 사용 - 즉시 발행됨 대응)
+      const insightsWithDate = allInsights.filter(insight => 
+        insight.created_at != null
+      ) as Array<{
         id: number
         title: string | null
         summary: string | null
         thumbnail_url: string | null
-        published_at: string
+        published_at: string | null
         created_at: string
         updated_at?: string | null
       }>
       
       if (insightsWithDate.length > 0) {
-        // published_at 기준으로 정렬하되, 같은 날짜면 created_at 기준
+        // published_at 우선, 없으면 created_at 기준으로 정렬
         insightsWithDate.sort((a, b) => {
-          const dateA = new Date(a.published_at).getTime()
-          const dateB = new Date(b.published_at).getTime()
+          const dateA = new Date(a.published_at || a.created_at).getTime()
+          const dateB = new Date(b.published_at || b.created_at).getTime()
           if (dateA !== dateB) {
             return dateB - dateA
           }
@@ -148,18 +145,18 @@ export async function getLatestArticle(): Promise<EditionArticle | null> {
   
   if (latestInsight !== null) {
     const insight: LatestInsightType = latestInsight
-    const insightPublishedAt = insight.published_at
+    const insightDateSource = insight.published_at || insight.created_at
     const insightCreatedAt = insight.created_at
     
-    if (insightPublishedAt !== null && insightCreatedAt) {
-      const insightDate = new Date(insightPublishedAt).getTime()
+    if (insightDateSource && insightCreatedAt) {
+      const insightDate = new Date(insightDateSource).getTime()
       // 인사이트가 더 최신이거나, 같은 날짜지만 더 최근에 생성된 경우
       const insightCreatedDate = new Date(insightCreatedAt).getTime()
       const articleCreatedDate = articleData?.created_at ? new Date(articleData.created_at).getTime() : 0
       
       if (insightDate > latestDate || (insightDate === latestDate && insightCreatedDate > articleCreatedDate)) {
         // 인사이트가 더 최신이면 가상 article 생성
-        const publishedDate = new Date(insightPublishedAt)
+        const publishedDate = new Date(insightDateSource)
         const year = publishedDate.getUTCFullYear()
         const month = String(publishedDate.getUTCMonth() + 1).padStart(2, '0')
         const day = String(publishedDate.getUTCDate()).padStart(2, '0')
@@ -188,7 +185,7 @@ export async function getLatestArticle(): Promise<EditionArticle | null> {
             content: null,
             thumbnail_url: insight.thumbnail_url,
             edition_id: editionId, // 개별 인사이트 editionId 사용
-            published_at: insightPublishedAt,
+            published_at: insight.published_at || publishedDate.toISOString(),
             updated_at: insight.updated_at || insightCreatedAt,
             category: 'news' as const,
             is_published: true,

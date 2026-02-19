@@ -64,18 +64,18 @@ export default async function NewsArchivePage({ searchParams }: PageProps) {
     // edition_id가 null이지만 published_at이 있으면 개별 가상 에디션 ID 생성
     let editionId = insight.edition_id
     
-    if (!editionId && insight.published_at) {
-      // published_at에서 날짜 부분만 추출하고 인사이트 ID를 추가하여 고유한 에디션 ID 생성
-      try {
-        const publishedDate = new Date(insight.published_at)
-        const year = publishedDate.getUTCFullYear()
-        const month = String(publishedDate.getUTCMonth() + 1).padStart(2, '0')
-        const day = String(publishedDate.getUTCDate()).padStart(2, '0')
-        // 각 인사이트마다 고유한 에디션 ID: YYYY-MM-DD-insight-{id}
-        editionId = `${year}-${month}-${day}-insight-${insight.id}`
-      } catch (e) {
-        // 날짜 파싱 실패 시 무시
-        console.warn('인사이트 날짜 파싱 실패:', insight.published_at, e)
+    if (!editionId) {
+      const dateSource = insight.published_at || insight.created_at
+      if (dateSource) {
+        try {
+          const date = new Date(dateSource)
+          const year = date.getUTCFullYear()
+          const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+          const day = String(date.getUTCDate()).padStart(2, '0')
+          editionId = `${year}-${month}-${day}-insight-${insight.id}`
+        } catch (e) {
+          console.warn('인사이트 날짜 파싱 실패:', dateSource, e)
+        }
       }
     }
     

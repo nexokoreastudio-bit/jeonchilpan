@@ -23,7 +23,7 @@ export interface PostWithAuthor extends Post {
  * 중고장터(market) 게시글은 제외
  */
 export async function getPostsByBoardType(
-  boardType: 'free' | 'qna' | 'tip' | 'market' | 'review' | null = null,
+  boardType: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion' | null = null,
   limit: number = 20,
   offset: number = 0
 ): Promise<PostWithAuthor[]> {
@@ -88,16 +88,21 @@ export async function getPostById(postId: number): Promise<PostWithAuthor | null
   return data as PostWithAuthor
 }
 
+export interface PostWithNews extends PostWithAuthor {
+  news_id: number | null
+}
+
 /**
  * 게시글 작성
  */
 export async function createPost(
-  boardType: 'free' | 'qna' | 'tip' | 'market' | 'review',
+  boardType: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion',
   title: string,
   content: string,
   authorId: string,
   images?: string[],
-  rating?: number
+  rating?: number,
+  newsId?: number | null
 ): Promise<{ success: boolean; postId?: number; error?: string }> {
   try {
     const supabase = await createClient()
@@ -113,6 +118,7 @@ export async function createPost(
       rating: boardType === 'review' ? (rating || null) : null,
       is_best: false,
       is_verified_review: false,
+      news_id: newsId || null,
     }
 
     const { data: postResult, error } = await supabase

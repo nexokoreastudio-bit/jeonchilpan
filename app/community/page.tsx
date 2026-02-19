@@ -4,11 +4,12 @@ import { createClient } from '@/lib/supabase/server'
 import { getPostsByBoardType } from '@/lib/supabase/posts'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { MessageSquare, HelpCircle, Lightbulb } from 'lucide-react'
+import { MessageSquare, HelpCircle, Lightbulb, Newspaper } from 'lucide-react'
 import styles from './community.module.css'
 
 const BOARD_TYPES = [
   { type: null, label: '전체', icon: MessageSquare },
+  { type: 'news_discussion', label: '📰 뉴스 토론', icon: Newspaper },
   { type: 'free', label: '자유게시판', icon: MessageSquare },
   { type: 'qna', label: 'Q&A', icon: HelpCircle },
   { type: 'tip', label: '팁 & 노하우', icon: Lightbulb },
@@ -30,8 +31,8 @@ export default async function CommunityPage({ searchParams }: PageProps) {
 
   // 게시판 타입 파싱 (중고장터 제외)
   const boardType =
-    searchParams.board && ['free', 'qna', 'tip'].includes(searchParams.board)
-      ? (searchParams.board as 'free' | 'qna' | 'tip')
+    searchParams.board && ['free', 'qna', 'tip', 'news_discussion'].includes(searchParams.board)
+      ? (searchParams.board as 'free' | 'qna' | 'tip' | 'news_discussion')
       : null
 
   // 게시글 목록 가져오기
@@ -44,7 +45,9 @@ export default async function CommunityPage({ searchParams }: PageProps) {
       <div className={styles.header}>
         <h1>💬 커뮤니티</h1>
         <p className={styles.subtitle}>
-          넥소 사용자들과 정보를 공유하고 소통하세요
+          {boardType === 'news_discussion' 
+            ? '교육 뉴스를 주제로 토론하고 의견을 나눠보세요'
+            : '넥소 사용자들과 정보를 공유하고 소통하세요'}
         </p>
       </div>
 
@@ -99,6 +102,8 @@ export default async function CommunityPage({ searchParams }: PageProps) {
                   <span className={styles.boardType}>
                     {post.board_type === 'market' 
                       ? '중고장터' 
+                      : post.board_type === 'news_discussion'
+                      ? '📰 뉴스 토론'
                       : BOARD_TYPES.find(b => b.type === post.board_type)?.label || '전체'}
                   </span>
                   <span className={styles.author}>

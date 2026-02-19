@@ -39,6 +39,13 @@ export function AdminMenu() {
               인사이트 관리
             </Link>
             <Link
+              href="/admin/crawled-news"
+              onClick={() => setIsOpen(false)}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-nexo-navy transition-colors"
+            >
+              뉴스 관리
+            </Link>
+            <Link
               href="/admin/field-news"
               onClick={() => setIsOpen(false)}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-nexo-navy transition-colors"

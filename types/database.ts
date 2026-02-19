@@ -119,7 +119,7 @@ export interface Database {
       posts: {
         Row: {
           id: number
-          board_type: 'free' | 'qna' | 'tip' | 'market' | 'review' | null
+          board_type: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion' | null
           title: string
           content: string
           author_id: string | null
@@ -129,12 +129,13 @@ export interface Database {
           rating: number | null
           is_best: boolean
           is_verified_review: boolean
+          news_id: number | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: number
-          board_type?: 'free' | 'qna' | 'tip' | 'market' | 'review' | null
+          board_type?: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion' | null
           title: string
           content: string
           author_id?: string | null
@@ -144,12 +145,13 @@ export interface Database {
           rating?: number | null
           is_best?: boolean
           is_verified_review?: boolean
+          news_id?: number | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: number
-          board_type?: 'free' | 'qna' | 'tip' | 'market' | 'review' | null
+          board_type?: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion' | null
           title?: string
           content?: string
           author_id?: string | null
@@ -159,6 +161,7 @@ export interface Database {
           rating?: number | null
           is_best?: boolean
           is_verified_review?: boolean
+          news_id?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -465,6 +468,91 @@ export interface Database {
           published_at?: string | null
           is_published?: boolean
           views?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      crawled_news: {
+        Row: {
+          id: number
+          title: string
+          url: string
+          source: string
+          category: '입시' | '학업' | '취업' | '교육정책' | '기타'
+          summary: string | null
+          thumbnail_url: string | null
+          published_at: string | null
+          crawled_at: string
+          is_featured: boolean
+          view_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          title: string
+          url: string
+          source: string
+          category?: '입시' | '학업' | '취업' | '교육정책' | '기타'
+          summary?: string | null
+          thumbnail_url?: string | null
+          published_at?: string | null
+          crawled_at?: string
+          is_featured?: boolean
+          view_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          title?: string
+          url?: string
+          source?: string
+          category?: '입시' | '학업' | '취업' | '교육정책' | '기타'
+          summary?: string | null
+          thumbnail_url?: string | null
+          published_at?: string | null
+          crawled_at?: string
+          is_featured?: boolean
+          view_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      news_sources: {
+        Row: {
+          id: number
+          name: string
+          base_url: string
+          rss_url: string | null
+          category_filter: string[] | null
+          is_active: boolean
+          crawl_interval_hours: number
+          last_crawled_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          name: string
+          base_url: string
+          rss_url?: string | null
+          category_filter?: string[] | null
+          is_active?: boolean
+          crawl_interval_hours?: number
+          last_crawled_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          name?: string
+          base_url?: string
+          rss_url?: string | null
+          category_filter?: string[] | null
+          is_active?: boolean
+          crawl_interval_hours?: number
+          last_crawled_at?: string | null
           created_at?: string
           updated_at?: string
         }

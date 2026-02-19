@@ -9,12 +9,13 @@ import { redirect } from 'next/navigation'
  * 게시글 작성 서버 액션
  */
 export async function createPost(
-  boardType: 'free' | 'qna' | 'tip' | 'market' | 'review',
+  boardType: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion',
   title: string,
   content: string,
   authorId: string,
   images?: string[],
-  rating?: number
+  rating?: number,
+  newsId?: number | null
 ): Promise<{ success: boolean; postId?: number; error?: string }> {
   try {
     const supabase = await createClient()
@@ -31,7 +32,7 @@ export async function createPost(
     }
 
     // 게시글 작성 (DB 트리거가 자동으로 포인트 지급)
-    const result = await createPostQuery(boardType, title, content, authorId, images, rating)
+    const result = await createPostQuery(boardType, title, content, authorId, images, rating, newsId)
 
     if (result.success && result.postId) {
       revalidatePath('/community')

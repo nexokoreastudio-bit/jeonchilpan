@@ -37,3 +37,8 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Scheduled Functions: 매일 자동 크롤링
+[[functions]]
+  function = "crawl-news-scheduled"
+  schedule = "0 9 * * *"  # 매일 오전 9시 (UTC 기준, 한국 시간 오전 9시는 "0 0 * * *")

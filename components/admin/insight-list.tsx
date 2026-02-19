@@ -6,7 +6,7 @@ import { Database } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { InsightEditForm } from './insight-edit-form'
-import { Calendar, Eye, EyeOff, CheckCircle2 } from 'lucide-react'
+import { Calendar, Eye, EyeOff, CheckCircle2, ChevronDown, ChevronUp, FileText } from 'lucide-react'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { EditionInfo } from '@/lib/supabase/articles'
@@ -53,6 +53,7 @@ export function InsightList({ editions }: InsightListProps) {
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [bulkPublishing, setBulkPublishing] = useState<string | null>(null)
+  const [expandedInsightId, setExpandedInsightId] = useState<number | null>(null)
 
   useEffect(() => {
     fetchInsights()
@@ -197,9 +198,13 @@ export function InsightList({ editions }: InsightListProps) {
                     <InsightEditForm
                       insight={insight}
                       editions={editions}
-                      onCancel={() => setEditingId(null)}
+                      onCancel={() => {
+                        setEditingId(null)
+                        setExpandedInsightId(null)
+                      }}
                       onSuccess={() => {
                         setEditingId(null)
+                        setExpandedInsightId(null)
                         fetchInsights()
                       }}
                     />
@@ -226,12 +231,55 @@ export function InsightList({ editions }: InsightListProps) {
                           {insight.summary}
                         </p>
                         {insight.content && (
-                          <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <p className="text-xs font-semibold text-gray-500 mb-2">✍️ 넥소에디터 컬럼 미리보기:</p>
-                            <div
-                              className="text-xs text-gray-700 prose prose-sm max-w-none line-clamp-4"
-                              dangerouslySetInnerHTML={{ __html: sanitizeHtml(insight.content) }}
-                            />
+                          <div className="mt-3">
+                            <button
+                              onClick={() => setExpandedInsightId(expandedInsightId === insight.id ? null : insight.id)}
+                              className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+                            >
+                              <div className="flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-gray-500" />
+                                <span className="text-xs font-semibold text-gray-700">
+                                  {expandedInsightId === insight.id ? '전체 내용 숨기기' : '전체 내용 보기'}
+                                </span>
+                              </div>
+                              {expandedInsightId === insight.id ? (
+                                <ChevronUp className="w-4 h-4 text-gray-500" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4 text-gray-500" />
+                              )}
+                            </button>
+                            {expandedInsightId === insight.id && (
+                              <div className="mt-3 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+                                <div className="mb-3 pb-2 border-b border-gray-200 flex items-center justify-between">
+                                  <p className="text-sm font-semibold text-gray-700">✍️ 넥소에디터 컬럼 전체 내용</p>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setEditingId(insight.id)
+                                      // 전체 내용을 보는 상태에서 수정 모드로 전환
+                                    }}
+                                    className="h-7 px-3 text-xs"
+                                  >
+                                    수정하기
+                                  </Button>
+                                </div>
+                                <div className="max-h-[600px] overflow-y-auto">
+                                  <div
+                                    className="text-sm text-gray-800 prose prose-sm max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(insight.content) }}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                            {expandedInsightId !== insight.id && (
+                              <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <div
+                                  className="text-xs text-gray-700 prose prose-sm max-w-none line-clamp-3"
+                                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(insight.content) }}
+                                />
+                              </div>
+                            )}
                           </div>
                         )}
                         <a

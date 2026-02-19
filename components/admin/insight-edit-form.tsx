@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select'
 import { Database } from '@/types/database'
 import { EditionInfo } from '@/lib/supabase/articles'
+import { sanitizeHtml } from '@/lib/utils/sanitize'
 
 type InsightRow = Database['public']['Tables']['insights']['Row']
 
@@ -28,6 +29,7 @@ interface InsightEditFormProps {
 export function InsightEditForm({ insight, editions, onCancel, onSuccess }: InsightEditFormProps) {
   const [title, setTitle] = useState(insight.title)
   const [summary, setSummary] = useState(insight.summary || '')
+  const [content, setContent] = useState(insight.content || '')
   const [category, setCategory] = useState<'입시' | '정책' | '학습법' | '상담팁' | '기타'>(insight.category || '기타')
   const [editionId, setEditionId] = useState<string>(insight.edition_id || 'none')
   const [publishDate, setPublishDate] = useState<string>(() => {
@@ -41,6 +43,7 @@ export function InsightEditForm({ insight, editions, onCancel, onSuccess }: Insi
   const [thumbnailUrl, setThumbnailUrl] = useState<string>(insight.thumbnail_url || '')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [showContentPreview, setShowContentPreview] = useState(true)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,6 +68,7 @@ export function InsightEditForm({ insight, editions, onCancel, onSuccess }: Insi
       const result = await updateInsight(insight.id, {
         title: title.trim(),
         summary: summary.trim() || null,
+        content: content.trim() || null,
         category,
         published_at: publishedAt,
         edition_id: finalEditionId,
@@ -110,6 +114,42 @@ export function InsightEditForm({ insight, editions, onCancel, onSuccess }: Insi
           className="mt-1"
           rows={3}
         />
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <Label htmlFor="content">전체 내용 (HTML)</Label>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowContentPreview(!showContentPreview)}
+            className="text-xs"
+          >
+            {showContentPreview ? '편집 모드' : '미리보기'}
+          </Button>
+        </div>
+        {showContentPreview ? (
+          <div className="mt-1 p-4 bg-gray-50 rounded-lg border border-gray-200 max-h-[400px] overflow-y-auto">
+            <div
+              className="text-sm text-gray-800 prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
+          </div>
+        ) : (
+          <Textarea
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            disabled={loading}
+            className="mt-1 font-mono text-xs"
+            rows={15}
+            placeholder="HTML 형식의 내용을 입력하세요..."
+          />
+        )}
+        <p className="text-xs text-gray-500 mt-1">
+          넥소에디터 컬럼의 전체 내용입니다. HTML 형식으로 작성됩니다.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

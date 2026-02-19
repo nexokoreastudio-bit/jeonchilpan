@@ -6,7 +6,7 @@ import { getPostById } from '@/lib/supabase/posts'
 import { deletePost } from '@/app/actions/posts'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { ArrowLeft, MessageSquare, HelpCircle, Lightbulb, ShoppingBag } from 'lucide-react'
+import { ArrowLeft, MessageSquare, HelpCircle, Lightbulb, ShoppingBag, Newspaper, ExternalLink } from 'lucide-react'
 import { HtmlContent } from '@/components/html-content'
 import { DeletePostButton } from '@/components/community/delete-post-button'
 import { LikeButton } from '@/components/community/like-button'
@@ -14,6 +14,7 @@ import { CommentsSection } from '@/components/community/comments-section'
 import { checkUserLiked } from '@/app/actions/likes'
 import { Database } from '@/types/database'
 import { JsonLd } from '@/components/seo/json-ld'
+import { getNewsById } from '@/lib/supabase/news'
 import styles from '../community.module.css'
 
 const BOARD_TYPE_INFO = {
@@ -21,6 +22,7 @@ const BOARD_TYPE_INFO = {
   qna: { label: 'Q&A', icon: HelpCircle },
   tip: { label: '팁 & 노하우', icon: Lightbulb },
   market: { label: '중고장터', icon: ShoppingBag },
+  news_discussion: { label: '📰 뉴스 토론', icon: Newspaper },
 } as const
 
 interface PageProps {
@@ -65,6 +67,9 @@ export default async function PostDetailPage({ params }: PageProps) {
   const boardInfo = post.board_type && post.board_type in BOARD_TYPE_INFO 
     ? BOARD_TYPE_INFO[post.board_type as keyof typeof BOARD_TYPE_INFO] 
     : null
+
+  // 뉴스 토론 게시글인 경우 뉴스 정보 가져오기
+  const newsData = post.news_id ? await getNewsById(post.news_id) : null
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
   const currentUrl = `${baseUrl}/community/${post.id}`
@@ -144,6 +149,36 @@ export default async function PostDetailPage({ params }: PageProps) {
         </div>
 
         <h1 className={styles.postDetailTitle}>{post.title}</h1>
+
+        {/* 뉴스 정보 표시 (뉴스 토론 게시글일 때) */}
+        {newsData && post.board_type === 'news_discussion' && (
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-1">
+                  {newsData.title.replace(/<[^>]*>/g, '').trim()}
+                </h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  출처: {newsData.source} | 카테고리: {newsData.category}
+                </p>
+                {newsData.summary && (
+                  <p className="text-sm text-gray-700 mb-3">
+                    {newsData.summary.replace(/<[^>]*>/g, '').trim()}
+                  </p>
+                )}
+              </div>
+            </div>
+            <a
+              href={newsData.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              <ExternalLink className="w-4 h-4" />
+              원문 보기
+            </a>
+          </div>
+        )}
 
         {post.images && post.images.length > 0 && (
           <div className={styles.postImages}>

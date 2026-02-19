@@ -16,10 +16,11 @@ export async function updateSession(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('❌ Supabase 환경 변수가 설정되지 않았습니다.')
-    console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? '✅ 설정됨' : '❌ 없음')
-    console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✅ 설정됨' : '❌ 없음')
-    throw new Error('Supabase 환경 변수가 설정되지 않았습니다. .env.local 파일을 확인하세요.')
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('⚠️ Supabase 환경 변수가 설정되지 않았습니다. .env.local 파일을 확인하세요.')
+    }
+    // 환경 변수 없을 때도 요청 통과 (개발 시 DB 없이 UI 확인 가능)
+    return NextResponse.next({ request })
   }
 
   const supabase = createServerClient<Database>(

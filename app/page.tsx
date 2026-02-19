@@ -10,6 +10,7 @@ import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { CrawledNewsSection } from '@/components/news/crawled-news-section'
 
 // 날짜 포맷팅 유틸리티 함수
 function formatEditionDate(editionId: string | null): string {
@@ -50,23 +51,41 @@ function formatEditionDate(editionId: string | null): string {
 export const revalidate = 0 // 항상 최신 데이터 가져오기 (예약 발행 즉시 반영)
 
 export default async function HomePage() {
-  const latestArticle = await getLatestArticle()
-  const allEditions = await getAllEditionsWithInfo()
-  const supabase = await createClient()
+  let latestArticle: Awaited<ReturnType<typeof getLatestArticle>> = null
+  let allEditions: Awaited<ReturnType<typeof getAllEditionsWithInfo>> = []
+  let allInsights: Awaited<ReturnType<typeof getInsights>> = []
+  let latestReviews: Awaited<ReturnType<typeof getReviews>> = []
+  let latestFieldNews: any[] = []
+  let latestPosts: Awaited<ReturnType<typeof getPostsByBoardType>> = []
 
-  // 최신 콘텐츠 데이터 가져오기
-  const [allInsights, latestReviews, latestFieldNews, latestPosts] = await Promise.all([
-    getInsights(), // 모든 발행된 인사이트 가져오기
-    getReviews('latest', 3, 0),
-    supabase
-      .from('field_news')
-      .select('*')
-      .eq('is_published', true)
-      .order('published_at', { ascending: false })
-      .limit(3)
-      .then(({ data }) => data || []),
-    getPostsByBoardType(null, 3, 0) // 전체 게시판에서 최신 3개 가져오기
-  ])
+  try {
+    const supabase = await createClient()
+    latestArticle = await getLatestArticle()
+    allEditions = await getAllEditionsWithInfo()
+
+    // 최신 콘텐츠 데이터 가져오기
+    const [insights, reviews, fieldNews, posts] = await Promise.all([
+      getInsights(), // 모든 발행된 인사이트 가져오기
+      getReviews('latest', 3, 0),
+      supabase
+        .from('field_news')
+        .select('*')
+        .eq('is_published', true)
+        .order('published_at', { ascending: false })
+        .limit(3)
+        .then(({ data }) => data || []),
+      getPostsByBoardType(null, 3, 0) // 전체 게시판에서 최신 3개 가져오기
+    ])
+    allInsights = insights
+    latestReviews = reviews
+    latestFieldNews = fieldNews || []
+    latestPosts = posts
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('홈페이지 데이터 로드 실패:', error)
+    }
+    // DB/API 실패 시 빈 데이터로 페이지 렌더링 유지
+  }
 
   // 발행호별 인사이트 개수 및 목록 계산
   // 각 인사이트마다 개별 가상 에디션 ID 생성 (같은 날짜의 인사이트도 분리)
@@ -75,21 +94,22 @@ export default async function HomePage() {
   
   allInsights.forEach(insight => {
     // edition_id가 있으면 그대로 사용
-    // edition_id가 null이지만 published_at이 있으면 개별 가상 에디션 ID 생성
+    // edition_id가 null이면 published_at 또는 created_at으로 개별 가상 에디션 ID 생성
     let editionId = insight.edition_id
     
-    if (!editionId && insight.published_at) {
-      // published_at에서 날짜 부분만 추출하고 인사이트 ID를 추가하여 고유한 에디션 ID 생성
-      try {
-        const publishedDate = new Date(insight.published_at)
-        const year = publishedDate.getUTCFullYear()
-        const month = String(publishedDate.getUTCMonth() + 1).padStart(2, '0')
-        const day = String(publishedDate.getUTCDate()).padStart(2, '0')
-        // 각 인사이트마다 고유한 에디션 ID: YYYY-MM-DD-insight-{id}
-        editionId = `${year}-${month}-${day}-insight-${insight.id}`
-      } catch (e) {
-        // 날짜 파싱 실패 시 무시
-        console.warn('인사이트 날짜 파싱 실패:', insight.published_at, e)
+    if (!editionId) {
+      // published_at 우선, 없으면 created_at 사용 (즉시 발행됨 인사이트 대응)
+      const dateSource = insight.published_at || insight.created_at
+      if (dateSource) {
+        try {
+          const date = new Date(dateSource)
+          const year = date.getUTCFullYear()
+          const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+          const day = String(date.getUTCDate()).padStart(2, '0')
+          editionId = `${year}-${month}-${day}-insight-${insight.id}`
+        } catch (e) {
+          console.warn('인사이트 날짜 파싱 실패:', dateSource, e)
+        }
       }
     }
     
@@ -123,19 +143,21 @@ export default async function HomePage() {
     allEditionIds.add(edition.edition_id)
   })
   
-  // 인사이트만 있는 발행호 추가 (각 인사이트마다 개별 에디션 ID 생성)
+  // 인사이트만 있는 발행호 추가 (published_at 또는 created_at으로 가상 에디션 ID 생성)
   allInsights.forEach(insight => {
-    if (!insight.edition_id && insight.published_at) {
-      try {
-        const publishedDate = new Date(insight.published_at)
-        const year = publishedDate.getUTCFullYear()
-        const month = String(publishedDate.getUTCMonth() + 1).padStart(2, '0')
-        const day = String(publishedDate.getUTCDate()).padStart(2, '0')
-        // 각 인사이트마다 고유한 에디션 ID: YYYY-MM-DD-insight-{id}
-        const editionId = `${year}-${month}-${day}-insight-${insight.id}`
-        allEditionIds.add(editionId)
-      } catch (e) {
-        // 날짜 파싱 실패 시 무시
+    if (!insight.edition_id) {
+      const dateSource = insight.published_at || insight.created_at
+      if (dateSource) {
+        try {
+          const date = new Date(dateSource)
+          const year = date.getUTCFullYear()
+          const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+          const day = String(date.getUTCDate()).padStart(2, '0')
+          const editionId = `${year}-${month}-${day}-insight-${insight.id}`
+          allEditionIds.add(editionId)
+        } catch (e) {
+          // 날짜 파싱 실패 시 무시
+        }
       }
     }
   })
@@ -201,6 +223,9 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* 크롤링된 교육 뉴스 섹션 */}
+      <CrawledNewsSection />
+
       {/* 히어로 섹션 - 이미지 오버레이 레이아웃 */}
       {latestArticle && (
         <section className="border-b border-gray-200 bg-white">

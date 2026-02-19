@@ -1,0 +1,21 @@
+name: Daily News Crawling
+
+on:
+  schedule:
+    # 매일 한국 시간 오전 9시 (UTC 0시)
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # 수동 실행도 가능
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Netlify Crawl
+        run: |
+          curl -X POST https://daily-nexo.netlify.app/api/crawl-news \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -d '{}'
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+

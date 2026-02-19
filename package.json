@@ -4,7 +4,7 @@
   "description": "NEXO Weekly - Next.js 기반 에듀테크 커뮤니티 플랫폼",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "WATCHPACK_POLLING=true next dev",
     "dev:legacy": "npx serve -l 3000",
     "build": "next build",
     "start": "next start",
