@@ -20,7 +20,8 @@ npm run deploy:check
 
 ## 추가 확인사항
 
-- [ ] `netlify.toml` - 영문 주석만 사용 (한글/특수문자 사용 금지)
+- [ ] `netlify.toml` - 영문 주석만, `publish = ".next"` 설정 (repo root 사용 금지)
+- [ ] Netlify UI - Publish directory가 .next인지 확인 (netlify.toml과 충돌 시 UI에서 제거)
 - [ ] 환경 변수 - `.env.local`에 필요한 값이 있는지 확인
 
 ## 배포 절차
