@@ -25,7 +25,12 @@ interface CrawledNewsItem {
 
 const categories: Array<'전체' | '입시' | '학업' | '취업' | '교육정책'> = ['전체', '입시', '학업', '취업', '교육정책']
 
-export function CrawledNewsSection() {
+interface CrawledNewsSectionProps {
+  limit?: number
+  showMoreButton?: boolean
+}
+
+export function CrawledNewsSection({ limit = 12, showMoreButton = true }: CrawledNewsSectionProps) {
   const router = useRouter()
   const [news, setNews] = useState<CrawledNewsItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -47,7 +52,7 @@ export function CrawledNewsSection() {
       if (selectedSource !== '전체') {
         params.append('source', selectedSource)
       }
-      params.append('limit', '12')
+      params.append('limit', String(limit))
 
       const response = await fetch(`/api/crawl-news?${params.toString()}`)
       const data = await response.json()
@@ -250,7 +255,7 @@ export function CrawledNewsSection() {
         </div>
 
         {/* 더 보기 버튼 (선택사항) */}
-        {news.length >= 12 && (
+        {showMoreButton && news.length >= 12 && (
           <div className="mt-12 text-center">
             <Button
               variant="outline"
