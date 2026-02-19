@@ -74,7 +74,8 @@ export default function CrawledNewsAdminPage() {
         .eq('id', user.id)
         .single()
 
-      setIsAdmin(profile?.role === 'admin')
+      const profileData = profile as { role?: string } | null
+      setIsAdmin(profileData?.role === 'admin')
     } catch (error) {
       console.error('인증 확인 실패:', error)
       setIsAuthenticated(false)

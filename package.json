@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
+    "deploy:check": "npm run type-check && npm run build",
     "generate-og-image": "node scripts/generate-og-image.js",
     "setup-qrcode": "node scripts/setup-qrcode.js",
     "postinstall": "npm run setup-qrcode || true",

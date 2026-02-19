@@ -60,7 +60,8 @@ export async function POST(request: NextRequest) {
       query = query.eq('id', sourceId)
     }
     
-    const { data: sources, error: sourcesError } = await query
+    const { data: sourcesRaw, error: sourcesError } = await query
+    const sources = sourcesRaw as Database['public']['Tables']['news_sources']['Row'][] | null
     
     if (sourcesError) {
       return NextResponse.json(
@@ -121,8 +122,7 @@ export async function POST(request: NextRequest) {
         crawledItems.push(...items)
         
         // 마지막 크롤링 시간 업데이트
-        await supabase
-          .from('news_sources')
+        await (supabase.from('news_sources') as any)
           .update({ last_crawled_at: new Date().toISOString() })
           .eq('id', source.id)
         
@@ -169,7 +169,7 @@ async function saveCrawledNews(
     thumbnail_url?: string
     published_at?: string
   }>,
-  supabase: ReturnType<typeof createClient>
+  supabase: Awaited<ReturnType<typeof createClient>>
 ): Promise<{ saved: number; updated: number; skipped: number }> {
   let savedCount = 0
   let updatedCount = 0
@@ -191,11 +191,12 @@ async function saveCrawledNews(
       }
       
       // 1차: URL 중복 체크
-      const { data: existingByUrl } = await supabase
+      const { data: existingByUrlRaw } = await supabase
         .from('crawled_news')
         .select('id, title, summary, thumbnail_url, published_at, crawled_at')
         .eq('url', item.url)
         .maybeSingle()
+      const existingByUrl = existingByUrlRaw as { id: number; title: string; summary: string | null; thumbnail_url: string | null; published_at: string | null; crawled_at: string } | null
       
       if (existingByUrl) {
         // 기존 기사 정보 업데이트 (요약, 썸네일 등이 개선되었을 수 있음)
@@ -225,15 +226,13 @@ async function saveCrawledNews(
         
         // 업데이트할 내용이 있으면 업데이트
         if (hasUpdate) {
-          await supabase
-            .from('crawled_news')
+          await (supabase.from('crawled_news') as any)
             .update(updateData)
             .eq('id', existingByUrl.id)
           updatedCount++
         } else {
           // 업데이트할 내용이 없어도 크롤링 시간만 업데이트
-          await supabase
-            .from('crawled_news')
+          await (supabase.from('crawled_news') as any)
             .update({ crawled_at: new Date().toISOString() })
             .eq('id', existingByUrl.id)
         }
@@ -259,8 +258,7 @@ async function saveCrawledNews(
       }
       
       // 새 기사 저장
-      const { error } = await supabase
-        .from('crawled_news')
+      const { error } = await (supabase.from('crawled_news') as any)
         .insert({
           title: item.title,
           url: item.url,

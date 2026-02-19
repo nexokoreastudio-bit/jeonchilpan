@@ -1,0 +1,31 @@
+---
+description: 배포 전 필수 검증 - Netlify 크레딧 절약
+globs: 
+alwaysApply: false
+---
+
+# 배포 전 검증 체크리스트
+
+Netlify 배포 시 실패하면 크레딧이 소진됩니다. **반드시 로컬에서 검증 완료 후** 배포하세요.
+
+## 배포 전 필수 실행
+
+```bash
+npm run deploy:check
+```
+
+이 명령은 다음을 순서대로 실행합니다:
+1. **type-check** - TypeScript 타입 검사
+2. **build** - 프로덕션 빌드 (Netlify와 동일, 내부에서 lint 포함)
+
+## 추가 확인사항
+
+- [ ] `netlify.toml` - 영문 주석만 사용 (한글/특수문자 사용 금지)
+- [ ] 환경 변수 - `.env.local`에 필요한 값이 있는지 확인
+
+## 배포 절차
+
+1. `npm run deploy:check` 실행 → **모두 통과** 확인
+2. `git add -A && git commit -m "메시지" && git push origin main`
+
+deploy:check가 실패하면 커밋/푸시하지 마세요.

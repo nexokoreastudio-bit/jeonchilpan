@@ -55,7 +55,7 @@ export function CrawledNewsSection() {
       if (data.success) {
         setNews(data.data || [])
         // 소스 목록 추출
-        const uniqueSources = Array.from(new Set(data.data?.map((item: CrawledNewsItem) => item.source) || []))
+        const uniqueSources = Array.from(new Set(data.data?.map((item: CrawledNewsItem) => item.source) || [])) as string[]
         setSources(uniqueSources)
       }
     } catch (error) {

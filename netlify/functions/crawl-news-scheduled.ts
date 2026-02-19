@@ -2,7 +2,7 @@
 // 참고: Netlify Scheduled Functions는 Pro 플랜 이상에서만 사용 가능할 수 있습니다.
 // 무료 플랜인 경우 외부 Cron 서비스(cron-job.org 등)를 사용하세요.
 
-exports.handler = async (event, context) => {
+exports.handler = async (event: { source?: string }, _context: unknown) => {
   // Netlify Scheduled Functions는 event.source가 'netlify-scheduled'입니다
   if (event.source !== 'netlify-scheduled') {
     return {
@@ -41,12 +41,10 @@ exports.handler = async (event, context) => {
     }
   } catch (error) {
     console.error('스케줄된 크롤링 실패:', error)
+    const message = error instanceof Error ? error.message : '크롤링 중 오류 발생'
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        success: false,
-        error: error.message || '크롤링 중 오류 발생',
-      }),
+      body: JSON.stringify({ success: false, error: message }),
     }
   }
 }
