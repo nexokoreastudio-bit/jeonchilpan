@@ -172,7 +172,7 @@ export async function createQuoteRequest(
  */
 export async function updateLeadStatus(
   leadId: number,
-  status: 'pending' | 'contacted' | 'completed' | 'cancelled',
+  status: 'pending' | 'in_consultation' | 'contacted' | 'demo_completed' | 'quote_completed' | 'consultation_completed' | 'completed' | 'cancelled',
   adminNotes?: string | null
 ): Promise<{ success: boolean; error?: string }> {
   try {

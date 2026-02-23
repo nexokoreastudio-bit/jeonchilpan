@@ -117,9 +117,7 @@ ${lastUserMsg}
       )
       if (!res.ok) {
         const errText = await res.text()
-        if (process.env.NODE_ENV === 'development') {
-          console.warn(`[Chat] ${modelName} 실패:`, res.status, errText.substring(0, 200))
-        }
+        console.warn(`[Chat] ${modelName} 실패:`, res.status, errText.substring(0, 300))
         continue
       }
       const data = await res.json()
@@ -133,10 +131,9 @@ ${lastUserMsg}
         if (fullText) return { reply: String(fullText).trim() }
       }
     } catch (e) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(`[Chat] ${modelName} 예외:`, e)
-      }
+      console.warn(`[Chat] ${modelName} 예외:`, e)
     }
   }
+  console.error('[Chat] 모든 모델 실패 - GEMINI_API_KEY 확인 필요')
   return { error: '챗봇 응답 생성에 실패했습니다.' }
 }

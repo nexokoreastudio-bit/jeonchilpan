@@ -316,7 +316,7 @@ export interface Database {
           quantity: number | null
           message: string | null
           referrer_code: string | null
-          status: 'pending' | 'contacted' | 'completed' | 'cancelled'
+          status: 'pending' | 'in_consultation' | 'contacted' | 'demo_completed' | 'quote_completed' | 'consultation_completed' | 'completed' | 'cancelled'
           admin_notes: string | null
           created_at: string
           updated_at: string
@@ -334,14 +334,14 @@ export interface Database {
           quantity?: number | null
           message?: string | null
           referrer_code?: string | null
-          status?: 'pending' | 'contacted' | 'completed' | 'cancelled'
+          status?: 'pending' | 'in_consultation' | 'contacted' | 'demo_completed' | 'quote_completed' | 'consultation_completed' | 'completed' | 'cancelled'
           admin_notes?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: number
-          type?: 'demo' | 'quote' | 'consultation'
+          type?: 'demo' | 'quote' | 'consultation' | 'chatbot_consultation'
           name?: string
           email?: string
           phone?: string | null
@@ -352,7 +352,7 @@ export interface Database {
           quantity?: number | null
           message?: string | null
           referrer_code?: string | null
-          status?: 'pending' | 'contacted' | 'completed' | 'cancelled'
+          status?: 'pending' | 'in_consultation' | 'contacted' | 'demo_completed' | 'quote_completed' | 'consultation_completed' | 'completed' | 'cancelled'
           admin_notes?: string | null
           created_at?: string
           updated_at?: string
