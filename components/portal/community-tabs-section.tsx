@@ -6,13 +6,14 @@ import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import type { PostWithAuthor } from '@/lib/supabase/posts'
 
-type BoardType = 'all' | 'notice' | 'bamboo' | 'materials' | 'verification'
+type BoardType = 'all' | 'notice' | 'bamboo' | 'materials' | 'job' | 'verification'
 
 const TABS: { key: BoardType; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'notice', label: '공지사항' },
   { key: 'bamboo', label: '대나무숲' },
   { key: 'materials', label: '자료공유' },
+  { key: 'job', label: '구인/구직' },
   { key: 'verification', label: '구독자 인증' },
 ]
 
@@ -20,6 +21,7 @@ const BOARD_LABELS: Record<string, string> = {
   notice: '공지',
   bamboo: '대나무숲',
   materials: '자료공유',
+  job: '구인/구직',
   verification: '인증',
 }
 
@@ -35,6 +37,7 @@ interface CommunityTabsSectionProps {
     notice: PostWithAuthor[]
     bamboo: PostWithAuthor[]
     materials: PostWithAuthor[]
+    job: PostWithAuthor[]
     verification: PostWithAuthor[]
   }
 }

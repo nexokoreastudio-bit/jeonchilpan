@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getPostsByBoardType, type BoardType } from '@/lib/supabase/posts'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { FileStack, MessageSquare, BadgeCheck, FileText } from 'lucide-react'
+import { FileStack, MessageSquare, BadgeCheck, FileText, Briefcase } from 'lucide-react'
 import type { Metadata } from 'next'
 import { ForumJsonLd } from '@/components/seo/json-ld'
 import styles from './community.module.css'
@@ -22,10 +22,11 @@ const BOARD_TYPES = [
   { type: 'notice', label: '공지사항', icon: Megaphone },
   { type: 'bamboo', label: '원장님 대나무숲', icon: MessageSquare },
   { type: 'materials', label: '공유자료실', icon: FileStack },
+  { type: 'job', label: '구인/구직', icon: Briefcase },
   { type: 'verification', label: '구독자 인증', icon: BadgeCheck },
 ] as const
 
-const VALID_BOARD_TYPES: BoardType[] = ['notice', 'bamboo', 'materials', 'verification']
+const VALID_BOARD_TYPES: BoardType[] = ['notice', 'bamboo', 'materials', 'job', 'verification']
 
 interface PageProps {
   searchParams: {
@@ -82,10 +83,17 @@ export default async function CommunityPage({ searchParams }: PageProps) {
                   {' > '}공유자료실
                 </span>
               )}
+              {boardType === 'job' && (
+                <span className="text-slate-600 font-normal ml-1">
+                  {' > '}구인/구직
+                </span>
+              )}
             </h1>
             <p className="text-slate-500 text-xs mt-0.5">
               {boardType === 'materials'
                 ? '템플릿·자료를 공유하고 큰 화면에서 활용하세요'
+                : boardType === 'job'
+                ? '학원 선생님 구인·구직 정보를 나눠보세요'
                 : '학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 전문가 플랫폼'}
             </p>
           </div>

@@ -5,7 +5,7 @@ import { getPostsByBoardType } from '@/lib/supabase/posts'
 import { SafeImage } from '@/components/safe-image'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { Calendar, MessageSquare, HelpCircle, Lightbulb } from 'lucide-react'
+import { Calendar, MessageSquare, HelpCircle, Lightbulb, Briefcase } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 interface PageProps {
@@ -92,9 +92,11 @@ export default async function SearchPage({ searchParams }: PageProps) {
   const totalResults = matchedInsights.length + matchedEditions.length + matchedPosts.length
 
   const boardTypeLabels: Record<string, { label: string; icon: any }> = {
-    free: { label: '자유게시판', icon: MessageSquare },
-    qna: { label: 'Q&A', icon: HelpCircle },
-    tip: { label: '팁 & 노하우', icon: Lightbulb },
+    notice: { label: '공지사항', icon: MessageSquare },
+    bamboo: { label: '대나무숲', icon: MessageSquare },
+    materials: { label: '자료공유', icon: MessageSquare },
+    job: { label: '구인/구직', icon: Briefcase },
+    verification: { label: '구독자 인증', icon: MessageSquare },
   }
 
   return (

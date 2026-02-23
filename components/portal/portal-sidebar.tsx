@@ -34,8 +34,10 @@ export function PortalSidebar({
   ]
 
   const boardLabels: Record<string, string> = {
+    notice: '공지',
     bamboo: '대나무숲',
     materials: '자료공유',
+    job: '구인/구직',
     verification: '인증',
   }
 
@@ -217,7 +219,25 @@ export function PortalSidebar({
           </div>
         </div>
 
-        {/* 시연신청 CTA - 넥소 배너 (코인판 광고 박스 스타일) */}
+        {/* 실전 팁 - 전자칠판 활용 팁 */}
+        <div className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+          <div className="border-b border-gray-100 bg-amber-50/80 px-4 py-2.5 flex items-center gap-2">
+            <span className="text-amber-600">💡</span>
+            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+              실전 팁
+            </h3>
+          </div>
+          <div className="p-3 space-y-2.5">
+            <p className="text-sm text-slate-700 leading-relaxed">
+              <strong className="text-slate-800">QR 공유:</strong> 판서 내용을 즉시 PDF로 변환하여 학생들에게 전송하세요.
+            </p>
+            <p className="text-sm text-slate-700 leading-relaxed">
+              <strong className="text-slate-800">화면 분할:</strong> 한쪽에는 영상을, 다른 한쪽에는 판서를 동시에 진행하세요.
+            </p>
+          </div>
+        </div>
+
+        {/* 시연신청 CTA - 넥소 배너 */}
         <div className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
           <div className="border-b border-gray-100 bg-[#00c4b4]/5 px-4 py-2.5">
             <span className="text-xs font-bold text-slate-600">NEXO</span>

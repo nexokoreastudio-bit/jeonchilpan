@@ -5,12 +5,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database'
 
-/** Lean 리뉴얼: board_type (대나무숲 + 공식 자료실 + 구독자 인증 + 공지사항) */
+/** Lean 리뉴얼: board_type (대나무숲 + 공식 자료실 + 구독자 인증 + 공지사항 + 구인구직) */
 export type BoardType =
   | 'bamboo'       // 원장님 대나무숲 - 익명/하소연
   | 'materials'    // 공유자료실 - 다운로드 전용
   | 'verification' // 구독자 인증 요청 - 인증글 작성
   | 'notice'       // 공지사항 - 관리자 전용
+  | 'job'          // 학원 선생님 구인/구직
 
 type Post = Database['public']['Tables']['posts']['Row']
 type PostRow = Database['public']['Tables']['posts']['Row']
@@ -27,7 +28,7 @@ export interface PostWithAuthor extends Post {
 
 /**
  * 게시판 타입별 게시글 목록 가져오기
- * 중고장터(market) 게시글은 제외
+ * 공지글(board_type=notice)은 모든 게시판에서 상단 고정
  */
 export async function getPostsByBoardType(
   boardType: BoardType | null = null,
@@ -36,32 +37,90 @@ export async function getPostsByBoardType(
 ): Promise<PostWithAuthor[]> {
   const supabase = await createClient()
 
-  let query = supabase
+  const selectQuery = `
+    *,
+    author:users!posts_author_id_fkey (
+      id,
+      nickname,
+      avatar_url
+    )
+  `
+
+  // 공지사항 전용 탭: 공지글만 반환
+  if (boardType === 'notice') {
+    const { data, error } = await supabase
+      .from('posts')
+      .select(selectQuery)
+      .eq('board_type', 'notice')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (error) {
+      if (process.env.NODE_ENV === 'development') console.error('게시글 조회 실패:', error)
+      return []
+    }
+    return (data || []) as PostWithAuthor[]
+  }
+
+  // 전체/대나무숲/자료실/인증: 공지글 상단 고정
+  const needsNoticePinned = boardType === null || ['bamboo', 'materials', 'verification', 'job'].includes(boardType)
+
+  if (needsNoticePinned) {
+    const [noticeRes, boardRes] = await Promise.all([
+      supabase
+        .from('posts')
+        .select(selectQuery)
+        .eq('board_type', 'notice')
+        .order('created_at', { ascending: false })
+        .limit(50),
+      boardType
+        ? supabase
+            .from('posts')
+            .select(selectQuery)
+            .eq('board_type', boardType)
+            .order('created_at', { ascending: false })
+            .range(0, offset + limit - 1)
+        : supabase
+            .from('posts')
+            .select(selectQuery)
+            .order('created_at', { ascending: false })
+            .range(0, Math.max(offset + limit + 99, 199)) // 공지 제외 후 충분한 목록 확보
+    ])
+
+    if (noticeRes.error || boardRes.error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('게시글 조회 실패:', noticeRes.error || boardRes.error)
+      }
+      return []
+    }
+
+    const notices = (noticeRes.data || []) as PostWithAuthor[]
+    let boardPosts = (boardRes.data || []) as PostWithAuthor[]
+
+    // 전체 탭: 공지 제외한 나머지만 (boardPosts에 이미 공지 포함 가능성 낮음)
+    if (boardType === null) {
+      boardPosts = boardPosts.filter((p) => p.board_type !== 'notice')
+    }
+
+    const noticeIds = new Set(notices.map((p) => p.id))
+    const merged = [
+      ...notices,
+      ...boardPosts.filter((p) => !noticeIds.has(p.id)),
+    ]
+    return merged.slice(offset, offset + limit) as PostWithAuthor[]
+  }
+
+  // fallback (미사용)
+  const { data, error } = await supabase
     .from('posts')
-    .select(`
-      *,
-      author:users!posts_author_id_fkey (
-        id,
-        nickname,
-        avatar_url
-      )
-    `)
+    .select(selectQuery)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
 
-  if (boardType) {
-    query = query.eq('board_type', boardType)
-  }
-
-  const { data, error } = await query
-
   if (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('게시글 조회 실패:', error)
-    }
+    if (process.env.NODE_ENV === 'development') console.error('게시글 조회 실패:', error)
     return []
   }
-
   return (data || []) as PostWithAuthor[]
 }
 

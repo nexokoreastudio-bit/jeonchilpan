@@ -287,29 +287,29 @@ export default async function EditionPage({
             </div>
           )}
 
-          {/* 할인 홍보 배너 */}
-          <DiscountBanner />
-
-          {/* CTA 버튼 (상담 신청 / 견적 요청) */}
-          <div className="mt-8 p-6 bg-gray-50 border border-gray-100 rounded-xl">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div>
-                <h3 className="text-base font-semibold text-gray-900 mb-1">학원 수업 환경 개선이 궁금하신가요?</h3>
-                <p className="text-gray-600 text-sm">이 자료는 큰 화면에 띄워 활용하시기 좋습니다. 학원에 맞는 디지털 도구를 직접 체험해보세요.</p>
-              </div>
-              <div className="flex gap-3">
-                <Link
-                  href="/leads/demo"
-                  className="px-5 py-2.5 bg-[#1a1a1a] text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
-                >
-                  시연 예약
-                </Link>
-                <Link
-                  href="/leads/quote"
-                  className="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  견적 문의
-                </Link>
+          {/* 박스 섹션: 할인 배너 + CTA (통일된 카드 스타일) */}
+          <div className="space-y-4 mb-8">
+            <DiscountBanner />
+            <div className="bg-white border border-gray-200/80 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900 mb-1">학원 수업 환경 개선이 궁금하신가요?</h3>
+                  <p className="text-gray-600 text-sm">이 자료는 큰 화면에 띄워 활용하시기 좋습니다. 학원에 맞는 디지털 도구를 직접 체험해보세요.</p>
+                </div>
+                <div className="flex gap-3 shrink-0">
+                  <Link
+                    href="/leads/demo"
+                    className="px-5 py-2.5 bg-[#1a1a1a] text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    시연 예약
+                  </Link>
+                  <Link
+                    href="/leads/quote"
+                    className="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    견적 문의
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -367,19 +367,6 @@ export default async function EditionPage({
             allEditions={allEditions}
           />
         </main>
-
-        {/* 사이드바 */}
-        <aside className={styles.sidebar}>
-          <div className={styles.tipsBox}>
-            <h4>💡 실전 팁</h4>
-            <p>
-              <strong>QR 공유:</strong> 판서 내용을 즉시 PDF로 변환하여 학생들에게 전송하세요.
-            </p>
-            <p>
-              <strong>화면 분할:</strong> 한쪽에는 영상을, 다른 한쪽에는 판서를 동시에 진행하세요.
-            </p>
-          </div>
-        </aside>
       </div>
 
       {/* 푸터 */}

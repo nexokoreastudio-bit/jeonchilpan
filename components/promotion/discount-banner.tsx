@@ -9,26 +9,26 @@ import { Percent, ShoppingCart } from 'lucide-react'
  */
 export function DiscountBanner() {
   return (
-    <div className="bg-gradient-to-r from-nexo-navy via-nexo-navy to-nexo-cyan text-white rounded-xl p-6 mb-8 shadow-lg">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4 flex-1">
-          <div className="bg-white/20 rounded-full p-4">
-            <Percent className="w-8 h-8" />
+    <div className="bg-white border border-gray-200/80 rounded-xl p-5 shadow-sm overflow-hidden">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-start gap-4 flex-1">
+          <div className="bg-[#00c4b4]/10 rounded-xl p-3 shrink-0">
+            <Percent className="w-6 h-6 text-[#00c4b4]" />
           </div>
           <div>
-            <h3 className="text-xl font-bold mb-1">
+            <h3 className="text-base font-semibold text-gray-900 mb-1">
               🎁 구독자 인증 시 10% 할인 혜택
             </h3>
-            <p className="text-sm text-white/90">
-              전자칠판 구매 시 구독자 인증을 완료하시면 <strong>10% 할인</strong>이 자동 적용됩니다
+            <p className="text-sm text-gray-600">
+              전자칠판 구매 시 구독자 인증을 완료하시면 <strong className="text-gray-800">10% 할인</strong>이 자동 적용됩니다
             </p>
           </div>
         </div>
         <Link
           href="/mypage"
-          className="flex items-center gap-2 bg-white text-nexo-navy font-bold px-6 py-3 rounded-lg hover:bg-nexo-cyan hover:text-white transition-colors whitespace-nowrap"
+          className="flex items-center gap-2 bg-[#00c4b4] text-white font-medium px-5 py-2.5 rounded-lg hover:bg-[#00a396] transition-colors whitespace-nowrap text-sm"
         >
-          <ShoppingCart className="w-5 h-5" />
+          <ShoppingCart className="w-4 h-4" />
           인증하러 가기
         </Link>
       </div>

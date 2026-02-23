@@ -117,6 +117,7 @@ export function PostWriteForm({ userId, initialBoardType, isAdmin = false }: Pos
             {isAdmin && <SelectItem value="notice">공지사항</SelectItem>}
             <SelectItem value="bamboo">원장님 대나무숲</SelectItem>
             <SelectItem value="materials">공유자료실</SelectItem>
+            <SelectItem value="job">구인/구직</SelectItem>
             <SelectItem value="verification">구독자 인증 요청</SelectItem>
           </SelectContent>
         </Select>
@@ -147,6 +148,8 @@ export function PostWriteForm({ userId, initialBoardType, isAdmin = false }: Pos
               ? '예: OO학원 원장 홍길동입니다. 넥소 전자칠판 사용 중 / 구매 예정입니다.'
               : boardType === 'materials'
               ? '공유자료실에 등록된 다운로드 자료를 안내해주세요.'
+              : boardType === 'job'
+              ? '예: [구인] OO학원 수학 강사 모집 / [구직] 전자칠판 활용 가능한 강사 구합니다'
               : '마음 속 이야기를 편하게 나눠주세요. (익명 가능)'
           }
           className="mt-2 w-full min-h-[300px] p-3 border border-input rounded-md bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"

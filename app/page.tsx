@@ -75,6 +75,7 @@ export default async function HomePage() {
     notice: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
     bamboo: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
     materials: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
+    job: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
     verification: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
   }
   let popularPosts: Awaited<ReturnType<typeof getPopularPosts>> = []
@@ -104,6 +105,7 @@ export default async function HomePage() {
       postsNotice,
       postsBamboo,
       postsMaterials,
+      postsJob,
       postsVerification,
       popularPostsData,
       latestPostsForSidebarData,
@@ -124,6 +126,7 @@ export default async function HomePage() {
       getPostsByBoardType('notice', 10, 0),
       getPostsByBoardType('bamboo', 10, 0),
       getPostsByBoardType('materials', 10, 0),
+      getPostsByBoardType('job', 10, 0),
       getPostsByBoardType('verification', 10, 0),
       getPopularPosts(10),
       getLatestPosts(10),
@@ -140,6 +143,7 @@ export default async function HomePage() {
       notice: postsNotice,
       bamboo: postsBamboo,
       materials: postsMaterials,
+      job: postsJob,
       verification: postsVerification,
     }
     popularPosts = popularPostsData
@@ -318,6 +322,7 @@ export default async function HomePage() {
         postsByBoard.notice.length > 0 ||
         postsByBoard.bamboo.length > 0 ||
         postsByBoard.materials.length > 0 ||
+        postsByBoard.job.length > 0 ||
         postsByBoard.verification.length > 0) && (
         <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
           <div className="border-b border-gray-100 bg-slate-50/50 px-4 py-3">

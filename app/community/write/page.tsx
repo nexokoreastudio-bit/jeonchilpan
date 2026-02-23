@@ -9,7 +9,7 @@ interface PageProps {
   }
 }
 
-const VALID_BOARD_TYPES: BoardType[] = ['bamboo', 'materials', 'verification', 'notice']
+const VALID_BOARD_TYPES: BoardType[] = ['bamboo', 'materials', 'job', 'verification', 'notice']
 
 export default async function WritePostPage({ searchParams }: PageProps) {
   const supabase = await createClient()

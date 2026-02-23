@@ -6,7 +6,7 @@ import { getPostById } from '@/lib/supabase/posts'
 import { deletePost } from '@/app/actions/posts'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { ArrowLeft, MessageSquare, FileStack, ExternalLink, BadgeCheck, Download } from 'lucide-react'
+import { ArrowLeft, MessageSquare, FileStack, ExternalLink, BadgeCheck, Download, Briefcase } from 'lucide-react'
 import { HtmlContent } from '@/components/html-content'
 import { DeletePostButton } from '@/components/community/delete-post-button'
 import { LikeButton } from '@/components/community/like-button'
@@ -18,8 +18,10 @@ import { getNewsById } from '@/lib/supabase/news'
 import styles from '../community.module.css'
 
 const BOARD_TYPE_INFO = {
+  notice: { label: '공지사항', icon: MessageSquare },
   bamboo: { label: '원장님 대나무숲', icon: MessageSquare },
   materials: { label: '공유자료실', icon: FileStack },
+  job: { label: '구인/구직', icon: Briefcase },
   verification: { label: '구독자 인증', icon: BadgeCheck },
 } as const
 
