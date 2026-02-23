@@ -10,6 +10,9 @@ import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { CrawledNewsSection } from '@/components/news/crawled-news-section'
 import { ConsultingCheatSheet } from '@/components/consulting-cheat-sheet'
+import { PortalSidebar } from '@/components/portal/portal-sidebar'
+import { CommunityTabsSection } from '@/components/portal/community-tabs-section'
+import { getPopularPosts, getLatestPosts, getLatestComments, getPortalNotices } from '@/lib/supabase/portal'
 
 // 날짜 포맷팅 유틸리티 함수
 function formatEditionDate(editionId: string | null): string {
@@ -56,15 +59,37 @@ export default async function HomePage() {
   let latestReviews: Awaited<ReturnType<typeof getReviews>> = []
   let latestFieldNews: any[] = []
   let latestPosts: Awaited<ReturnType<typeof getPostsByBoardType>> = []
+  let postsByBoard = {
+    all: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
+    bamboo: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
+    materials: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
+    verification: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
+  }
+  let popularPosts: Awaited<ReturnType<typeof getPopularPosts>> = []
+  let latestPostsForSidebar: Awaited<ReturnType<typeof getLatestPosts>> = []
+  let latestComments: Awaited<ReturnType<typeof getLatestComments>> = []
+  let notices: Awaited<ReturnType<typeof getPortalNotices>> = []
 
   try {
     const supabase = await createClient()
     latestArticle = await getLatestArticle()
     allEditions = await getAllEditionsWithInfo()
 
-    // 최신 콘텐츠 데이터 가져오기
-    const [insights, reviews, fieldNews, posts] = await Promise.all([
-      getInsights(), // 모든 발행된 인사이트 가져오기
+    // 최신 콘텐츠 데이터 + 포털 사이드바용 데이터
+    const [
+      insights,
+      reviews,
+      fieldNews,
+      postsAll,
+      postsBamboo,
+      postsMaterials,
+      postsVerification,
+      popularPostsData,
+      latestPostsForSidebarData,
+      latestCommentsData,
+      noticesData,
+    ] = await Promise.all([
+      getInsights(),
       getReviews('latest', 3, 0),
       supabase
         .from('field_news')
@@ -73,12 +98,29 @@ export default async function HomePage() {
         .order('published_at', { ascending: false })
         .limit(3)
         .then(({ data }) => data || []),
-      getPostsByBoardType(null, 3, 0) // 전체 게시판에서 최신 3개 가져오기
+      getPostsByBoardType(null, 10, 0),
+      getPostsByBoardType('bamboo', 10, 0),
+      getPostsByBoardType('materials', 10, 0),
+      getPostsByBoardType('verification', 10, 0),
+      getPopularPosts(10),
+      getLatestPosts(10),
+      getLatestComments(10),
+      getPortalNotices(5),
     ])
     allInsights = insights
     latestReviews = reviews
     latestFieldNews = fieldNews || []
-    latestPosts = posts
+    latestPosts = postsAll
+    postsByBoard = {
+      all: postsAll,
+      bamboo: postsBamboo,
+      materials: postsMaterials,
+      verification: postsVerification,
+    }
+    popularPosts = popularPostsData
+    latestPostsForSidebar = latestPostsForSidebarData
+    latestComments = latestCommentsData
+    notices = noticesData
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       console.error('홈페이지 데이터 로드 실패:', error)
@@ -213,76 +255,33 @@ export default async function HomePage() {
       return dateB - dateA
     })
 
-  // 게시판 타입 라벨 매핑
-  const boardTypeLabels: Record<string, string> = {
-    bamboo: '원장님 대나무숲',
-    materials: '넥소 공식 자료실',
-    verification: '구독자 인증',
-  }
-
   // 상담팁 카테고리 인사이트 (컨닝페이퍼용)
   const consultingInsights = allInsights.filter((i) => i.category === '상담팁')
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
-      {/* 최상단: 커뮤니티 - 이슈화 */}
-      {latestPosts.length > 0 && (
-        <section className="py-12 md:py-16 bg-white border-b border-gray-100">
+      {/* 포털형 2단 레이아웃: 메인 + 우측 사이드바 (데스크톱에서만) */}
+      <div className="flex flex-col lg:flex-row container mx-auto max-w-7xl px-4 py-6 gap-6">
+        <div className="flex-1 min-w-0">
+      {/* 최상단: 커뮤니티 - 탭 UI (전체/대나무숲/자료실/구독자 인증) */}
+      {(postsByBoard.all.length > 0 ||
+        postsByBoard.bamboo.length > 0 ||
+        postsByBoard.materials.length > 0 ||
+        postsByBoard.verification.length > 0) && (
+        <section className="py-8 md:py-10">
           <div className="container mx-auto max-w-6xl px-4">
-            <div className="mb-10 flex items-end justify-between">
+            <div className="mb-4 flex items-end justify-between">
               <div>
                 <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#00c4b4] bg-[#00c4b4]/10 rounded mb-2">
                   커뮤니티
                 </span>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900">
                   지금 이런 이야기가 오가고 있어요
                 </h2>
                 <p className="text-gray-500 text-sm mt-1">학원장·강사님들이 공유하는 생생한 정보</p>
               </div>
-              <Link href="/community" className="hidden md:flex items-center gap-2 text-sm font-medium text-[#00c4b4] hover:underline">
-                커뮤니티 더 보기
-                <ArrowRight className="w-4 h-4" />
-              </Link>
             </div>
-            <div className="divide-y divide-gray-100">
-              {latestPosts.map((post) => (
-                <Link key={post.id} href={`/community/${post.id}`} className="block py-6 group first:pt-0">
-                  <article className="hover:bg-gray-50/50 -mx-2 px-2 py-2 rounded-lg transition-colors">
-                    <div className="flex items-center gap-2 mb-2">
-                      {post.board_type && (
-                        <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600">
-                          {boardTypeLabels[post.board_type] || post.board_type}
-                        </span>
-                      )}
-                      <span className="text-xs text-gray-400">
-                        {post.author?.nickname || '익명'} · {format(new Date(post.created_at), 'M.dd', { locale: ko })}
-                      </span>
-                    </div>
-                    <h3 className="text-base font-semibold text-gray-900 group-hover:text-[#00c4b4] transition-colors line-clamp-1 mb-1">
-                      {post.title}
-                    </h3>
-                    <p className="text-gray-500 text-sm line-clamp-2 mb-3">
-                      {post.content.replace(/<[^>]*>/g, '').substring(0, 120)}
-                      {post.content.replace(/<[^>]*>/g, '').length > 120 ? '...' : ''}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-gray-400">
-                      <span>👍 {post.likes_count}</span>
-                      <span>💬 {post.comments_count}</span>
-                      {post.images && post.images.length > 0 && <span>📷 {post.images.length}</span>}
-                    </div>
-                  </article>
-                </Link>
-              ))}
-            </div>
-            <div className="mt-6 md:hidden">
-              <Link
-                href="/community"
-                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#00c4b4]"
-              >
-                전체 보기
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+            <CommunityTabsSection postsByBoard={postsByBoard} />
           </div>
         </section>
       )}
@@ -542,6 +541,15 @@ export default async function HomePage() {
               </div>
             </section>
         </div>
+      </div>
+        </div>
+        {/* 우측 포털 사이드바 */}
+        <PortalSidebar
+          notices={notices}
+          popularPosts={popularPosts}
+          latestPosts={latestPostsForSidebar}
+          latestComments={latestComments}
+        />
       </div>
     </div>
   )

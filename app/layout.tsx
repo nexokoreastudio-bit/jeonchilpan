@@ -3,7 +3,7 @@ import { Noto_Sans_KR, Noto_Serif_KR } from 'next/font/google'
 import './globals.css'
 import { HeaderClient } from '@/components/layout/header-client'
 import { Footer } from '@/components/layout/footer'
-import { PageSidebar } from '@/components/layout/page-sidebar'
+import { MainLayout } from '@/components/layout/main-layout'
 import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/json-ld'
 import { KakaoSDKLoader } from '@/components/kakao/kakao-sdk-loader'
 import { SalesAIChatbot } from '@/components/chat/sales-ai-chatbot'
@@ -101,10 +101,7 @@ export default function RootLayout({
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         <HeaderClient />
-        <main className="flex-1 flex">
-          <div className="flex-1 min-w-0">{children}</div>
-          <PageSidebar />
-        </main>
+        <MainLayout>{children}</MainLayout>
         <Footer />
         <SalesAIChatbot />
         {/* 카카오 SDK 로드 (JavaScript 키가 설정된 경우에만) */}
