@@ -22,11 +22,12 @@ interface LeadsListProps {
   leads: LeadRow[]
 }
 
-const TYPE_LABELS = {
-  demo: '상담 신청',
+const TYPE_LABELS: Record<string, string> = {
+  demo: '시연 신청',
   quote: '견적 요청',
   consultation: '상담 요청',
-} as const
+  chatbot_consultation: '챗봇 상담',
+}
 
 const STATUS_LABELS = {
   pending: '대기중',
@@ -94,7 +95,7 @@ export function LeadsList({ leads }: LeadsListProps) {
                 <td className="px-4 py-3 text-sm text-gray-900">{lead.id}</td>
                 <td className="px-4 py-3 text-sm">
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                    {TYPE_LABELS[lead.type]}
+                    {TYPE_LABELS[lead.type] ?? lead.type}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-900">{lead.name}</td>

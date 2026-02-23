@@ -200,7 +200,7 @@ export async function getPortalLeadStats(): Promise<PortalLeadStats | null> {
       supabase
         .from('leads')
         .select('id', { count: 'exact', head: true })
-        .eq('type', 'consultation')
+        .in('type', ['consultation', 'chatbot_consultation'])
         .gte('created_at', toIso(startOfThisMonth)),
     ])
 

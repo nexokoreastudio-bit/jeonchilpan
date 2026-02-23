@@ -52,6 +52,7 @@ export default async function AdminLeadsPage() {
     completed: leads.filter(l => l.status === 'completed').length,
     demo: leads.filter(l => l.type === 'demo').length,
     quote: leads.filter(l => l.type === 'quote').length,
+    chatbot: leads.filter(l => l.type === 'chatbot_consultation').length,
   }
 
   return (
@@ -63,7 +64,7 @@ export default async function AdminLeadsPage() {
         </div>
 
         {/* 통계 카드 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow p-4">
             <div className="text-sm text-gray-600 mb-1">전체</div>
             <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
@@ -81,12 +82,16 @@ export default async function AdminLeadsPage() {
             <div className="text-2xl font-bold text-green-700">{stats.completed}</div>
           </div>
           <div className="bg-purple-50 rounded-lg shadow p-4">
-            <div className="text-sm text-purple-600 mb-1">상담 신청</div>
+            <div className="text-sm text-purple-600 mb-1">시연 신청</div>
             <div className="text-2xl font-bold text-purple-700">{stats.demo}</div>
           </div>
           <div className="bg-orange-50 rounded-lg shadow p-4">
             <div className="text-sm text-orange-600 mb-1">견적 요청</div>
             <div className="text-2xl font-bold text-orange-700">{stats.quote}</div>
+          </div>
+          <div className="bg-teal-50 rounded-lg shadow p-4">
+            <div className="text-sm text-teal-600 mb-1">챗봇 상담</div>
+            <div className="text-2xl font-bold text-teal-700">{stats.chatbot}</div>
           </div>
         </div>
 

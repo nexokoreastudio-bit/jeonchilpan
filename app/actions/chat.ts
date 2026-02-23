@@ -1,15 +1,43 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getNexoManualForPrompt } from '@/lib/chat/nexo-manual'
+import { NEXO_PRODUCT_MANUAL } from '@/lib/chat/nexo-product-manual'
 
-const SYSTEM_PROMPT = `당신은 넥소(NEXO) 전자칠판 영업·상담 담당자입니다.
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+
+function buildSystemPrompt(): string {
+  const manualText = getNexoManualForPrompt()
+  return `당신은 넥소(NEXO) 전자칠판 영업·상담 담당자입니다.
 - 넥소는 전자칠판을 제조·생산·판매하는 교육 기기 회사입니다.
 - 학원, 교습소, 학교 등 교육 현장에 전자칠판을 공급합니다.
-- 상담·견적 문의에 친절하고 전문적으로 답변하세요.
-- 가격·할인(예: 구독자 10% 할인), 설치, A/S, 데모 신청 등 안내 가능.
-- 구체적 견적은 "견적 요청" 또는 "상담 신청" 페이지를 안내하세요.
-- 답변은 2~4문장, 친근하고 명확하게. 이모지 적당히 사용.
-- 넥소가 학원이 아님을 명확히 하세요.`
+- 넥소가 학원이 아님을 명확히 하세요.
+
+[사이트 기능 링크 - 답변 시 상황에 맞는 링크를 반드시 포함하세요]
+- 시연 신청: ${BASE_URL}/leads/demo (쇼룸 방문 체험)
+- 견적 요청: ${BASE_URL}/leads/quote (맞춤 견적)
+- 자료실: ${BASE_URL}/resources (입시 자료, 다운로드)
+- 레벨별 혜택: ${BASE_URL}/benefits (구독자 10% 할인)
+- 오시는 길: ${BASE_URL}/location (쇼룸 주소, 연락처)
+- 고객 후기: ${BASE_URL}/reviews
+- 현장 소식: ${BASE_URL}/field (설치 사례)
+- 커뮤니티: ${BASE_URL}/community (원장님 소통)
+
+[넥소 FAQ - 자주 묻는 질문]
+${manualText}
+
+[넥소칠판 NX-Series 제품 사용 매뉴얼 - 아래 내용을 참고하여 사용법·트러블슈팅을 정확히 안내하세요]
+${NEXO_PRODUCT_MANUAL}
+
+[답변 규칙]
+- 시연/체험 문의 → 시연 신청 링크 포함
+- 가격/견적 문의 → 견적 요청 링크 포함
+- 할인 문의 → 레벨별 혜택 링크 포함
+- 상담사와 직접 상담이 필요할 때 → "연락처 남기기"를 눌러 이름·이메일을 남겨주시면 담당자가 연락드립니다
+- 답변은 2~4문장으로 완결. 친근하고 명확하게. 이모지 적당히 사용.`
+}
+
+const getSystemPrompt = () => buildSystemPrompt()
 
 export interface ChatMessage {
   role: 'user' | 'assistant'
@@ -31,17 +59,23 @@ export async function sendChatMessage(
     return { error: '챗봇 서비스가 설정되지 않았습니다.' }
   }
 
-  // 연락처 입력 시 리드 저장
+  // 연락처 입력 시 리드 저장 (대화 맥락 포함)
   if (contact?.name && contact?.email) {
+    const conversationSummary = messages
+      .slice(-6)
+      .map((m) => `${m.role === 'user' ? '사용자' : '상담원'}: ${m.content}`)
+      .join('\n')
+    const leadMessage = `[챗봇 상담] AI 챗봇에서 연락처 제출\n\n최근 대화:\n${conversationSummary || '(없음)'}`
+
     const supabase = await createClient()
     await (supabase.from('leads') as any).insert({
-      type: 'consultation',
+      type: 'chatbot_consultation',
       name: contact.name,
       email: contact.email,
       phone: contact.phone || null,
       academy_name: null,
       region: null,
-      message: '[챗봇 상담] AI 챗봇에서 연락처 제출',
+      message: leadMessage,
       referrer_code: null,
       status: 'pending',
     })
@@ -52,7 +86,7 @@ export async function sendChatMessage(
     .map((m) => (m.role === 'user' ? `사용자: ${m.content}` : `상담원: ${m.content}`))
     .join('\n')
 
-  const prompt = `${SYSTEM_PROMPT}
+  const prompt = `${getSystemPrompt()}
 
 === 이전 대화 ===
 ${conversationContext || '(없음)'}
@@ -62,7 +96,7 @@ ${lastUserMsg}
 
 위 맥락을 고려하여 상담원으로서 답변해주세요. 답변만 출력하세요.`
 
-  const modelsToTry = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
+  const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
 
   for (const modelName of modelsToTry) {
     try {
@@ -75,17 +109,33 @@ ${lastUserMsg}
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
               temperature: 0.7,
-              maxOutputTokens: 512,
+              maxOutputTokens: 2048,
             },
           }),
+          signal: AbortSignal.timeout(15000),
         }
       )
-      if (!res.ok) continue
+      if (!res.ok) {
+        const errText = await res.text()
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[Chat] ${modelName} 실패:`, res.status, errText.substring(0, 200))
+        }
+        continue
+      }
       const data = await res.json()
-      const textPart = data?.candidates?.[0]?.content?.parts?.[0]?.text
-      if (textPart) return { reply: String(textPart).trim() }
-    } catch {
-      // continue
+      const candidate = data?.candidates?.[0]
+      const parts = candidate?.content?.parts
+      if (parts?.length) {
+        const fullText = parts
+          .map((p: { text?: string }) => p?.text)
+          .filter(Boolean)
+          .join('')
+        if (fullText) return { reply: String(fullText).trim() }
+      }
+    } catch (e) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`[Chat] ${modelName} 예외:`, e)
+      }
     }
   }
   return { error: '챗봇 응답 생성에 실패했습니다.' }

@@ -44,10 +44,8 @@ export function SalesAIChatbot() {
       if (result.error) throw new Error(result.error)
       if (result.reply) setMessages((m) => [...m, { role: 'assistant', content: result.reply ?? '' }])
     } catch (e: any) {
-      setMessages((m) => [
-        ...m,
-        { role: 'assistant', content: '죄송합니다. 잠시 후 다시 시도해주세요.' },
-      ])
+      const errMsg = e?.message || '죄송합니다. 잠시 후 다시 시도해주세요.'
+      setMessages((m) => [...m, { role: 'assistant', content: errMsg }])
     } finally {
       setLoading(false)
     }
@@ -73,25 +71,26 @@ export function SalesAIChatbot() {
   if (!open) {
     return (
       <>
-        <button
-          onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#1a1a1a] text-white shadow-lg hover:bg-[#00c4b4] transition-colors flex items-center justify-center"
-          aria-label="챗봇 열기"
-        >
-          <MessageCircle className="w-6 h-6" />
-        </button>
         <Link
           href="/leads/quote"
           className="fixed bottom-24 right-6 z-40 px-4 py-2 rounded-lg bg-[#00c4b4] text-white text-sm font-medium shadow-lg hover:bg-[#00a396] transition-colors"
         >
           전자칠판 10% 할인가 견적 받기
         </Link>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="fixed bottom-6 right-6 z-[100] w-14 h-14 rounded-full bg-[#1a1a1a] text-white shadow-lg hover:bg-[#00c4b4] transition-colors flex items-center justify-center cursor-pointer [touch-action:manipulation]"
+          aria-label="넥소 전자칠판 상담 열기"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </button>
       </>
     )
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+    <div className="fixed bottom-6 right-6 z-[100] w-[380px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 bg-[#1a1a1a] text-white">
         <span className="font-semibold">넥소 전자칠판 상담</span>
         {!contactSubmitted && (
@@ -113,26 +112,51 @@ export function SalesAIChatbot() {
 
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[280px] max-h-[360px]"
+        className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3 min-h-[280px] max-h-[400px]"
       >
         {messages.length === 0 && (
-          <div className="text-slate-500 text-sm">
-            안녕하세요! 넥소 전자칠판에 대해 궁금한 점을 물어보세요.
+          <div className="space-y-3">
+            <div className="text-slate-500 text-sm">
+              안녕하세요! 넥소 전자칠판에 대해 궁금한 점을 물어보세요.
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href="/leads/demo"
+                className="inline-flex items-center px-3 py-1.5 rounded-full bg-[#00c4b4]/10 text-[#00c4b4] text-xs font-medium hover:bg-[#00c4b4]/20 transition-colors"
+              >
+                시연 신청
+              </Link>
+              <Link
+                href="/leads/quote"
+                className="inline-flex items-center px-3 py-1.5 rounded-full bg-[#00c4b4]/10 text-[#00c4b4] text-xs font-medium hover:bg-[#00c4b4]/20 transition-colors"
+              >
+                견적 요청
+              </Link>
+              {!contactSubmitted && (
+                <button
+                  type="button"
+                  onClick={toggleContactForm}
+                  className="inline-flex items-center px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-xs font-medium hover:bg-slate-200 transition-colors"
+                >
+                  상담사 연결
+                </button>
+              )}
+            </div>
           </div>
         )}
         {messages.map((m, i) => (
           <div
             key={i}
-            className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex min-w-0 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
+              className={`max-w-[85%] min-w-0 rounded-2xl px-4 py-2 text-sm break-words whitespace-pre-wrap ${
                 m.role === 'user'
                   ? 'bg-[#00c4b4] text-white'
                   : 'bg-slate-100 text-slate-800'
               }`}
             >
-              {m.content}
+              <ChatMessageContent content={m.content} isUser={m.role === 'user'} />
             </div>
           </div>
         ))}
@@ -203,7 +227,34 @@ export function SalesAIChatbot() {
         </Button>
       </form>
 
-      <div className="px-4 pb-3">
+      <div className="px-4 pb-3 space-y-2">
+        <div className="flex flex-wrap gap-2 justify-center">
+          <Link
+            href="/leads/demo"
+            className="text-xs text-[#00c4b4] hover:underline font-medium"
+          >
+            시연 신청
+          </Link>
+          <span className="text-slate-300">|</span>
+          <Link
+            href="/leads/quote"
+            className="text-xs text-[#00c4b4] hover:underline font-medium"
+          >
+            견적 요청
+          </Link>
+          {!contactSubmitted && (
+            <>
+              <span className="text-slate-300">|</span>
+              <button
+                type="button"
+                onClick={toggleContactForm}
+                className="text-xs text-slate-600 hover:text-[#00c4b4] font-medium"
+              >
+                상담사 연결
+              </button>
+            </>
+          )}
+        </div>
         <Link
           href="/leads/quote"
           className="block text-center py-2 text-sm font-medium text-[#00c4b4] hover:underline"
@@ -212,6 +263,26 @@ export function SalesAIChatbot() {
         </Link>
       </div>
     </div>
+  )
+}
+
+/** URL을 클릭 가능한 링크로 렌더링 */
+function ChatMessageContent({ content, isUser }: { content: string; isUser: boolean }) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g
+  const parts = content.split(urlRegex)
+  const linkClass = isUser ? 'underline opacity-90' : 'text-[#00c4b4] hover:underline'
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.startsWith('http') ? (
+          <a key={i} href={part} target="_blank" rel="noopener noreferrer" className={linkClass}>
+            {part}
+          </a>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
   )
 }
 

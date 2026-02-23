@@ -305,7 +305,7 @@ export interface Database {
       leads: {
         Row: {
           id: number
-          type: 'demo' | 'quote' | 'consultation'
+          type: 'demo' | 'quote' | 'consultation' | 'chatbot_consultation'
           name: string
           email: string
           phone: string | null
@@ -323,7 +323,7 @@ export interface Database {
         }
         Insert: {
           id?: number
-          type: 'demo' | 'quote' | 'consultation'
+          type: 'demo' | 'quote' | 'consultation' | 'chatbot_consultation'
           name: string
           email: string
           phone?: string | null
