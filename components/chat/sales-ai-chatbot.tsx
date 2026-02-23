@@ -266,20 +266,64 @@ export function SalesAIChatbot() {
   )
 }
 
-/** URL을 클릭 가능한 링크로 렌더링 */
+/** 마크다운 링크 [텍스트](url) 및 URL을 클릭 가능한 링크로 렌더링. 사이트 내 경로는 같은 탭에서 이동 */
 function ChatMessageContent({ content, isUser }: { content: string; isUser: boolean }) {
-  const urlRegex = /(https?:\/\/[^\s]+)/g
-  const parts = content.split(urlRegex)
   const linkClass = isUser ? 'underline opacity-90' : 'text-[#00c4b4] hover:underline'
+  const parts: { type: 'text' | 'internal' | 'external'; text: string; href?: string }[] = []
+  let remaining = content
+
+  // 1. 마크다운 링크 [텍스트](/path) 또는 [텍스트](https://...)
+  const mdLinkRegex = /\[([^\]]+)\]\((\/[^\)]+|https?:\/\/[^\)]+)\)/g
+  let match
+  let lastIndex = 0
+  while ((match = mdLinkRegex.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ type: 'text', text: content.slice(lastIndex, match.index) })
+    }
+    const href = match[2]
+    const isInternal = href.startsWith('/')
+    parts.push({
+      type: isInternal ? 'internal' : 'external',
+      text: match[1],
+      href,
+    })
+    lastIndex = match.index + match[0].length
+  }
+  if (lastIndex < content.length) {
+    remaining = content.slice(lastIndex)
+  } else {
+    remaining = ''
+  }
+
+  // 2. 남은 텍스트에서 http URL 추출
+  const urlRegex = /(https?:\/\/[^\s\)]+)/g
+  const urlParts = remaining.split(urlRegex)
+
   return (
     <>
-      {parts.map((part, i) =>
+      {parts.map((p, i) => {
+        if (p.type === 'text') return <span key={i}>{p.text}</span>
+        if (p.type === 'internal' && p.href)
+          return (
+            <Link key={i} href={p.href} className={linkClass}>
+              {p.text}
+            </Link>
+          )
+        if (p.type === 'external' && p.href)
+          return (
+            <a key={i} href={p.href} target="_blank" rel="noopener noreferrer" className={linkClass}>
+              {p.text}
+            </a>
+          )
+        return null
+      })}
+      {urlParts.map((part, i) =>
         part.startsWith('http') ? (
-          <a key={i} href={part} target="_blank" rel="noopener noreferrer" className={linkClass}>
+          <a key={`url-${i}`} href={part} target="_blank" rel="noopener noreferrer" className={linkClass}>
             {part}
           </a>
         ) : (
-          <span key={i}>{part}</span>
+          <span key={`url-${i}`}>{part}</span>
         )
       )}
     </>

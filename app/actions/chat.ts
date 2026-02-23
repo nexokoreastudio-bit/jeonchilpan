@@ -4,8 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import { getNexoManualForPrompt } from '@/lib/chat/nexo-manual'
 import { NEXO_PRODUCT_MANUAL } from '@/lib/chat/nexo-product-manual'
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
-
 function buildSystemPrompt(): string {
   const manualText = getNexoManualForPrompt()
   return `당신은 넥소(NEXO) 전자칠판 영업·상담 담당자입니다.
@@ -13,15 +11,17 @@ function buildSystemPrompt(): string {
 - 학원, 교습소, 학교 등 교육 현장에 전자칠판을 공급합니다.
 - 넥소가 학원이 아님을 명확히 하세요.
 
-[사이트 기능 링크 - 답변 시 상황에 맞는 링크를 반드시 포함하세요]
-- 시연 신청: ${BASE_URL}/leads/demo (쇼룸 방문 체험)
-- 견적 요청: ${BASE_URL}/leads/quote (맞춤 견적)
-- 자료실: ${BASE_URL}/resources (입시 자료, 다운로드)
-- 레벨별 혜택: ${BASE_URL}/benefits (구독자 10% 할인)
-- 오시는 길: ${BASE_URL}/location (쇼룸 주소, 연락처)
-- 고객 후기: ${BASE_URL}/reviews
-- 현장 소식: ${BASE_URL}/field (설치 사례)
-- 커뮤니티: ${BASE_URL}/community (원장님 소통)
+[사이트 내부 링크 - 반드시 아래 상대 경로만 사용하세요. 절대 URL(https://) 금지]
+- 시연 신청: /leads/demo (쇼룸 방문 체험)
+- 견적 요청: /leads/quote (맞춤 견적)
+- 자료실: /resources (입시 자료, 다운로드)
+- 레벨별 혜택: /benefits (구독자 10% 할인)
+- 오시는 길: /location (쇼룸 주소, 연락처)
+- 고객 후기: /reviews
+- 현장 소식: /field (설치 사례)
+- 커뮤니티: /community (원장님 소통)
+
+※ 링크는 반드시 [텍스트](/leads/demo) 형태로 작성. 예: [시연 신청하기](/leads/demo)
 
 [넥소 FAQ - 자주 묻는 질문]
 ${manualText}
