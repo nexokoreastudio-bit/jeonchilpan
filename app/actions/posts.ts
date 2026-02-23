@@ -26,6 +26,19 @@ export async function createPost(
       return { success: false, error: '인증되지 않은 사용자입니다.' }
     }
 
+    // 공지사항은 관리자만 작성 가능
+    if (boardType === 'notice') {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle()
+      const role = (profile as { role?: string } | null)?.role
+      if (role !== 'admin') {
+        return { success: false, error: '공지사항은 관리자만 작성할 수 있습니다.' }
+      }
+    }
+
     // 게시글 작성 (DB 트리거가 자동으로 포인트 지급)
     const result = await createPostQuery(boardType, title, content, authorId, images, rating, newsId)
 
@@ -51,7 +64,8 @@ export async function updatePost(
   title: string,
   content: string,
   userId: string,
-  boardType?: BoardType
+  boardType?: BoardType,
+  images?: string[] | null
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient()
@@ -61,7 +75,7 @@ export async function updatePost(
       return { success: false, error: '인증되지 않은 사용자입니다.' }
     }
 
-    const result = await updatePostQuery(postId, title, content, userId, boardType)
+    const result = await updatePostQuery(postId, title, content, userId, boardType, images)
 
     if (result.success) {
       revalidatePath('/community')

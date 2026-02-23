@@ -17,6 +17,10 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Malgun Gothic', 'Apple SD Gothic Neo', 'sans-serif'],
+        serif: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Malgun Gothic', 'Apple SD Gothic Neo', 'sans-serif'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

@@ -209,7 +209,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
             {matchedPosts.length > 0 && (
               <section>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  💬 커뮤니티 ({matchedPosts.length})
+                  💬 전칠판 ({matchedPosts.length})
                 </h2>
                 <div className="space-y-4">
                   {matchedPosts.map((post) => {
@@ -231,6 +231,11 @@ export default async function SearchPage({ searchParams }: PageProps) {
                                   {boardInfo.label}
                                 </Badge>
                               </>
+                            )}
+                            {new Date(post.created_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000 && (
+                              <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 text-[11px] font-bold leading-none text-white bg-[#f97316] rounded shrink-0">
+                                N
+                              </span>
                             )}
                             <span className="text-sm text-gray-500">
                               {post.author?.nickname || '익명'}

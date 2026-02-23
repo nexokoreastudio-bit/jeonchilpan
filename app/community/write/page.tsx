@@ -9,7 +9,7 @@ interface PageProps {
   }
 }
 
-const VALID_BOARD_TYPES: BoardType[] = ['bamboo', 'materials', 'verification']
+const VALID_BOARD_TYPES: BoardType[] = ['bamboo', 'materials', 'verification', 'notice']
 
 export default async function WritePostPage({ searchParams }: PageProps) {
   const supabase = await createClient()
@@ -19,6 +19,14 @@ export default async function WritePostPage({ searchParams }: PageProps) {
   if (authError || !user) {
     redirect('/login?redirect=/community/write')
   }
+
+  let isAdmin = false
+  const { data: profile } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle()
+  isAdmin = (profile as { role?: string } | null)?.role === 'admin'
 
   const initialBoardType =
     searchParams.type && VALID_BOARD_TYPES.includes(searchParams.type as BoardType)
@@ -30,11 +38,11 @@ export default async function WritePostPage({ searchParams }: PageProps) {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-nexo-navy mb-2">글쓰기</h1>
         <p className="text-gray-600">
-          커뮤니티에 글을 작성해주세요. 게시판을 선택하고 제목과 내용을 입력하세요.
+          전칠판에 글을 작성해주세요. 게시판을 선택하고 제목과 내용을 입력하세요.
         </p>
       </div>
 
-      <PostWriteForm userId={user.id} initialBoardType={initialBoardType} />
+      <PostWriteForm userId={user.id} initialBoardType={initialBoardType} isAdmin={isAdmin} />
     </div>
   )
 }

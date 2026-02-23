@@ -42,27 +42,27 @@ export function ConsultingCheatSheet({ insights }: ConsultingCheatSheetProps) {
   }
 
   return (
-    <section className="bg-slate-50 border-b border-slate-200 py-8 md:py-10">
-      <div className="container mx-auto max-w-6xl px-4">
-        <div className="flex items-end justify-between mb-6">
+    <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+      <div className="border-b border-gray-100 bg-slate-50/50 px-5 py-4">
+        <div className="flex items-end justify-between">
           <div>
-            <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
+            <h2 className="text-base font-bold text-slate-800">
               오늘의 상담 컨닝페이퍼
             </h2>
-            <p className="text-slate-600 mt-1 text-base md:text-lg">
+            <p className="text-slate-500 text-sm mt-1">
               학부모 상담 전 꼭 보세요. 핵심 멘트와 요약을 한 번에 복사할 수 있어요.
             </p>
           </div>
           <Link
             href="/news"
-            className="hidden md:flex items-center gap-2 text-base font-medium text-[#00c4b4] hover:text-[#00a396] transition-colors shrink-0"
+            className="hidden md:flex items-center gap-2 text-sm font-medium text-[#00c4b4] hover:text-[#00a396] transition-colors shrink-0"
           >
-            전체 보기
-            <ArrowRight className="w-4 h-4" />
+            전체 보기 <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      </div>
+      <div className="container mx-auto max-w-6xl px-5 py-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {insights.slice(0, 6).map((insight) => {
             const coreMent = insight.title
             const summary = insight.summary || ''
@@ -71,10 +71,10 @@ export function ConsultingCheatSheet({ insights }: ConsultingCheatSheetProps) {
             return (
               <article
                 key={insight.id}
-                className="bg-white rounded-xl border border-slate-200 p-5 md:p-6 hover:shadow-md transition-shadow"
+                className="bg-slate-50/50 border border-gray-100 p-5 rounded-lg hover:border-[#00c4b4]/30 hover:shadow-sm transition-all duration-200"
               >
                 <div className="flex items-start justify-between gap-2 mb-3">
-                  <span className="text-xs font-medium text-[#00c4b4] bg-[#00c4b4]/10 px-2 py-1 rounded">
+                  <span className="text-xs font-medium text-[#00c4b4] bg-[#00c4b4]/10 px-2 py-1 rounded-sm">
                     상담팁
                   </span>
                   <Link

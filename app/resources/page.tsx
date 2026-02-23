@@ -1,13 +1,10 @@
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getAllResources } from '@/lib/supabase/resources'
-import { format } from 'date-fns'
-import { ko } from 'date-fns/locale'
-import { Download, FileText, FileSpreadsheet, File, FileImage } from 'lucide-react'
+import { FileText, FileSpreadsheet, File, FileImage } from 'lucide-react'
 import { DownloadResourceButton } from '@/components/resources/download-button'
-import { ImageDownloadButton } from '@/components/resources/image-download-button'
 import { SafeImage } from '@/components/safe-image'
+import { PageSection } from '@/components/layout/page-section'
 import styles from './resources.module.css'
 
 const FILE_TYPE_ICONS = {
@@ -39,15 +36,10 @@ export default async function ResourcesPage() {
   const resources = await getAllResources('bronze', user.id)
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>📚 자료실</h1>
-        <p className={styles.subtitle}>
-          학원 수업·상담에 활용할 수 있는 입시 자료와 템플릿을 다운로드하세요. 큰 화면에 띄워 보시기 좋게 제작되었습니다.
-        </p>
-      </div>
-
-      {/* 자료 목록 */}
+      <PageSection
+        title="📚 자료실"
+        subtitle="학원 수업·상담에 활용할 수 있는 입시 자료와 템플릿을 다운로드하세요. 큰 화면에 띄워 보시기 좋게 제작되었습니다."
+      >
       {resources.length === 0 ? (
         <div className={styles.empty}>
           <p>아직 등록된 자료가 없습니다.</p>
@@ -116,7 +108,7 @@ export default async function ResourcesPage() {
           })}
         </div>
       )}
-    </div>
+      </PageSection>
   )
 }
 

@@ -46,11 +46,12 @@ export default async function MyPage() {
   } as UserRow)
 
   return (
-    <div className={styles.mypageContainer}>
-      <div className={styles.mypageHeader}>
-        <h1>👤 마이페이지</h1>
-        <p className={styles.subtitle}>구독자 전용 페이지입니다</p>
-      </div>
+    <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm max-w-3xl">
+          <div className="border-b border-gray-100 bg-slate-50/50 px-4 py-3">
+            <h1 className="text-sm font-bold text-slate-800">👤 마이페이지</h1>
+            <p className="text-slate-500 text-xs mt-0.5">구독자 전용 페이지입니다</p>
+          </div>
+          <div className="p-4 md:p-5 space-y-6">
 
       {/* 구독자 인증 할인 배지 */}
       <DiscountBadge 
@@ -119,8 +120,9 @@ export default async function MyPage() {
             </div>
           </div>
         </div>
-      )}
-    </div>
+        )}
+          </div>
+    </section>
   )
 }
 

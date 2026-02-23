@@ -119,7 +119,7 @@ export interface Database {
       posts: {
         Row: {
           id: number
-          board_type: 'bamboo' | 'materials' | 'verification' | null
+          board_type: 'bamboo' | 'materials' | 'verification' | 'notice' | null
           title: string
           content: string
           author_id: string | null
@@ -135,7 +135,7 @@ export interface Database {
         }
         Insert: {
           id?: number
-          board_type?: 'bamboo' | 'materials' | 'verification' | null
+          board_type?: 'bamboo' | 'materials' | 'verification' | 'notice' | null
           title: string
           content: string
           author_id?: string | null
@@ -151,7 +151,7 @@ export interface Database {
         }
         Update: {
           id?: number
-          board_type?: 'bamboo' | 'materials' | 'verification' | null
+          board_type?: 'bamboo' | 'materials' | 'verification' | 'notice' | null
           title?: string
           content?: string
           author_id?: string | null

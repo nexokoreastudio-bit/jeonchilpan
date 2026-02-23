@@ -12,7 +12,18 @@ import { CrawledNewsSection } from '@/components/news/crawled-news-section'
 import { ConsultingCheatSheet } from '@/components/consulting-cheat-sheet'
 import { PortalSidebar } from '@/components/portal/portal-sidebar'
 import { CommunityTabsSection } from '@/components/portal/community-tabs-section'
-import { getPopularPosts, getLatestPosts, getLatestComments, getPortalNotices } from '@/lib/supabase/portal'
+import {
+  getPopularPosts,
+  getLatestPosts,
+  getLatestComments,
+  getPortalNotices,
+  getPortalEducationNews,
+  getPortalLeadStats,
+  getPortalEngagementStats,
+} from '@/lib/supabase/portal'
+import { MonitoringDashboard } from '@/components/portal/monitoring-dashboard'
+import { CollapsibleSection } from '@/components/portal/collapsible-section'
+import { CenterBanner } from '@/components/shared/center-banner'
 
 // 날짜 포맷팅 유틸리티 함수
 function formatEditionDate(editionId: string | null): string {
@@ -61,6 +72,7 @@ export default async function HomePage() {
   let latestPosts: Awaited<ReturnType<typeof getPostsByBoardType>> = []
   let postsByBoard = {
     all: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
+    notice: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
     bamboo: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
     materials: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
     verification: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
@@ -69,6 +81,14 @@ export default async function HomePage() {
   let latestPostsForSidebar: Awaited<ReturnType<typeof getLatestPosts>> = []
   let latestComments: Awaited<ReturnType<typeof getLatestComments>> = []
   let notices: Awaited<ReturnType<typeof getPortalNotices>> = []
+  let educationNews: Awaited<ReturnType<typeof getPortalEducationNews>> = []
+  let leadStats: Awaited<ReturnType<typeof getPortalLeadStats>> = null
+  let engagementStats: Awaited<ReturnType<typeof getPortalEngagementStats>> = {
+    reviewCount: 0,
+    avgRating: 0,
+    postsThisWeek: 0,
+    commentsThisWeek: 0,
+  }
 
   try {
     const supabase = await createClient()
@@ -81,6 +101,7 @@ export default async function HomePage() {
       reviews,
       fieldNews,
       postsAll,
+      postsNotice,
       postsBamboo,
       postsMaterials,
       postsVerification,
@@ -88,6 +109,7 @@ export default async function HomePage() {
       latestPostsForSidebarData,
       latestCommentsData,
       noticesData,
+      educationNewsData,
     ] = await Promise.all([
       getInsights(),
       getReviews('latest', 3, 0),
@@ -99,6 +121,7 @@ export default async function HomePage() {
         .limit(3)
         .then(({ data }) => data || []),
       getPostsByBoardType(null, 10, 0),
+      getPostsByBoardType('notice', 10, 0),
       getPostsByBoardType('bamboo', 10, 0),
       getPostsByBoardType('materials', 10, 0),
       getPostsByBoardType('verification', 10, 0),
@@ -106,13 +129,15 @@ export default async function HomePage() {
       getLatestPosts(10),
       getLatestComments(10),
       getPortalNotices(5),
-    ])
+      getPortalEducationNews(5),
+    ] as const)
     allInsights = insights
     latestReviews = reviews
     latestFieldNews = fieldNews || []
     latestPosts = postsAll
     postsByBoard = {
       all: postsAll,
+      notice: postsNotice,
       bamboo: postsBamboo,
       materials: postsMaterials,
       verification: postsVerification,
@@ -121,6 +146,13 @@ export default async function HomePage() {
     latestPostsForSidebar = latestPostsForSidebarData
     latestComments = latestCommentsData
     notices = noticesData
+    educationNews = educationNewsData
+    const [leadStatsData, engagementStatsData] = await Promise.all([
+      getPortalLeadStats(),
+      getPortalEngagementStats(),
+    ])
+    leadStats = leadStatsData
+    engagementStats = engagementStatsData
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       console.error('홈페이지 데이터 로드 실패:', error)
@@ -259,28 +291,49 @@ export default async function HomePage() {
   const consultingInsights = allInsights.filter((i) => i.category === '상담팁')
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
-      {/* 포털형 2단 레이아웃: 메인 + 우측 사이드바 (데스크톱에서만) */}
-      <div className="flex flex-col lg:flex-row container mx-auto max-w-7xl px-4 py-6 gap-6">
-        <div className="flex-1 min-w-0">
-      {/* 최상단: 커뮤니티 - 탭 UI (전체/대나무숲/자료실/구독자 인증) */}
+    <div className="min-h-screen bg-[#f4f6f8]">
+      {/* 포털형 2단: 콘텐츠 | 우측 사이드바 */}
+      <div className="flex flex-col lg:flex-row container mx-auto max-w-7xl px-4 md:px-6 py-8 md:py-10 gap-6 xl:gap-8">
+        <div className="flex-1 min-w-0 flex flex-col gap-4 md:gap-6">
+          {/* 콘텐츠 영역 - 배너와 공간을 나누지 않음, 항상 full width */}
+          <div className="flex-1 min-w-0 space-y-2 md:space-y-3">
+      {/* 최상단: 실시간 현황 (접기/펼치기) */}
+      <CollapsibleSection
+        title="실시간 현황"
+        subtitle="시연·견적 문의와 고객 후기를 한눈에"
+        badge={
+          ((leadStats?.demoThisWeek ?? 0) > 0 || (leadStats?.quoteThisWeek ?? 0) > 0 || engagementStats.postsThisWeek > 0 || engagementStats.commentsThisWeek > 0) ? (
+            <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white bg-[#00c4b4] rounded">
+              NEW
+            </span>
+          ) : undefined
+        }
+        defaultOpen={false}
+      >
+        <MonitoringDashboard leadStats={leadStats} engagementStats={engagementStats} />
+      </CollapsibleSection>
+
+      {/* 전칠판 - 한국 전자칠판 공개 커뮤니티 */}
       {(postsByBoard.all.length > 0 ||
+        postsByBoard.notice.length > 0 ||
         postsByBoard.bamboo.length > 0 ||
         postsByBoard.materials.length > 0 ||
         postsByBoard.verification.length > 0) && (
-        <section className="py-8 md:py-10">
-          <div className="container mx-auto max-w-6xl px-4">
-            <div className="mb-4 flex items-end justify-between">
-              <div>
-                <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#00c4b4] bg-[#00c4b4]/10 rounded mb-2">
-                  커뮤니티
+        <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+          <div className="border-b border-gray-100 bg-slate-50/50 px-4 py-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-sm font-bold text-slate-800">
+                전칠판 - 한국 전자칠판 공개 커뮤니티
+              </h2>
+              {(engagementStats.postsThisWeek > 0 || engagementStats.commentsThisWeek > 0) && (
+                <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white bg-[#00c4b4] rounded">
+                  NEW
                 </span>
-                <h2 className="text-lg md:text-xl font-bold text-gray-900">
-                  지금 이런 이야기가 오가고 있어요
-                </h2>
-                <p className="text-gray-500 text-sm mt-1">학원장·강사님들이 공유하는 생생한 정보</p>
-              </div>
+              )}
             </div>
+            <p className="text-slate-500 text-xs mt-0.5">전자칠판·스마트보드 사용자들이 모이는 공개 포럼</p>
+          </div>
+          <div className="p-0">
             <CommunityTabsSection postsByBoard={postsByBoard} />
           </div>
         </section>
@@ -339,35 +392,38 @@ export default async function HomePage() {
       )}
 
       {/* 오늘의 교육 뉴스 (실시간 큐레이션) */}
-      <CrawledNewsSection limit={3} />
+      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+        <CrawledNewsSection limit={3} embedded />
+      </section>
+
+      {/* 중앙 배너 */}
+      <CenterBanner variant="outline" />
 
       {/* 큐레이션 인사이트 - 학부모 상담에 활용 */}
-      <section className="py-20 md:py-24 bg-[#fafafa]">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="flex items-end justify-between mb-14">
+      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+        <div className="border-b border-gray-100 bg-slate-50/50 px-5 py-4">
+          <div className="flex items-end justify-between">
             <div>
-              <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#00c4b4] bg-[#00c4b4]/10 rounded mb-3">
-                NEXO 에디터 큐레이션
-              </span>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-                학부모 상담에 쓸 오늘의 인사이트
+              <h2 className="text-base font-bold text-slate-800">
+                NEXO 에디터 큐레이션 - 학부모 상담에 쓸 오늘의 인사이트
               </h2>
-              <p className="text-gray-500 mt-3 text-base max-w-xl">
-                입시·교육 정책을 전문가 관점에서 해석해드립니다. 상담실에서 바로 활용해보세요.
+              <p className="text-slate-500 text-sm mt-1">
+                입시·교육 정책을 전문가 관점에서 해석해드립니다.
               </p>
             </div>
             <Link href="/news" className="hidden md:flex items-center gap-2 text-sm font-medium text-[#00c4b4] hover:text-[#00a396] transition-colors shrink-0">
-              발행호 전체 보기
-              <ArrowRight className="w-4 h-4" />
+              발행호 전체 보기 <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
+        </div>
+        <div className="container mx-auto max-w-6xl px-6 py-12 md:py-14">
           
           {editionsWithInsights.filter(edition => edition.insightsCount > 0).length === 0 ? (
-            <div className="text-center py-16 text-gray-500">
-              <p>발행된 인사이트가 없습니다.</p>
+            <div className="text-center py-20 text-slate-500 text-sm">
+              발행된 인사이트가 없습니다.
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
               {editionsWithInsights
                 .filter(edition => {
                   // 인사이트가 있고, relatedInsights가 배열인 발행호만 표시
@@ -389,9 +445,9 @@ export default async function HomePage() {
                     href={`/news/${edition.edition_id}`}
                     className="group block"
                   >
-                    <article className="h-full flex flex-col bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200">
+                    <article className="h-full flex flex-col bg-white overflow-hidden border border-gray-100 rounded-lg hover:border-[#00c4b4]/30 hover:shadow-md transition-all duration-200">
                       {edition.thumbnail_url ? (
-                        <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-50">
+                        <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-50 rounded-t-lg">
                           <Image
                             src={edition.thumbnail_url}
                             alt={edition.title || '인사이트'}
@@ -400,7 +456,7 @@ export default async function HomePage() {
                           />
                         </div>
                       ) : (
-                        <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-50">
+                        <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-50 rounded-t-lg">
                           <Image
                             src="/assets/images/nexo_logo_black.png"
                             alt={edition.title || '인사이트'}
@@ -409,8 +465,8 @@ export default async function HomePage() {
                           />
                         </div>
                       )}
-                      <div className="p-5 flex-1 flex flex-col">
-                        <div className="flex items-center gap-2 mb-3">
+                      <div className="p-6 flex-1 flex flex-col">
+                        <div className="flex items-center gap-2 mb-4">
                           <span className="text-xs text-gray-500">
                             {formatEditionDate(edition.edition_id)}
                           </span>
@@ -420,15 +476,15 @@ export default async function HomePage() {
                             </span>
                           )}
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-[#00c4b4] transition-colors line-clamp-2">
+                        <h3 className="text-lg font-semibold text-slate-800 mb-3 group-hover:text-[#00c4b4] transition-colors line-clamp-2">
                           {edition.title || '인사이트'}
                         </h3>
                         {edition.subtitle && (
-                          <p className="text-gray-500 text-sm line-clamp-2 flex-1">
+                          <p className="text-slate-500 text-sm line-clamp-2 flex-1">
                             {edition.subtitle}
                           </p>
                         )}
-                        <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#00c4b4] group-hover:gap-2 transition-all">
+                        <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[#00c4b4] group-hover:gap-2 transition-all">
                           인사이트 읽기
                           <ArrowRight className="w-4 h-4" />
                         </span>
@@ -467,7 +523,7 @@ export default async function HomePage() {
             href={process.env.NEXT_PUBLIC_KAKAO_OPEN_CHAT_URL || 'https://open.kakao.com/o/sample'}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[#FEE500] text-[#1a1a1a] font-bold text-sm hover:bg-[#f5dc00] transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-[#FEE500] text-[#1a1a1a] font-bold text-sm hover:bg-[#f5dc00] transition-colors"
           >
             정보방 입장하기
             <ArrowRight className="w-5 h-5" />
@@ -475,17 +531,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 메인 콘텐츠 */}
-      <div className="container mx-auto max-w-6xl px-4 pt-20 pb-16 md:pt-24 md:pb-20">
-        <div className="space-y-16">
-            {/* 현장 소식 & 고객 후기 */}
-            <section>
-              <div className="grid md:grid-cols-2 gap-12">
+      {/* 메인 콘텐츠 - 현장 소식 & 고객 후기 */}
+      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+        <div className="border-b border-gray-100 bg-slate-50/50 px-5 py-4">
+          <h2 className="text-base font-bold text-slate-800">현장 소식 & 고객 후기</h2>
+          <p className="text-slate-500 text-sm mt-1">전국 학원들의 변화 스토리와 원장님·강사님 후기</p>
+        </div>
+        <div className="container mx-auto max-w-6xl px-5 py-10">
+          <div className="grid md:grid-cols-2 gap-10">
                 {latestFieldNews.length > 0 && (
-                  <div>
-                    <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100 rounded mb-2">현장</span>
-                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1">전국 학원들의 변화 스토리</h3>
-                    <p className="text-gray-500 text-sm mb-6">실제 현장에서 벌어지는 수업 환경 개선 이야기</p>
+                  <div className="bg-slate-50/50 border border-gray-100 p-5 rounded-lg">
+                    <h3 className="text-base font-bold text-slate-800 mb-2">전국 학원들의 변화 스토리</h3>
+                    <p className="text-slate-500 text-sm mb-5">실제 현장에서 벌어지는 수업 환경 개선 이야기</p>
                     <div className="space-y-6">
                       {latestFieldNews.map((news: any) => (
                         <Link key={news.id} href={`/field#news-${news.id}`} className="block group">
@@ -513,14 +570,13 @@ export default async function HomePage() {
                   </div>
                 )}
                 {latestReviews.length > 0 && (
-                  <div>
-                    <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100 rounded mb-2">후기</span>
-                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1">원장님·강사님이 직접 남긴 후기</h3>
-                    <p className="text-gray-500 text-sm mb-6">실제 사용 후 솔직하게 써주신 생생한 이야기</p>
+                  <div className="bg-slate-50/50 border border-gray-100 p-5 rounded-lg">
+                    <h3 className="text-base font-bold text-slate-800 mb-2">원장님·강사님이 직접 남긴 후기</h3>
+                    <p className="text-slate-500 text-sm mb-5">실제 사용 후 솔직하게 써주신 생생한 이야기</p>
                     <div className="space-y-6">
                       {latestReviews.map((review) => (
                         <Link key={review.id} href={`/reviews#review-${review.id}`} className="block group">
-                          <article className="p-4 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
+                          <article className="p-4 border border-gray-100 rounded-lg hover:border-[#00c4b4]/30 hover:shadow-sm transition-all duration-200 bg-white">
                             <div className="flex items-start justify-between gap-2 mb-2">
                               <h4 className="text-sm font-semibold text-gray-900 group-hover:text-[#00c4b4] transition-colors line-clamp-1 flex-1">
                                 {review.title}
@@ -538,14 +594,15 @@ export default async function HomePage() {
                     </div>
                   </div>
                 )}
-              </div>
-            </section>
+          </div>
         </div>
-      </div>
+      </section>
+          </div>
         </div>
         {/* 우측 포털 사이드바 */}
         <PortalSidebar
           notices={notices}
+          educationNews={educationNews}
           popularPosts={popularPosts}
           latestPosts={latestPostsForSidebar}
           latestComments={latestComments}

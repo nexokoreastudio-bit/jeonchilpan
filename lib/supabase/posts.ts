@@ -5,11 +5,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database'
 
-/** Lean 리뉴얼: board_type (대나무숲 + 공식 자료실 + 구독자 인증) */
+/** Lean 리뉴얼: board_type (대나무숲 + 공식 자료실 + 구독자 인증 + 공지사항) */
 export type BoardType =
   | 'bamboo'       // 원장님 대나무숲 - 익명/하소연
-  | 'materials'    // 넥소 공식 자료실 - 다운로드 전용
+  | 'materials'    // 공유자료실 - 다운로드 전용
   | 'verification' // 구독자 인증 요청 - 인증글 작성
+  | 'notice'       // 공지사항 - 관리자 전용
 
 type Post = Database['public']['Tables']['posts']['Row']
 type PostRow = Database['public']['Tables']['posts']['Row']
@@ -151,7 +152,8 @@ export async function updatePost(
   title: string,
   content: string,
   userId: string,
-  boardType?: BoardType
+  boardType?: BoardType,
+  images?: string[] | null
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient()
@@ -186,6 +188,7 @@ export async function updatePost(
       title,
       content,
       ...(boardType && { board_type: boardType }),
+      ...(images !== undefined && { images }),
       updated_at: new Date().toISOString(),
     }
 

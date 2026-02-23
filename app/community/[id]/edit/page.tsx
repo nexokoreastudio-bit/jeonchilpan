@@ -64,6 +64,7 @@ export default async function CommunityEditPage({ params }: PageProps) {
         initialBoardType={boardType}
         initialTitle={post.title}
         initialContent={post.content}
+        initialImages={post.images || undefined}
       />
     </div>
   )

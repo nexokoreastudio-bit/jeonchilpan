@@ -13,7 +13,7 @@ export function Footer() {
                 <span className="text-lg font-bold text-white tracking-tight">NEXO Daily</span>
               </Link>
               <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
-                학원장·강사님을 위한 교육 정보 큐레이션과 커뮤니티입니다.
+                NEXO가 운영하는 한국 전자칠판 공개 커뮤니티입니다.
                 입시 뉴스, 학원 운영 팁, 자료 공유를 통해 현장을 지원합니다.
               </p>
             </div>
@@ -28,7 +28,7 @@ export function Footer() {
                   발행호
                 </Link>
                 <Link href="/community" className="text-sm text-slate-400 hover:text-white transition-colors">
-                  커뮤니티
+                  전칠판
                 </Link>
                 <Link href="/seminar" className="text-sm text-slate-400 hover:text-white transition-colors">
                   세미나 (준비중)

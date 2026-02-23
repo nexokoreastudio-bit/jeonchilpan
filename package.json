@@ -25,7 +25,13 @@
     "generate:insight-images:all": "node scripts/auto-generate-insight-images.js --all",
     "generate:insight-images:unsplash": "node scripts/auto-generate-insight-images.js --unsplash-only",
     "create:community": "tsx scripts/create-natural-community-posts.ts",
-    "create:resources-bucket": "node scripts/create-resources-bucket.js"
+    "seed:sample": "tsx scripts/seed-sample-community.ts",
+    "seed:comments": "tsx scripts/seed-sample-comments.ts",
+    "seed:comments:post-specific": "tsx scripts/seed-post-specific-comments.ts",
+    "remove:nexo-comments": "tsx scripts/remove-nexo-comments.ts",
+    "create:resources-bucket": "node scripts/create-resources-bucket.js",
+    "create:community-materials-bucket": "node scripts/create-community-materials-bucket.js",
+    "delete:materials-posts": "tsx scripts/delete-materials-posts.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

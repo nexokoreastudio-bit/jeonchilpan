@@ -56,8 +56,9 @@
 
 .empty {
   text-align: center;
-  padding: 80px 20px;
-  color: #9ca3af;
+  padding: 64px 20px;
+  color: #64748b;
+  font-size: 0.9375rem;
 }
 
 .resourcesGrid {
@@ -75,14 +76,15 @@
 
 .resourceCard {
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 6px;
   padding: 0;
   display: flex;
   flex-direction: column;
   transition: border-color 0.2s;
   overflow: hidden;
   min-height: 380px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .resourceCard:hover {

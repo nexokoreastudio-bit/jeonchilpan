@@ -23,20 +23,21 @@
 
 .empty {
   text-align: center;
-  padding: 80px 20px;
-  background: #f9f9f9;
-  border-radius: 12px;
+  padding: 64px 20px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px dashed rgba(226, 232, 240, 0.9);
 }
 
 .empty p {
-  font-size: 1.125rem;
-  color: #666;
+  font-size: 0.9375rem;
+  color: #64748b;
   margin-bottom: 8px;
 }
 
 .emptySubtext {
-  font-size: 0.875rem;
-  color: #999;
+  font-size: 0.8125rem;
+  color: #94a3b8;
 }
 
 .newsGrid {
@@ -54,20 +55,18 @@
 
 .newsCard {
   background: white;
-  border: 1px solid #e8e8e8;
-  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 6px;
   overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: border-color 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .newsCard:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  transform: translateY(-4px);
-  border-color: #d0d0d0;
+  border-color: #00c4b4;
 }
 
 .thumbnail {

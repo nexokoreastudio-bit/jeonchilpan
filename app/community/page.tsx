@@ -3,19 +3,29 @@ import { createClient } from '@/lib/supabase/server'
 import { getPostsByBoardType, type BoardType } from '@/lib/supabase/posts'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { FileStack, MessageSquare, BadgeCheck } from 'lucide-react'
+import { FileStack, MessageSquare, BadgeCheck, FileText } from 'lucide-react'
 import type { Metadata } from 'next'
 import { ForumJsonLd } from '@/components/seo/json-ld'
 import styles from './community.module.css'
+import { Megaphone } from 'lucide-react'
+import { CenterBanner } from '@/components/shared/center-banner'
+
+/** 최근 7일 이내 작성된 글인지 (NEW 배지용) */
+function isNewPost(createdAt: string): boolean {
+  const created = new Date(createdAt).getTime()
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
+  return created > sevenDaysAgo
+}
 
 const BOARD_TYPES = [
   { type: null, label: '전체', icon: MessageSquare },
+  { type: 'notice', label: '공지사항', icon: Megaphone },
   { type: 'bamboo', label: '원장님 대나무숲', icon: MessageSquare },
-  { type: 'materials', label: '넥소 공식 자료실', icon: FileStack },
+  { type: 'materials', label: '공유자료실', icon: FileStack },
   { type: 'verification', label: '구독자 인증', icon: BadgeCheck },
 ] as const
 
-const VALID_BOARD_TYPES: BoardType[] = ['bamboo', 'materials', 'verification']
+const VALID_BOARD_TYPES: BoardType[] = ['notice', 'bamboo', 'materials', 'verification']
 
 interface PageProps {
   searchParams: {
@@ -24,11 +34,11 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: '커뮤니티 | 학원장·강사 전문가 네트워크',
-  description: '넥소 전자칠판 사용자들의 자료 공유, 지역 네트워크, 구인구직, 자유소통 공간. 학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 커뮤니티.',
-  keywords: ['넥소 커뮤니티', '학원장 모임', '강사 커뮤니티', '전자칠판 자료', '학원 구인구직', '지역 학원 네트워크'],
+  title: '전칠판 | 한국 전자칠판 공개 커뮤니티 - NEXO 운영',
+  description: '한국 전자칠판·스마트보드 사용자들의 자료 공유와 소통 공간. NEXO가 운영합니다.',
+  keywords: ['전칠판', '넥소 전자칠판', '학원장 모임', '강사 커뮤니티', '전자칠판 자료', '학원 구인구직', '지역 학원 네트워크'],
   openGraph: {
-    title: '커뮤니티 | NEXO Daily',
+    title: '전칠판 | NEXO Daily',
     description: '넥소 전자칠판 사용자들의 자료 공유, 지역 네트워크, 구인구직, 자유소통 공간.',
   },
 }
@@ -58,18 +68,28 @@ export default async function CommunityPage({ searchParams }: PageProps) {
   return (
     <>
       <ForumJsonLd
-        name="NEXO Daily 커뮤니티"
-        description="넥소 전자칠판 사용자들의 자료 공유, 지역 네트워크, 구인구직, 자유소통 공간. 학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 커뮤니티."
+        name="전칠판 - NEXO Daily 전자칠판 커뮤니티"
+        description="넥소 전자칠판 사용자들의 자료 공유, 지역 네트워크, 구인구직, 자유소통 공간. 학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 전칠판."
         url={communityUrl}
       />
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>💬 커뮤니티</h1>
-        <p className={styles.subtitle}>
-          학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 전문가 플랫폼
-        </p>
-      </div>
-
+    <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-start">
+    <section className="flex-1 min-w-0 bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+          <div className="border-b border-gray-100 bg-slate-50/50 px-4 py-3">
+            <h1 className="text-sm font-bold text-slate-800">
+              💬 전칠판
+              {boardType === 'materials' && (
+                <span className="text-slate-600 font-normal ml-1">
+                  {' > '}공유자료실
+                </span>
+              )}
+            </h1>
+            <p className="text-slate-500 text-xs mt-0.5">
+              {boardType === 'materials'
+                ? '템플릿·자료를 공유하고 큰 화면에서 활용하세요'
+                : '학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 전문가 플랫폼'}
+            </p>
+          </div>
+          <div className="p-4 md:p-5">
       {/* 게시판 탭 */}
       <div className={styles.tabs}>
         {BOARD_TYPES.map((board) => {
@@ -98,6 +118,11 @@ export default async function CommunityPage({ searchParams }: PageProps) {
         )}
       </div>
 
+      {/* 중앙 배너 - 콘텐츠와 사이드바 사이 */}
+      <div className="mb-6">
+        <CenterBanner variant="primary" />
+      </div>
+
       {/* 게시글 목록 */}
       {posts.length === 0 ? (
         <div className={styles.empty}>
@@ -114,46 +139,31 @@ export default async function CommunityPage({ searchParams }: PageProps) {
             <Link
               key={post.id}
               href={`/community/${post.id}`}
-              className={styles.postCard}
-              data-board={post.board_type === 'bamboo' ? 'bamboo' : undefined}
+              className={styles.postRow}
             >
-              <div className={styles.postHeader}>
-                <div className={styles.postMeta}>
-                  <span className={styles.boardType}>
-                    {BOARD_TYPES.find(b => b.type === post.board_type)?.label || '전체'}
-                  </span>
-                  <span className={styles.author}>
-                    {post.author?.nickname || '익명'}
-                  </span>
-                  <span className={styles.date}>
-                    {format(new Date(post.created_at), 'yyyy.MM.dd', { locale: ko })}
-                  </span>
+              <div className={styles.postRowLeft}>
+                <h2 className={styles.postTitle}>
+                  {post.title}
+                  {post.comments_count > 0 && (
+                    <span className={styles.commentCount}> [{post.comments_count}]</span>
+                  )}
+                </h2>
+                <div className={styles.postIcons}>
+                  {isNewPost(post.created_at) && (
+                    <span className={styles.newBadge}>N</span>
+                  )}
+                  {(post.images?.length ?? 0) > 0 && (
+                    <FileText className={styles.attachIcon} />
+                  )}
                 </div>
-                {post.updated_at !== post.created_at && (
-                  <span className={styles.updated}>수정됨</span>
-                )}
               </div>
-              <h2 className={styles.postTitle}>{post.title}</h2>
-              <p className={styles.postContent}>
-                {post.content.replace(/<[^>]*>/g, '').substring(0, 150)}
-                {post.content.replace(/<[^>]*>/g, '').length > 150 ? '...' : ''}
-              </p>
-              <div className={styles.postFooter}>
-                <div className={styles.postStats}>
-                  <div className={styles.statItem}>
-                    <span>👍</span>
-                    <span>{post.likes_count}</span>
-                  </div>
-                  <div className={styles.statItem}>
-                    <MessageSquare className="w-4 h-4" />
-                    <span>{post.comments_count}</span>
-                  </div>
-                </div>
-                {post.images && post.images.length > 0 && (
-                  <span className={styles.hasImages}>
-                    📷 <span>{post.images.length}</span>
-                  </span>
-                )}
+              <div className={styles.postRowRight}>
+                <span className={styles.authorName} title={post.author?.nickname || '익명'}>
+                  {post.author?.nickname || '익명'}
+                </span>
+                <span className={styles.date}>
+                  {format(new Date(post.created_at), 'yyyy.MM.dd', { locale: ko })}
+                </span>
               </div>
             </Link>
           ))}
@@ -161,14 +171,16 @@ export default async function CommunityPage({ searchParams }: PageProps) {
       )}
 
       {/* 자연스러운 연결 - 자료 공유와 연계 */}
-      <div className="mt-12 pt-8 border-t border-gray-100">
-        <p className="text-sm text-gray-500 text-center">
+      <div className="mt-8 pt-6 border-t border-gray-100">
+        <p className="text-sm text-slate-500 text-center">
           자료 공유 게시판에 올리시는 템플릿·자료는 큰 화면에 띄워 보시기 좋게 활용하시면 효과적입니다.{' '}
           <Link href="/leads/demo" className="text-[#00c4b4] hover:underline font-medium">
             전자칠판 시연 예약
           </Link>
         </p>
       </div>
+          </div>
+        </section>
     </div>
     </>
   )

@@ -83,7 +83,7 @@ export async function Header() {
               href="/community"
               className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
             >
-              커뮤니티
+              전칠판
             </Link>
             <Link
               href="/seminar"

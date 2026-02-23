@@ -42,14 +42,14 @@ export default async function FieldNewsPage() {
 
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>🏗️ 현장 소식</h1>
-        <p className={styles.subtitle}>
-          전국 학원들의 수업 환경 개선 현장을 소개합니다. 실제 학원장님들의 도입 후기를 만나보세요.
-        </p>
-      </div>
-
+    <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+          <div className="border-b border-gray-100 bg-slate-50/50 px-4 py-3">
+            <h1 className="text-sm font-bold text-slate-800">🏗️ 현장 소식</h1>
+            <p className="text-slate-500 text-xs mt-0.5">
+              전국 학원들의 수업 환경 개선 현장을 소개합니다. 실제 학원장님들의 도입 후기를 만나보세요.
+            </p>
+          </div>
+          <div className="p-4 md:p-5">
       {!fieldNews || fieldNews.length === 0 ? (
         <div className={styles.empty}>
           <p>현장 소식이 아직 없습니다.</p>
@@ -108,14 +108,15 @@ export default async function FieldNewsPage() {
         </div>
       )}
 
-      <div className={styles.cta}>
-        <h3>현장 소식은 관리자가 직접 등록합니다</h3>
-        <p>
+      <div className={`${styles.cta} mt-6 pt-6 border-t border-gray-100`}>
+        <h3 className="text-sm font-bold text-slate-800">현장 소식은 관리자가 직접 등록합니다</h3>
+        <p className="text-slate-500 text-xs mt-1">
           설치기사가 촬영한 현장 사진과 설명을 관리자 페이지에서 등록하여<br />
           사용자들에게 현장의 생생한 분위기를 전달합니다.
         </p>
       </div>
-    </div>
+          </div>
+        </section>
   )
 }
 

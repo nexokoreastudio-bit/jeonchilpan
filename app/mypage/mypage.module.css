@@ -18,7 +18,7 @@
   font-weight: 700;
   color: #1a1a1a;
   margin-bottom: 10px;
-  font-family: 'Noto Serif KR', serif;
+  font-family: 'Pretendard', sans-serif;
 }
 
 .subtitle {
@@ -27,20 +27,20 @@
 }
 
 .section {
-  margin-bottom: 40px;
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 0;
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .section h2 {
-  font-size: 1.25rem;
+  font-size: 0.9375rem;
   font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #e8e8e8;
+  color: #1e293b;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .infoGrid {

@@ -1,20 +1,31 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { PageSidebar } from './page-sidebar'
 
 /**
- * 홈(/)에서는 PageSidebar 숨김 (포털 사이드바 사용)
- * 그 외 페이지에서는 PageSidebar 표시
+ * 홈(/)에서는 페이지 자체에 포털 사이드바 포함
+ * 그 외: [왼쪽 배너 | 콘텐츠 | 우측 사이드바] 3단 레이아웃
  */
-export function MainLayout({ children }: { children: React.ReactNode }) {
+export function MainLayout({
+  children,
+  sidebar,
+}: {
+  children: React.ReactNode
+  sidebar?: React.ReactNode
+}) {
   const pathname = usePathname()
   const isHome = pathname === '/'
 
+  if (isHome) {
+    return <main className="flex-1">{children}</main>
+  }
+
   return (
-    <main className="flex-1 flex">
-      <div className="flex-1 min-w-0">{children}</div>
-      {!isHome && <PageSidebar />}
+    <main className="flex-1 min-h-screen bg-[#f4f6f8]">
+      <div className="flex flex-col lg:flex-row container mx-auto max-w-7xl px-4 md:px-6 py-8 md:py-10 gap-6 xl:gap-8">
+        <div className="flex-1 min-w-0">{children}</div>
+        {sidebar}
+      </div>
     </main>
   )
 }

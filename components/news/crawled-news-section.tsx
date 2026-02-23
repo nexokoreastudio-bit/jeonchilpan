@@ -25,9 +25,11 @@ const categories: Array<'전체' | '입시' | '학업' | '취업' | '교육정�
 interface CrawledNewsSectionProps {
   limit?: number
   showMoreButton?: boolean
+  /** 박스 내부 임베드 스타일 (코인판 스타일) */
+  embedded?: boolean
 }
 
-export function CrawledNewsSection({ limit = 12, showMoreButton = true }: CrawledNewsSectionProps) {
+export function CrawledNewsSection({ limit = 12, showMoreButton = true, embedded = false }: CrawledNewsSectionProps) {
   const router = useRouter()
   const [news, setNews] = useState<CrawledNewsItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -123,58 +125,26 @@ export function CrawledNewsSection({ limit = 12, showMoreButton = true }: Crawle
   const isCompact = limit <= 3
 
   return (
-    <section className={isCompact ? 'py-10 md:py-12 bg-white' : 'py-16 md:py-20 bg-white'}>
-      <div className="container mx-auto max-w-4xl px-4">
-        <div className={isCompact ? 'mb-5' : 'mb-8'}>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div className={embedded ? '' : (isCompact ? 'py-10 md:py-12' : 'py-16 md:py-20')}>
+      <div className={`container mx-auto max-w-4xl px-4 ${embedded ? 'pt-6 pb-4 md:pt-8 md:pb-5' : ''}`}>
+        <div className={isCompact || embedded ? 'mb-4' : 'mb-8'}>
+          <div className={embedded ? 'border-b border-gray-100 pb-6' : ''}>
             <div>
-              <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#00c4b4] bg-[#00c4b4]/10 rounded mb-3">
-                실시간 큐레이션
-              </span>
-              <h2 className={isCompact ? 'text-xl md:text-2xl font-bold text-gray-900 tracking-tight' : 'text-2xl md:text-3xl font-bold text-gray-900 tracking-tight'}>
+              {!embedded && (
+                <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#00c4b4] bg-[#00c4b4]/10 rounded-sm mb-2">
+                  실시간 큐레이션
+                </span>
+              )}
+              <h2 className={`font-bold text-slate-800 tracking-tight ${embedded ? 'text-base' : (isCompact ? 'text-xl md:text-2xl' : 'text-2xl md:text-3xl')}`}>
                 오늘 입시·교육계, 무슨 일이?
               </h2>
-              <p className={`text-gray-500 mt-2 ${isCompact ? 'text-sm' : 'text-base'}`}>
+              <p className={`text-slate-500 mt-1 ${embedded ? 'text-sm' : (isCompact ? 'text-sm' : 'text-base')}`}>
                 지금 막 나온 교육 뉴스 3선. 학원장님들이 꼭 알아야 할 소식만 골라봤어요.
               </p>
             </div>
 
-            {/* 필터: 찾기 좋게 - 상단 우측 */}
-            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-              <div className="flex gap-1.5 flex-wrap">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedCategory === category
-                        ? 'bg-[#1a1a1a] text-white shadow-sm'
-                        : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-              {sources.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 whitespace-nowrap hidden sm:inline">신문사</span>
-                  <select
-                    value={selectedSource}
-                    onChange={(e) => setSelectedSource(e.target.value)}
-                    className="px-4 py-2 rounded-lg text-sm bg-white border border-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00c4b4]/30 focus:border-[#00c4b4] min-w-[140px]"
-                  >
-                    <option value="전체">전체</option>
-                    {sources.map((source) => (
-                      <option key={source} value={source}>{source}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
+            {/* 안내: 접을 수 있게 */}
           </div>
-
-          {/* 안내: 접을 수 있게 */}
           <div className="mt-6">
             <button
               onClick={() => setShowNotice(!showNotice)}
@@ -183,7 +153,7 @@ export function CrawledNewsSection({ limit = 12, showMoreButton = true }: Crawle
               {showNotice ? '▲' : '▼'} 이용 안내
             </button>
             {showNotice && (
-              <div className="mt-2 p-4 bg-white rounded-lg border border-gray-200">
+              <div className="mt-2 p-4 bg-white rounded-sm border border-gray-200">
                 <p className="text-xs text-gray-600 leading-relaxed">
                   본 뉴스는 각 언론사 RSS 피드로 수집됩니다. 원문은 각 언론사 사이트에서 확인하실 수 있으며, 
                   본 서비스는 링크 제공 역할만 합니다. 저작권은 각 언론사에 있습니다.
@@ -191,10 +161,41 @@ export function CrawledNewsSection({ limit = 12, showMoreButton = true }: Crawle
               </div>
             )}
           </div>
+
+          {/* 필터: 뉴스 목록 직전 배치 */}
+          <div className="flex flex-wrap gap-3 items-center mt-4 mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-500 whitespace-nowrap">분류</span>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value as typeof selectedCategory)}
+                className="px-3 py-2 rounded-lg text-sm bg-white border border-gray-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#00c4b4]/30 focus:border-[#00c4b4] min-w-[120px]"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            {sources.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500 whitespace-nowrap">신문사</span>
+                <select
+                  value={selectedSource}
+                  onChange={(e) => setSelectedSource(e.target.value)}
+                  className="px-3 py-2 rounded-lg text-sm bg-white border border-gray-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#00c4b4]/30 focus:border-[#00c4b4] min-w-[140px]"
+                >
+                  <option value="전체">전체</option>
+                  {sources.map((source) => (
+                    <option key={source} value={source}>{source}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 기사 목록: 3개 이하면 컴팩트, 그 외는 카드형 */}
-        <div className={isCompact ? 'space-y-2' : 'space-y-4'}>
+        <div className={isCompact ? 'space-y-1' : 'space-y-2'}>
           {news.map((item) => (
             <a
               key={item.id}
@@ -204,7 +205,7 @@ export function CrawledNewsSection({ limit = 12, showMoreButton = true }: Crawle
               className="group block"
             >
               <article className={`bg-white border border-gray-100 hover:border-[#00c4b4]/30 hover:shadow-sm transition-all duration-200 ${
-                isCompact ? 'rounded-lg p-3 md:p-4' : 'rounded-xl p-5 md:p-6'
+                isCompact ? 'rounded-lg py-6 px-4 md:py-7 md:px-5' : 'rounded-xl py-7 px-5 md:py-8 md:px-6'
               }`}>
                 <div className={`flex gap-3 ${isCompact ? 'gap-3' : 'gap-4'}`}>
                   {/* 썸네일: 컴팩트 모드에서는 숨김 */}
@@ -284,7 +285,7 @@ export function CrawledNewsSection({ limit = 12, showMoreButton = true }: Crawle
           </div>
         )}
       </div>
-    </section>
+    </div>
   )
 }
 

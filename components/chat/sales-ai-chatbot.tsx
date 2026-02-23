@@ -42,7 +42,7 @@ export function SalesAIChatbot() {
         payloadContact
       )
       if (result.error) throw new Error(result.error)
-      if (result.reply) setMessages((m) => [...m, { role: 'assistant', content: result.reply }])
+      if (result.reply) setMessages((m) => [...m, { role: 'assistant', content: result.reply ?? '' }])
     } catch (e: any) {
       setMessages((m) => [
         ...m,

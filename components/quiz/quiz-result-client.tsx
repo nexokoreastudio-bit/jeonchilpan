@@ -165,7 +165,7 @@ export function QuizResultClient({ resultType, result }: QuizResultClientProps) 
           href="/signup"
           className="text-sm text-[#00c4b4] hover:underline font-medium"
         >
-          회원가입하고 커뮤니티 참여하기 →
+          회원가입하고 전칠판 참여하기 →
         </Link>
       </div>
     </div>

@@ -13,18 +13,14 @@ export default async function BenefitsPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-            구독자 할인 안내
-          </h1>
-          <p className="text-base text-gray-600">
-            넥소 전자칠판을 구매하신 분은 시리얼 번호 인증으로 추가 혜택을 받을 수 있습니다
-          </p>
-        </div>
-
-        <div className="bg-white rounded-xl border border-gray-200 p-6 md:p-8 space-y-6">
+    <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm max-w-2xl">
+          <div className="border-b border-gray-100 bg-slate-50/50 px-4 py-3">
+            <h1 className="text-sm font-bold text-slate-800">구독자 할인 안내</h1>
+            <p className="text-slate-500 text-xs mt-0.5">
+              넥소 전자칠판을 구매하신 분은 시리얼 번호 인증으로 추가 혜택을 받을 수 있습니다
+            </p>
+          </div>
+          <div className="p-6 md:p-8 space-y-6">
           <h2 className="text-lg font-semibold text-gray-900">인증 시 혜택</h2>
           <ul className="space-y-3">
             <li className="flex items-start gap-2">
@@ -37,7 +33,7 @@ export default async function BenefitsPage() {
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle2 className="w-5 h-5 text-[#00c4b4] flex-shrink-0 mt-0.5" />
-              <span>커뮤니티·발행호·인사이트 이용</span>
+              <span>전칠판·발행호·인사이트 이용</span>
             </li>
           </ul>
 
@@ -61,17 +57,16 @@ export default async function BenefitsPage() {
               </div>
             )}
           </div>
-        </div>
 
-        <div className="mt-8 text-center">
-          <Link
-            href="/leads/demo"
-            className="text-[#00c4b4] hover:underline font-medium"
-          >
-            전자칠판 시연 예약 →
-          </Link>
-        </div>
-      </div>
-    </div>
+          <div className="px-6 pb-8 pt-2 border-t border-gray-100 text-center">
+            <Link
+              href="/leads/demo"
+              className="text-[#00c4b4] hover:underline font-medium"
+            >
+              전자칠판 시연 예약 →
+            </Link>
+          </div>
+          </div>
+    </section>
   )
 }

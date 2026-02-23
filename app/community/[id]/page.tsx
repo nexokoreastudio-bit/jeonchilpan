@@ -6,7 +6,7 @@ import { getPostById } from '@/lib/supabase/posts'
 import { deletePost } from '@/app/actions/posts'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { ArrowLeft, MessageSquare, FileStack, ExternalLink, BadgeCheck } from 'lucide-react'
+import { ArrowLeft, MessageSquare, FileStack, ExternalLink, BadgeCheck, Download } from 'lucide-react'
 import { HtmlContent } from '@/components/html-content'
 import { DeletePostButton } from '@/components/community/delete-post-button'
 import { LikeButton } from '@/components/community/like-button'
@@ -19,7 +19,7 @@ import styles from '../community.module.css'
 
 const BOARD_TYPE_INFO = {
   bamboo: { label: '원장님 대나무숲', icon: MessageSquare },
-  materials: { label: '넥소 공식 자료실', icon: FileStack },
+  materials: { label: '공유자료실', icon: FileStack },
   verification: { label: '구독자 인증', icon: BadgeCheck },
 } as const
 
@@ -101,7 +101,7 @@ export default async function PostDetailPage({ params }: PageProps) {
       <div className={styles.container}>
         <Link href="/community" className={styles.backLink}>
           <ArrowLeft className="w-4 h-4" />
-          커뮤니티 목록
+          전칠판 목록
         </Link>
 
         <article className={styles.postDetail}>
@@ -153,15 +153,60 @@ export default async function PostDetailPage({ params }: PageProps) {
           )}
 
           {post.images && post.images.length > 0 && (
-            <div className={styles.postImages}>
-              {post.images.map((imageUrl, index) => (
-                <img
-                  key={index}
-                  src={imageUrl}
-                  alt={`첨부 이미지 ${index + 1}`}
-                  className={styles.postImage}
-                />
-              ))}
+            <div className="space-y-6">
+              {post.images.some((url) => {
+                const ext = (url.split('/').pop() || '').split('.').pop()?.toLowerCase() || ''
+                return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
+              }) && (
+                <div className={styles.postImages}>
+                  {post.images
+                    .filter((url) => {
+                      const ext = (url.split('/').pop() || '').split('.').pop()?.toLowerCase() || ''
+                      return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
+                    })
+                    .map((imageUrl, index) => (
+                      <img
+                        key={index}
+                        src={imageUrl}
+                        alt={`첨부 이미지 ${index + 1}`}
+                        className={styles.postImage}
+                      />
+                    ))}
+                </div>
+              )}
+              {post.images.some((url) => {
+                const fn = url.split('/').pop() || ''
+                const ext = fn.split('.').pop()?.toLowerCase() || ''
+                return ['pdf', 'pptx', 'docx', 'xlsx', 'hwp'].includes(ext)
+              }) && (
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-sm font-medium text-slate-700 mb-3">📎 첨부 문서</p>
+                  <ul className="flex flex-wrap gap-2">
+                    {post.images
+                      .filter((url) => {
+                        const fn = url.split('/').pop() || ''
+                        const ext = fn.split('.').pop()?.toLowerCase() || ''
+                        return ['pdf', 'pptx', 'docx', 'xlsx', 'hwp'].includes(ext)
+                      })
+                      .map((url, index) => {
+                        const fn = url.split('/').pop() || `파일${index + 1}`
+                        return (
+                          <li key={index}>
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors"
+                            >
+                              <Download className="w-4 h-4" />
+                              {decodeURIComponent(fn)}
+                            </a>
+                          </li>
+                        )
+                      })}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
@@ -201,6 +246,7 @@ export default async function PostDetailPage({ params }: PageProps) {
             postId={post.id}
             userId={user?.id || null}
             initialCommentsCount={post.comments_count}
+            postCreatedAt={post.created_at}
             isAdmin={isAdmin}
           />
         </div>
@@ -235,8 +281,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? BOARD_TYPE_INFO[post.board_type as keyof typeof BOARD_TYPE_INFO] 
     : null
   
-  const title = `${post.title} | ${boardInfo?.label || '커뮤니티'} - NEXO Daily`
-  const description = post.content.replace(/<[^>]*>/g, '').substring(0, 160) || '넥소 커뮤니티 게시글'
+  const title = `${post.title} | ${boardInfo?.label || '전칠판'} - NEXO Daily`
+  const description = post.content.replace(/<[^>]*>/g, '').substring(0, 160) || '넥소 전칠판 게시글'
   const imageUrl = post.images && post.images.length > 0 
     ? (post.images[0].startsWith('http') ? post.images[0] : `${baseUrl}${post.images[0]}`)
     : `${baseUrl}/assets/images/og-image.png`
@@ -245,8 +291,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     keywords: [
-      '넥소 커뮤니티',
-      boardInfo?.label || '커뮤니티',
+      '넥소 전칠판',
+      boardInfo?.label || '전칠판',
       '전자칠판',
       '학원 운영',
       '교육 정보',

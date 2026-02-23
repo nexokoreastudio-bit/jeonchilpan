@@ -82,8 +82,8 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: #1a1a1a;
-  color: white;
+  background: #fbbf24;
+  color: #1a1a1a;
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
@@ -91,7 +91,8 @@
 }
 
 .writeButton:hover {
-  background: #00c4b4;
+  background: #f59e0b;
+  color: #1a1a1a;
 }
 
 .empty {
@@ -119,39 +120,103 @@
 .postsList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
+  border-top: 1px solid #e5e7eb;
 }
 
-.postCard {
-  display: block;
-  padding: 20px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+.postRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.2s;
+  transition: background-color 0.2s;
 }
 
-.postCard:hover {
-  border-color: #00c4b4;
+.postRow:hover {
+  background-color: #f9fafb;
 }
 
-.postHeader {
+.postRowLeft {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
 
-.postMeta {
+.postTitle {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.commentCount {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.postIcons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.newBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: white;
+  background: #f97316;
+  border-radius: 4px;
+}
+
+.attachIcon {
+  width: 16px;
+  height: 16px;
+  color: #64748b;
+}
+
+.postRowRight {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
+  min-width: 140px;
+}
+
+.authorName {
   font-size: 0.875rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.postRow .date {
+  font-size: 0.8125rem;
   color: #6b7280;
 }
 
+/* 기존 .boardType 등은 상세 페이지 등에서 사용 가능하므로 유지 */
 .boardType {
   padding: 4px 10px;
   background: #f3f4f6;
@@ -172,14 +237,6 @@
   font-size: 0.75rem;
   color: #9ca3af;
   font-style: italic;
-}
-
-.postTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 8px;
-  line-height: 1.4;
 }
 
 .postContent {
@@ -551,8 +608,16 @@
     white-space: nowrap;
   }
 
-  .postCard {
-    padding: 16px;
+  .postRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+
+  .postRowRight {
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .postDetail {

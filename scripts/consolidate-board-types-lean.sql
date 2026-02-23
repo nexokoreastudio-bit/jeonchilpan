@@ -1,6 +1,6 @@
 -- NEXO Daily Lean 리뉴얼: board_type 통폐합
 -- bamboo: 원장님 대나무숲 (익명/하소연)
--- materials: 넥소 공식 자료실 (다운로드 전용)
+-- materials: 공유자료실 (다운로드 전용)
 
 -- 1. 기존 제약조건 제거
 ALTER TABLE public.posts DROP CONSTRAINT IF EXISTS posts_board_type_check;

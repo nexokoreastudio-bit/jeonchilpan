@@ -3,22 +3,25 @@
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { MessageSquare, Trash2 } from 'lucide-react'
+import { MessageSquare, Trash2, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { getCommentsByPostId, createComment, deleteComment, type CommentWithAuthor } from '@/app/actions/comments'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import styles from '@/app/community/community.module.css'
 
 interface CommentsSectionProps {
   postId: number
   userId: string | null
   initialCommentsCount: number
+  postCreatedAt?: string
   isAdmin?: boolean
 }
 
-export function CommentsSection({ postId, userId, initialCommentsCount, isAdmin = false }: CommentsSectionProps) {
+export function CommentsSection({ postId, userId, initialCommentsCount, postCreatedAt, isAdmin = false }: CommentsSectionProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const [comments, setComments] = useState<CommentWithAuthor[]>([])
   const [commentsCount, setCommentsCount] = useState(initialCommentsCount)
   const [content, setContent] = useState('')
@@ -26,9 +29,14 @@ export function CommentsSection({ postId, userId, initialCommentsCount, isAdmin 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [deletingIds, setDeletingIds] = useState<Set<number>>(new Set())
 
+  /** 비회원은 댓글 조회 불가. 로그인 사용자만 댓글 확인 가능 */
+  const canViewComments = !!userId
+
   useEffect(() => {
-    loadComments()
-  }, [postId])
+    if (canViewComments) {
+      loadComments()
+    }
+  }, [postId, canViewComments])
 
   const loadComments = async () => {
     setIsLoading(true)
@@ -114,20 +122,39 @@ export function CommentsSection({ postId, userId, initialCommentsCount, isAdmin 
         </form>
       ) : (
         <div className={styles.commentLoginPrompt}>
-          <p>댓글을 작성하려면 로그인이 필요합니다.</p>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push('/login?redirect=' + encodeURIComponent(window.location.pathname))}
-          >
-            로그인
-          </Button>
+          <p>비회원은 댓글을 작성할 수 없습니다.{' '}
+            <Link
+              href={'/login?redirect=' + encodeURIComponent(pathname || '/community')}
+              className="text-[#00c4b4] font-medium hover:underline"
+            >
+              [로그인]
+            </Link>
+          </p>
         </div>
       )}
 
       {/* 댓글 목록 */}
       <div className={styles.commentsList}>
-        {isLoading ? (
+        {!canViewComments ? (
+          <div className={styles.commentItem}>
+            <div className={styles.commentHeader}>
+              <div className={styles.commentAuthor}>
+                <div className={styles.commentAvatarPlaceholder}>시</div>
+                <span className={styles.commentAuthorName}>시스템</span>
+              </div>
+            </div>
+            <div className={styles.commentContent}>
+              <p>댓글을 보려면 로그인이 필요합니다.{' '}
+                <Link
+                  href={'/login?redirect=' + encodeURIComponent(pathname || '/community')}
+                  className="text-[#00c4b4] font-medium hover:underline"
+                >
+                  로그인 후 바로 확인하세요
+                </Link>
+              </p>
+            </div>
+          </div>
+        ) : isLoading ? (
           <p className={styles.commentsLoading}>댓글을 불러오는 중...</p>
         ) : comments.length === 0 ? (
           <p className={styles.commentsEmpty}>아직 댓글이 없습니다. 첫 댓글을 작성해보세요!</p>
@@ -181,6 +208,22 @@ export function CommentsSection({ postId, userId, initialCommentsCount, isAdmin 
           })
         )}
       </div>
+
+      {canViewComments && (
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => loadComments()}
+            disabled={isLoading}
+            className="text-slate-500 hover:text-slate-700"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            댓글 새로고침
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

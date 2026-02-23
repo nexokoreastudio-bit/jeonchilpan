@@ -78,21 +78,22 @@ export default async function ReviewsPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <>
       <JsonLd data={jsonLdData} />
-      <div className="max-w-6xl mx-auto">
-        {/* 헤더 */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            ⭐ 고객 후기
-          </h1>
-          <p className="text-lg text-gray-600">
-            학원 수업 환경을 개선하신 원장님·강사님들의 실제 후기를 확인하세요
-          </p>
-        </div>
+      <div className="space-y-6">
+        {/* 헤더 섹션 */}
+        <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+          <div className="border-b border-gray-100 bg-slate-50/50 px-4 py-3">
+            <h1 className="text-sm font-bold text-slate-800">⭐ 고객 후기</h1>
+            <p className="text-slate-500 text-xs mt-0.5">
+              학원 수업 환경을 개선하신 원장님·강사님들의 실제 후기를 확인하세요
+            </p>
+          </div>
+        </section>
 
         {/* 평점 통계 */}
-        <Card className="mb-8">
+        <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+        <Card className="mb-0 border-0 shadow-none rounded-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Star className="w-6 h-6 text-yellow-500" />
@@ -147,17 +148,20 @@ export default async function ReviewsPage({ searchParams }: PageProps) {
             </div>
           </CardContent>
         </Card>
+        </section>
 
         {/* 베스트 후기 */}
         {bestReviews.length > 0 && (
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <Award className="w-6 h-6 text-yellow-500" />
-              <h2 className="text-2xl font-bold">🏆 베스트 후기</h2>
+          <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm p-4 md:p-5">
+            <div className="border-b border-gray-100 bg-slate-50/50 -mx-4 -mt-4 md:-mx-5 md:-mt-5 px-4 py-3 md:px-5 md:pt-4 md:pb-3 mb-4">
+              <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <Award className="w-4 h-4 text-amber-500" />
+                베스트 후기
+              </h2>
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               {bestReviews.map((review) => (
-                <Card key={review.id} className="border-yellow-300 border-2">
+                <Card key={review.id} className="border border-gray-200/80 shadow-sm">
                   <CardHeader>
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -197,10 +201,11 @@ export default async function ReviewsPage({ searchParams }: PageProps) {
                 </Card>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* 정렬 및 필터 */}
+        {/* 전체 후기 목록 */}
+        <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm p-4 md:p-5">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex gap-2">
             <Link href="/reviews?sort=latest">
@@ -311,8 +316,9 @@ export default async function ReviewsPage({ searchParams }: PageProps) {
             ))}
           </div>
         )}
+        </section>
       </div>
-    </div>
+    </>
   )
 }
 
