@@ -96,6 +96,43 @@ export function NewsArticleJsonLd({
 }
 
 /**
+ * Forum 스키마 (커뮤니티 - 검색 엔진 커뮤니티 콘텐츠 노출 최적화)
+ */
+export function ForumJsonLd({
+  name,
+  description,
+  url,
+}: {
+  name: string
+  description: string
+  url: string
+}) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  return (
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        '@id': url,
+        name,
+        description,
+        url,
+        isPartOf: {
+          '@type': 'WebSite',
+          name: 'NEXO Daily',
+          url: baseUrl,
+        },
+        about: {
+          '@type': 'Thing',
+          name: '학원장 강사 커뮤니티',
+          description: '전자칠판 자료 공유, 지역 네트워크, 구인구직, 자유소통',
+        },
+      }}
+    />
+  )
+}
+
+/**
  * WebSite 스키마 (사이트 정보)
  */
 export function WebSiteJsonLd() {

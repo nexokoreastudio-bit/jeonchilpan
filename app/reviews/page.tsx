@@ -87,7 +87,7 @@ export default async function ReviewsPage({ searchParams }: PageProps) {
             ⭐ 고객 후기
           </h1>
           <p className="text-lg text-gray-600">
-            넥소 전자칠판을 사용하시는 고객님들의 생생한 후기를 확인하세요
+            학원 수업 환경을 개선하신 원장님·강사님들의 실제 후기를 확인하세요
           </p>
         </div>
 

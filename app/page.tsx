@@ -8,9 +8,8 @@ import { createClient } from '@/lib/supabase/server'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { CrawledNewsSection } from '@/components/news/crawled-news-section'
+import { ConsultingCheatSheet } from '@/components/consulting-cheat-sheet'
 
 // 날짜 포맷팅 유틸리티 함수
 function formatEditionDate(editionId: string | null): string {
@@ -216,106 +215,160 @@ export default async function HomePage() {
 
   // 게시판 타입 라벨 매핑
   const boardTypeLabels: Record<string, string> = {
-    free: '자유게시판',
-    qna: 'Q&A',
-    tip: '팁 & 노하우',
+    bamboo: '원장님 대나무숲',
+    materials: '넥소 공식 자료실',
+    verification: '구독자 인증',
   }
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* 크롤링된 교육 뉴스 섹션 */}
-      <CrawledNewsSection />
+  // 상담팁 카테고리 인사이트 (컨닝페이퍼용)
+  const consultingInsights = allInsights.filter((i) => i.category === '상담팁')
 
-      {/* 히어로 섹션 - 이미지 오버레이 레이아웃 */}
-      {latestArticle && (
-        <section className="border-b border-gray-200 bg-white">
-          <div className="relative w-full">
-            {/* 배경 이미지 */}
-            <div className="relative h-[500px] md:h-[600px] lg:h-[700px] w-full overflow-hidden">
-              {latestArticle.thumbnail_url ? (
-                <Image
-                  src={latestArticle.thumbnail_url}
-                  alt={latestArticle.title}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              ) : (
-                <Image
-                  src="/assets/images/아이와 엄마가 함께 공부하는 사진.png"
-                  alt="어머니와 아이가 함께 태블릿으로 학습하는 모습"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              )}
-              {/* 그라데이션 오버레이 */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40"></div>
-              
-              {/* 텍스트 콘텐츠 오버레이 */}
-              <div className="absolute inset-0 flex items-center">
-                <div className="container mx-auto max-w-7xl px-4 md:px-8">
-                  <div className="max-w-3xl space-y-6">
-                    {/* 최신호 배지 및 날짜 */}
-                    <div className="flex items-center gap-4 text-base md:text-lg text-white/90 tracking-wide">
-                      <Badge variant="outline" className="border-white/50 text-white bg-white/10 backdrop-blur-sm font-medium rounded-none px-4 py-1.5 text-sm md:text-base">
-                        최신호
-                      </Badge>
-                      <span className="font-semibold">{formatEditionDate(latestArticle.edition_id)}</span>
-                    </div>
-                    
-                    {/* 메인 제목 */}
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-[1.3] tracking-tight break-keep drop-shadow-lg">
-                      {latestArticle.title}
-                    </h1>
-                    
-                    {/* 부제목 */}
-                    {latestArticle.subtitle && (
-                      <p className="text-lg md:text-xl lg:text-2xl text-white/90 leading-relaxed font-normal mt-4 drop-shadow-md">
-                        {latestArticle.subtitle}
-                      </p>
-                    )}
-                    
-                    {/* 버튼 */}
-                    <div className="pt-4">
-                      <Link href={`/news/${latestArticle.edition_id}`}>
-                        <Button 
-                          size="lg" 
-                          className="bg-white hover:bg-white/90 text-nexo-navy rounded-none px-8 py-6 text-base font-semibold tracking-wide shadow-lg"
-                        >
-                          기사 읽기
-                          <ArrowRight className="ml-2 w-5 h-5" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
+  return (
+    <div className="min-h-screen bg-[#fafafa]">
+      {/* 최상단: 커뮤니티 - 이슈화 */}
+      {latestPosts.length > 0 && (
+        <section className="py-12 md:py-16 bg-white border-b border-gray-100">
+          <div className="container mx-auto max-w-6xl px-4">
+            <div className="mb-10 flex items-end justify-between">
+              <div>
+                <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#00c4b4] bg-[#00c4b4]/10 rounded mb-2">
+                  커뮤니티
+                </span>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                  지금 이런 이야기가 오가고 있어요
+                </h2>
+                <p className="text-gray-500 text-sm mt-1">학원장·강사님들이 공유하는 생생한 정보</p>
               </div>
+              <Link href="/community" className="hidden md:flex items-center gap-2 text-sm font-medium text-[#00c4b4] hover:underline">
+                커뮤니티 더 보기
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {latestPosts.map((post) => (
+                <Link key={post.id} href={`/community/${post.id}`} className="block py-6 group first:pt-0">
+                  <article className="hover:bg-gray-50/50 -mx-2 px-2 py-2 rounded-lg transition-colors">
+                    <div className="flex items-center gap-2 mb-2">
+                      {post.board_type && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600">
+                          {boardTypeLabels[post.board_type] || post.board_type}
+                        </span>
+                      )}
+                      <span className="text-xs text-gray-400">
+                        {post.author?.nickname || '익명'} · {format(new Date(post.created_at), 'M.dd', { locale: ko })}
+                      </span>
+                    </div>
+                    <h3 className="text-base font-semibold text-gray-900 group-hover:text-[#00c4b4] transition-colors line-clamp-1 mb-1">
+                      {post.title}
+                    </h3>
+                    <p className="text-gray-500 text-sm line-clamp-2 mb-3">
+                      {post.content.replace(/<[^>]*>/g, '').substring(0, 120)}
+                      {post.content.replace(/<[^>]*>/g, '').length > 120 ? '...' : ''}
+                    </p>
+                    <div className="flex items-center gap-4 text-xs text-gray-400">
+                      <span>👍 {post.likes_count}</span>
+                      <span>💬 {post.comments_count}</span>
+                      {post.images && post.images.length > 0 && <span>📷 {post.images.length}</span>}
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-6 md:hidden">
+              <Link
+                href="/community"
+                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#00c4b4]"
+              >
+                전체 보기
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         </section>
       )}
 
-      {/* 최신 교육 뉴스 섹션 - 3열 그리드 */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="flex items-center justify-between mb-16">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">최신 교육 뉴스</h2>
-              <p className="text-gray-600 text-lg">매일 업데이트되는 교육 정보와 인사이트</p>
+      {/* 오늘의 상담 컨닝페이퍼 */}
+      <ConsultingCheatSheet insights={consultingInsights} />
+
+      {/* 히어로 - 오늘의 인사이트 */}
+      {latestArticle && (
+        <section className="relative bg-gray-900 overflow-hidden">
+          <div className="absolute inset-0">
+            {latestArticle.thumbnail_url ? (
+              <Image
+                src={latestArticle.thumbnail_url}
+                alt={latestArticle.title}
+                fill
+                className="object-cover opacity-60"
+                priority
+              />
+            ) : (
+              <Image
+                src="/assets/images/아이와 엄마가 함께 공부하는 사진.png"
+                alt=""
+                fill
+                className="object-cover opacity-60"
+                priority
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+          </div>
+          <div className="relative min-h-[420px] md:min-h-[480px] flex items-end">
+            <div className="container mx-auto max-w-4xl px-4 pb-14 md:pb-20">
+              <span className="inline-block px-3 py-1 text-xs font-semibold text-[#00c4b4] bg-white/10 rounded-full mb-5">
+                📌 오늘의 인사이트
+              </span>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-[1.3] tracking-tight max-w-3xl">
+                {latestArticle.title}
+              </h1>
+              {latestArticle.subtitle && (
+                <p className="mt-4 text-base md:text-lg text-white/80 line-clamp-2 max-w-2xl">
+                  {latestArticle.subtitle}
+                </p>
+              )}
+              <p className="mt-3 text-sm text-white/60">{formatEditionDate(latestArticle.edition_id)}</p>
+              <Link
+                href={`/news/${latestArticle.edition_id}`}
+                className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition-colors text-sm"
+              >
+                인사이트 읽기
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-            <Link href="/news" className="text-sm text-gray-500 hover:text-nexo-navy transition-colors font-medium hidden md:block">
-              전체 보기 →
+          </div>
+        </section>
+      )}
+
+      {/* 오늘의 교육 뉴스 (실시간 큐레이션) */}
+      <CrawledNewsSection limit={3} />
+
+      {/* 큐레이션 인사이트 - 학부모 상담에 활용 */}
+      <section className="py-20 md:py-24 bg-[#fafafa]">
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="flex items-end justify-between mb-14">
+            <div>
+              <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#00c4b4] bg-[#00c4b4]/10 rounded mb-3">
+                NEXO 에디터 큐레이션
+              </span>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+                학부모 상담에 쓸 오늘의 인사이트
+              </h2>
+              <p className="text-gray-500 mt-3 text-base max-w-xl">
+                입시·교육 정책을 전문가 관점에서 해석해드립니다. 상담실에서 바로 활용해보세요.
+              </p>
+            </div>
+            <Link href="/news" className="hidden md:flex items-center gap-2 text-sm font-medium text-[#00c4b4] hover:text-[#00a396] transition-colors shrink-0">
+              발행호 전체 보기
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           
           {editionsWithInsights.filter(edition => edition.insightsCount > 0).length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-gray-500 text-lg">발행된 인사이트가 없습니다.</p>
-              <p className="text-gray-400 text-sm mt-2">관리자 페이지에서 인사이트를 발행해주세요.</p>
+            <div className="text-center py-16 text-gray-500">
+              <p>발행된 인사이트가 없습니다.</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {editionsWithInsights
                 .filter(edition => {
                   // 인사이트가 있고, relatedInsights가 배열인 발행호만 표시
@@ -335,70 +388,51 @@ export default async function HomePage() {
                   <Link 
                     key={edition.edition_id} 
                     href={`/news/${edition.edition_id}`}
-                    className="group"
+                    className="group block"
                   >
-                    <article className="h-full flex flex-col bg-white hover:shadow-lg transition-all duration-300 border border-gray-200">
+                    <article className="h-full flex flex-col bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200">
                       {edition.thumbnail_url ? (
-                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
+                        <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-50">
                           <Image
                             src={edition.thumbnail_url}
                             alt={edition.title || '인사이트'}
                             fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="object-cover group-hover:scale-[1.02] transition-transform duration-300"
                           />
                         </div>
                       ) : (
-                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-nexo-navy/10 to-gray-100">
+                        <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-50">
                           <Image
                             src="/assets/images/nexo_logo_black.png"
                             alt={edition.title || '인사이트'}
                             fill
-                            className="object-contain p-8 opacity-60"
+                            className="object-contain p-8 opacity-40"
                           />
                         </div>
                       )}
-                      <div className="p-6 flex-1 flex flex-col">
-                        <div className="flex items-center gap-2 mb-4 flex-wrap">
-                          <Badge variant="outline" className="text-xs border-gray-300 text-gray-600 font-normal rounded-none">
+                      <div className="p-5 flex-1 flex flex-col">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-xs text-gray-500">
                             {formatEditionDate(edition.edition_id)}
-                          </Badge>
+                          </span>
                           {edition.insightsCount > 0 && (
-                            <Badge variant="outline" className="text-xs border-nexo-cyan text-nexo-cyan bg-nexo-cyan/10">
-                              💡 인사이트 {edition.insightsCount}개
-                            </Badge>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-[#00c4b4]/10 text-[#00c4b4] font-medium">
+                              인사이트 {edition.insightsCount}
+                            </span>
                           )}
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-nexo-navy transition-colors line-clamp-2 leading-tight">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-[#00c4b4] transition-colors line-clamp-2">
                           {edition.title || '인사이트'}
                         </h3>
                         {edition.subtitle && (
-                          <p className="text-gray-600 text-sm line-clamp-2 mb-4 flex-1 leading-relaxed">
+                          <p className="text-gray-500 text-sm line-clamp-2 flex-1">
                             {edition.subtitle}
                           </p>
                         )}
-                        
-                        {/* 관련 인사이트 미리보기 */}
-                        {editionInsights.length > 0 && (
-                          <div className="mt-4 pt-4 border-t border-gray-100">
-                            <p className="text-xs font-semibold text-gray-500 mb-2">관련 인사이트</p>
-                            <div className="space-y-2">
-                              {editionInsights.map((insight) => (
-                                <div key={insight.id} className="text-xs text-gray-600 line-clamp-1">
-                                  • {insight.title || '제목 없음'}
-                                </div>
-                              ))}
-                              {edition.insightsCount > editionInsights.length && (
-                                <div className="text-xs text-gray-400">
-                                  +{edition.insightsCount - editionInsights.length}개 더
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="text-xs text-gray-500 mt-auto pt-4 border-t border-gray-100">
-                          <span className="hover:text-nexo-navy transition-colors font-medium">기사 읽기 →</span>
-                        </div>
+                        <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#00c4b4] group-hover:gap-2 transition-all">
+                          인사이트 읽기
+                          <ArrowRight className="w-4 h-4" />
+                        </span>
                       </div>
                     </article>
                   </Link>
@@ -409,184 +443,95 @@ export default async function HomePage() {
             </div>
           )}
 
-          {/* 모바일 전체 보기 버튼 */}
-          <div className="mt-12 text-center md:hidden">
-            <Link href="/news">
-              <Button variant="outline" className="border-nexo-navy text-nexo-navy hover:bg-nexo-navy hover:text-white rounded-none">
-                전체 보기
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
+          <div className="mt-10 md:hidden text-center">
+            <Link href="/news" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#00c4b4]">
+              전체 보기
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 메인 콘텐츠 영역 */}
-      <div className="container mx-auto max-w-7xl px-4 py-20">
-        <div className="grid lg:grid-cols-3 gap-20">
-          {/* 좌측: 주요 콘텐츠 (2/3 너비) */}
-          <div className="lg:col-span-2 space-y-24">
-            {/* 커뮤니티 새 글 섹션 */}
-            {latestPosts.length > 0 && (
-              <section>
-                <div className="mb-12 flex items-center justify-between">
-                  <div>
-                    <h2 className="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">커뮤니티 새 글</h2>
-                    <p className="text-gray-600 text-lg">사용자들이 공유하는 최신 정보와 이야기</p>
-                  </div>
-                  <Link 
-                    href="/community" 
-                    className="text-sm text-gray-500 hover:text-nexo-navy transition-colors font-medium hidden md:block"
-                  >
-                    전체 보기 →
-                  </Link>
-                </div>
-                
-                <div className="space-y-6">
-                  {latestPosts.map((post) => (
-                    <Link 
-                      key={post.id} 
-                      href={`/community/${post.id}`}
-                      className="block group"
-                    >
-                      <article className="border-l-4 border-nexo-cyan pl-8 py-6 hover:bg-gray-50/50 transition-colors rounded-r-lg">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-3 flex-wrap">
-                              {post.board_type && (
-                                <Badge variant="outline" className="text-xs border-gray-300 text-gray-600 font-normal rounded-none">
-                                  {boardTypeLabels[post.board_type] || post.board_type}
-                                </Badge>
-                              )}
-                              <span className="text-sm text-gray-500">
-                                {post.author?.nickname || '익명'}
-                              </span>
-                              <span className="text-sm text-gray-400">
-                                {format(new Date(post.created_at), 'yyyy.MM.dd', { locale: ko })}
-                              </span>
-                            </div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-nexo-navy transition-colors line-clamp-2 leading-tight">
-                              {post.title}
-                            </h3>
-                            <p className="text-gray-600 line-clamp-2 mb-4 leading-relaxed">
-                              {post.content.replace(/<[^>]*>/g, '').substring(0, 150)}
-                              {post.content.replace(/<[^>]*>/g, '').length > 150 ? '...' : ''}
-                            </p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <span>👍 {post.likes_count}</span>
-                              <span>💬 {post.comments_count}</span>
-                              {post.images && post.images.length > 0 && (
-                                <span>📷 {post.images.length}</span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </article>
-                    </Link>
-                  ))}
-                </div>
-                
-                {/* 모바일 전체 보기 버튼 */}
-                <div className="mt-8 text-center md:hidden">
-                  <Link href="/community">
-                    <Button variant="outline" className="border-nexo-navy text-nexo-navy hover:bg-nexo-navy hover:text-white rounded-none">
-                      전체 보기
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </Link>
-                </div>
-              </section>
-            )}
+      {/* 카카오 정보방 CTA - 호기심/참여 유도 */}
+      <section className="py-16 md:py-20 bg-[#1a1a1a] text-white">
+        <div className="container mx-auto max-w-2xl px-4 text-center">
+          <p className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4">
+            학원장·강사님들이 매일 모이는 곳
+          </p>
+          <h2 className="text-xl md:text-2xl font-bold mb-3">
+            매일 아침 8시, 뭐가 카톡으로 와 있을까?
+          </h2>
+          <p className="text-white/70 text-sm md:text-base mb-8">
+            입시 뉴스부터 자료 공유까지. 넥소 정보방에서 함께 나눠보세요.
+          </p>
+          <a
+            href={process.env.NEXT_PUBLIC_KAKAO_OPEN_CHAT_URL || 'https://open.kakao.com/o/sample'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[#FEE500] text-[#1a1a1a] font-bold text-sm hover:bg-[#f5dc00] transition-colors"
+          >
+            정보방 입장하기
+            <ArrowRight className="w-5 h-5" />
+          </a>
+        </div>
+      </section>
 
-            {/* 현장 소식 & 후기 섹션 */}
+      {/* 메인 콘텐츠 */}
+      <div className="container mx-auto max-w-6xl px-4 pt-20 pb-16 md:pt-24 md:pb-20">
+        <div className="space-y-16">
+            {/* 현장 소식 & 고객 후기 */}
             <section>
-              <div className="grid md:grid-cols-2 gap-16">
-                {/* 현장 소식 */}
+              <div className="grid md:grid-cols-2 gap-12">
                 {latestFieldNews.length > 0 && (
                   <div>
-                    <div className="mb-10">
-                      <h3 className="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">현장 소식</h3>
-                      <p className="text-gray-600 text-sm">전국 각지의 설치 현장</p>
-                    </div>
-                    
-                    <div className="space-y-8">
+                    <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100 rounded mb-2">현장</span>
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1">전국 학원들의 변화 스토리</h3>
+                    <p className="text-gray-500 text-sm mb-6">실제 현장에서 벌어지는 수업 환경 개선 이야기</p>
+                    <div className="space-y-6">
                       {latestFieldNews.map((news: any) => (
-                        <Link 
-                          key={news.id} 
-                          href={`/field#news-${news.id}`}
-                          className="block group"
-                        >
-                          <article className="hover:shadow-md transition-shadow duration-300">
+                        <Link key={news.id} href={`/field#news-${news.id}`} className="block group">
+                          <article>
                             {news.images && news.images.length > 0 ? (
-                              <div className="relative aspect-video w-full overflow-hidden bg-gray-100 mb-4">
+                              <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-50 mb-3">
                                 <Image
                                   src={news.images[0]}
                                   alt={news.title}
                                   fill
-                                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                  className="object-cover group-hover:scale-[1.02] transition-transform duration-300"
                                 />
                               </div>
                             ) : (
-                              <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 mb-4">
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                  <span className="text-gray-400 text-xs">이미지 준비 중</span>
-                                </div>
-                              </div>
+                              <div className="aspect-video rounded-lg bg-gray-100 mb-3" />
                             )}
-                            <div>
-                              <h4 className="text-xl font-bold text-gray-900 group-hover:text-nexo-navy transition-colors line-clamp-2 mb-2 leading-tight">
-                                {news.title}
-                              </h4>
-                              {news.location && (
-                                <p className="text-sm text-gray-500">
-                                  {news.location}
-                                </p>
-                              )}
-                            </div>
+                            <h4 className="text-sm font-semibold text-gray-900 group-hover:text-[#00c4b4] transition-colors line-clamp-2">
+                              {news.title}
+                            </h4>
+                            {news.location && <p className="text-xs text-gray-500 mt-1">{news.location}</p>}
                           </article>
                         </Link>
                       ))}
                     </div>
                   </div>
                 )}
-
-                {/* 고객 후기 */}
                 {latestReviews.length > 0 && (
                   <div>
-                    <div className="mb-10">
-                      <h3 className="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">고객 후기</h3>
-                      <p className="text-gray-600 text-sm">실제 사용자들의 생생한 후기</p>
-                    </div>
-                    
-                    <div className="space-y-8">
+                    <span className="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100 rounded mb-2">후기</span>
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1">원장님·강사님이 직접 남긴 후기</h3>
+                    <p className="text-gray-500 text-sm mb-6">실제 사용 후 솔직하게 써주신 생생한 이야기</p>
+                    <div className="space-y-6">
                       {latestReviews.map((review) => (
-                        <Link 
-                          key={review.id} 
-                          href={`/reviews#review-${review.id}`}
-                          className="block group"
-                        >
-                          <article className="hover:shadow-md transition-shadow duration-300 p-6 border-l-2 border-gray-200 hover:border-nexo-navy">
-                            <div className="flex items-start justify-between gap-2 mb-3">
-                              <h4 className="text-xl font-bold text-gray-900 group-hover:text-nexo-navy transition-colors line-clamp-2 flex-1 leading-tight">
+                        <Link key={review.id} href={`/reviews#review-${review.id}`} className="block group">
+                          <article className="p-4 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <h4 className="text-sm font-semibold text-gray-900 group-hover:text-[#00c4b4] transition-colors line-clamp-1 flex-1">
                                 {review.title}
                               </h4>
-                              {review.rating && (
-                                <div className="flex items-center gap-1 text-yellow-500 flex-shrink-0">
-                                  <span className="text-base font-bold">{review.rating}</span>
-                                </div>
-                              )}
+                              {review.rating && <span className="text-yellow-500 text-xs font-medium">{review.rating}★</span>}
                             </div>
-                            <p className="text-sm text-gray-600 line-clamp-2 mb-4 leading-relaxed">
-                              {review.content.replace(/<[^>]*>/g, '').substring(0, 100)}
-                            </p>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <Calendar className="w-3 h-3" />
-                              <span>{format(new Date(review.created_at), 'M월 d일', { locale: ko })}</span>
-                              {review.is_verified_review && (
-                                <Badge variant="outline" className="text-xs border-green-500 text-green-700 ml-2 rounded-none">
-                                  인증
-                                </Badge>
-                              )}
+                            <p className="text-gray-500 text-xs line-clamp-2 mb-2">{review.content.replace(/<[^>]*>/g, '').substring(0, 80)}</p>
+                            <div className="flex items-center gap-2 text-xs text-gray-400">
+                              {format(new Date(review.created_at), 'M.d', { locale: ko })}
+                              {review.is_verified_review && <span className="text-green-600">인증</span>}
                             </div>
                           </article>
                         </Link>
@@ -596,43 +541,6 @@ export default async function HomePage() {
                 )}
               </div>
             </section>
-          </div>
-
-          {/* 우측: 사이드바 (1/3 너비) */}
-          <aside className="lg:col-span-1 space-y-10">
-            {/* 전자칠판 상담 신청 배너 */}
-            <div className="bg-gradient-to-br from-nexo-navy to-nexo-navy/95 text-white p-10">
-              <h3 className="text-2xl font-bold mb-4">전자칠판 상담 신청</h3>
-              <p className="text-white/90 text-sm mb-8 leading-relaxed">
-                넥소 전자칠판을 직접 체험해보고, 학원 운영에 최적화된 솔루션을 확인하세요.
-              </p>
-              <Link href="/leads/demo">
-                <Button 
-                  className="w-full bg-white text-nexo-navy hover:bg-gray-100 rounded-none font-semibold shadow-sm"
-                >
-                  상담 신청하기
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
-            </div>
-
-            {/* 자료실 배너 */}
-            <div className="border border-gray-200 p-10 bg-gray-50/50">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">자료실</h3>
-              <p className="text-gray-600 text-sm mb-8 leading-relaxed">
-                학원 운영에 유용한 자료를 다운로드하세요
-              </p>
-              <Link href="/resources">
-                <Button 
-                  variant="outline" 
-                  className="w-full border-nexo-navy text-nexo-navy hover:bg-nexo-navy hover:text-white rounded-none font-semibold"
-                >
-                  자료실 바로가기
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
-            </div>
-          </aside>
         </div>
       </div>
     </div>

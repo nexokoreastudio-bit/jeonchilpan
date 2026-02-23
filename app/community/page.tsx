@@ -1,26 +1,36 @@
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { getPostsByBoardType } from '@/lib/supabase/posts'
+import { getPostsByBoardType, type BoardType } from '@/lib/supabase/posts'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { MessageSquare, HelpCircle, Lightbulb, Newspaper } from 'lucide-react'
+import { FileStack, MessageSquare, BadgeCheck } from 'lucide-react'
+import type { Metadata } from 'next'
+import { ForumJsonLd } from '@/components/seo/json-ld'
 import styles from './community.module.css'
 
 const BOARD_TYPES = [
   { type: null, label: '전체', icon: MessageSquare },
-  { type: 'news_discussion', label: '📰 뉴스 토론', icon: Newspaper },
-  { type: 'free', label: '자유게시판', icon: MessageSquare },
-  { type: 'qna', label: 'Q&A', icon: HelpCircle },
-  { type: 'tip', label: '팁 & 노하우', icon: Lightbulb },
-  // 중고장터는 숨김
-  // { type: 'market', label: '중고장터', icon: ShoppingBag },
+  { type: 'bamboo', label: '원장님 대나무숲', icon: MessageSquare },
+  { type: 'materials', label: '넥소 공식 자료실', icon: FileStack },
+  { type: 'verification', label: '구독자 인증', icon: BadgeCheck },
 ] as const
+
+const VALID_BOARD_TYPES: BoardType[] = ['bamboo', 'materials', 'verification']
 
 interface PageProps {
   searchParams: {
     board?: string
   }
+}
+
+export const metadata: Metadata = {
+  title: '커뮤니티 | 학원장·강사 전문가 네트워크',
+  description: '넥소 전자칠판 사용자들의 자료 공유, 지역 네트워크, 구인구직, 자유소통 공간. 학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 커뮤니티.',
+  keywords: ['넥소 커뮤니티', '학원장 모임', '강사 커뮤니티', '전자칠판 자료', '학원 구인구직', '지역 학원 네트워크'],
+  openGraph: {
+    title: '커뮤니티 | NEXO Daily',
+    description: '넥소 전자칠판 사용자들의 자료 공유, 지역 네트워크, 구인구직, 자유소통 공간.',
+  },
 }
 
 export default async function CommunityPage({ searchParams }: PageProps) {
@@ -29,10 +39,10 @@ export default async function CommunityPage({ searchParams }: PageProps) {
   // 현재 사용자 확인
   const { data: { user } } = await supabase.auth.getUser()
 
-  // 게시판 타입 파싱 (중고장터 제외)
+  // 게시판 타입 파싱
   const boardType =
-    searchParams.board && ['free', 'qna', 'tip', 'news_discussion'].includes(searchParams.board)
-      ? (searchParams.board as 'free' | 'qna' | 'tip' | 'news_discussion')
+    searchParams.board && VALID_BOARD_TYPES.includes(searchParams.board as BoardType)
+      ? (searchParams.board as BoardType)
       : null
 
   // 게시글 목록 가져오기
@@ -40,14 +50,23 @@ export default async function CommunityPage({ searchParams }: PageProps) {
 
   const selectedBoard = BOARD_TYPES.find(b => b.type === boardType) || BOARD_TYPES[0]
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const communityUrl = boardType
+    ? `${baseUrl}/community?board=${boardType}`
+    : `${baseUrl}/community`
+
   return (
+    <>
+      <ForumJsonLd
+        name="NEXO Daily 커뮤니티"
+        description="넥소 전자칠판 사용자들의 자료 공유, 지역 네트워크, 구인구직, 자유소통 공간. 학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 커뮤니티."
+        url={communityUrl}
+      />
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>💬 커뮤니티</h1>
         <p className={styles.subtitle}>
-          {boardType === 'news_discussion' 
-            ? '교육 뉴스를 주제로 토론하고 의견을 나눠보세요'
-            : '넥소 사용자들과 정보를 공유하고 소통하세요'}
+          학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 전문가 플랫폼
         </p>
       </div>
 
@@ -71,13 +90,13 @@ export default async function CommunityPage({ searchParams }: PageProps) {
       </div>
 
       {/* 게시글 작성 버튼 */}
-      {user && (
-        <div className={styles.actions}>
+      <div className={styles.actions}>
+        {user && (
           <Link href="/community/write" className={styles.writeButton}>
             ✍️ 글쓰기
           </Link>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* 게시글 목록 */}
       {posts.length === 0 ? (
@@ -96,15 +115,12 @@ export default async function CommunityPage({ searchParams }: PageProps) {
               key={post.id}
               href={`/community/${post.id}`}
               className={styles.postCard}
+              data-board={post.board_type === 'bamboo' ? 'bamboo' : undefined}
             >
               <div className={styles.postHeader}>
                 <div className={styles.postMeta}>
                   <span className={styles.boardType}>
-                    {post.board_type === 'market' 
-                      ? '중고장터' 
-                      : post.board_type === 'news_discussion'
-                      ? '📰 뉴스 토론'
-                      : BOARD_TYPES.find(b => b.type === post.board_type)?.label || '전체'}
+                    {BOARD_TYPES.find(b => b.type === post.board_type)?.label || '전체'}
                   </span>
                   <span className={styles.author}>
                     {post.author?.nickname || '익명'}
@@ -120,22 +136,41 @@ export default async function CommunityPage({ searchParams }: PageProps) {
               <h2 className={styles.postTitle}>{post.title}</h2>
               <p className={styles.postContent}>
                 {post.content.replace(/<[^>]*>/g, '').substring(0, 150)}
-                {post.content.length > 150 ? '...' : ''}
+                {post.content.replace(/<[^>]*>/g, '').length > 150 ? '...' : ''}
               </p>
               <div className={styles.postFooter}>
                 <div className={styles.postStats}>
-                  <span>👍 {post.likes_count}</span>
-                  <span>💬 {post.comments_count}</span>
+                  <div className={styles.statItem}>
+                    <span>👍</span>
+                    <span>{post.likes_count}</span>
+                  </div>
+                  <div className={styles.statItem}>
+                    <MessageSquare className="w-4 h-4" />
+                    <span>{post.comments_count}</span>
+                  </div>
                 </div>
                 {post.images && post.images.length > 0 && (
-                  <span className={styles.hasImages}>📷 {post.images.length}</span>
+                  <span className={styles.hasImages}>
+                    📷 <span>{post.images.length}</span>
+                  </span>
                 )}
               </div>
             </Link>
           ))}
         </div>
       )}
+
+      {/* 자연스러운 연결 - 자료 공유와 연계 */}
+      <div className="mt-12 pt-8 border-t border-gray-100">
+        <p className="text-sm text-gray-500 text-center">
+          자료 공유 게시판에 올리시는 템플릿·자료는 큰 화면에 띄워 보시기 좋게 활용하시면 효과적입니다.{' '}
+          <Link href="/leads/demo" className="text-[#00c4b4] hover:underline font-medium">
+            전자칠판 시연 예약
+          </Link>
+        </p>
+      </div>
     </div>
+    </>
   )
 }
 

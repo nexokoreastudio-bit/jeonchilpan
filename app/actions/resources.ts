@@ -544,23 +544,6 @@ export async function downloadResource(
       email: user.email ? String(user.email) : null,
     }
 
-    // 사용자 정보 확인
-    const { data: userData } = await supabase
-      .from('users')
-      .select('point, level')
-      .eq('id', plainUser.id)
-      .single()
-
-    // Supabase 결과를 plain object로 명시적 변환
-    const typedUserData = userData as { point: number; level: 'bronze' | 'silver' | 'gold' } | null
-    const plainUserData = typedUserData ? {
-      point: Number(typedUserData.point) || 0,
-      level: typedUserData.level || 'bronze',
-    } : { point: 0, level: 'bronze' as const }
-
-    const userPoint = plainUserData.point
-    const userLevel = plainUserData.level
-
     // 자료 정보 확인
     const { data: resourceData, error: resourceError } = await supabase
       .from('resources')
@@ -607,27 +590,6 @@ export async function downloadResource(
       thumbnail_url: typedResourceData.thumbnail_url ? String(typedResourceData.thumbnail_url) : null,
     }
 
-    // 접근 레벨 확인
-    const levelOrder = { bronze: 1, silver: 2, gold: 3 }
-    const userLevelOrder = levelOrder[userLevel]
-    const resourceLevelOrder = levelOrder[resource.access_level]
-
-    if (resourceLevelOrder > userLevelOrder) {
-      return { 
-        success: false, 
-        error: String('접근 권한이 없습니다.') 
-      }
-    }
-
-    // 포인트 확인
-    const downloadCost = resource.download_cost
-    if (userPoint < downloadCost) {
-      return {
-        success: false,
-        error: String(`포인트가 부족합니다. (필요: ${downloadCost}, 현재: ${userPoint})`),
-      }
-    }
-
     // 이미 다운로드한 경우 체크
     const { data: existingDownload } = await supabase
       .from('downloads')
@@ -638,40 +600,8 @@ export async function downloadResource(
 
     const hasDownloaded = !!existingDownload
 
-    // 이미 다운로드한 경우 바로 반환 (plain object로 명시적 반환)
     if (hasDownloaded) {
-      return { 
-        success: true, 
-        fileUrl: String(resource.file_url || '') 
-      }
-    }
-
-    // 포인트 차감
-    if (downloadCost > 0) {
-      const newPoint = Number(userPoint) - downloadCost
-      const updatePointData = {
-        point: newPoint,
-      }
-      const { error: pointError } = await supabase
-        .from('users')
-        .update(updatePointData as any as never)
-        .eq('id', plainUser.id)
-
-      if (pointError) {
-        return { 
-          success: false, 
-          error: String('포인트 차감 실패') 
-        }
-      }
-
-      // 포인트 로그 기록
-      const pointLogData = {
-        user_id: String(plainUser.id),
-        amount: -downloadCost,
-        reason: String('download_resource'),
-        related_id: Number(resourceId),
-      }
-      await supabase.from('point_logs').insert(pointLogData as any)
+      return { success: true, fileUrl: String(resource.file_url || '') }
     }
 
     // 다운로드 이력 기록

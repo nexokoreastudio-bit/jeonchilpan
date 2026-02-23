@@ -65,6 +65,34 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'images.pexels.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'flexible.img.hani.co.kr',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.hani.co.kr',
+      },
+      {
+        protocol: 'https',
+        hostname: 'imgnews.pstatic.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'photo.jtbc.co.kr',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.chosun.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.joins.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dimg.donga.com',
+      },
     ],
     // 프로덕션에서 이미지 최적화 활성화
     unoptimized: false,

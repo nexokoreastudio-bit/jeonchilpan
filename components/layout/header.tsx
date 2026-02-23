@@ -86,6 +86,12 @@ export async function Header() {
               커뮤니티
             </Link>
             <Link
+              href="/seminar"
+              className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
+            >
+              세미나
+            </Link>
+            <Link
               href="/reviews"
               className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
             >

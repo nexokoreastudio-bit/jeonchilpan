@@ -119,7 +119,7 @@ export interface Database {
       posts: {
         Row: {
           id: number
-          board_type: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion' | null
+          board_type: 'bamboo' | 'materials' | 'verification' | null
           title: string
           content: string
           author_id: string | null
@@ -135,7 +135,7 @@ export interface Database {
         }
         Insert: {
           id?: number
-          board_type?: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion' | null
+          board_type?: 'bamboo' | 'materials' | 'verification' | null
           title: string
           content: string
           author_id?: string | null
@@ -151,7 +151,7 @@ export interface Database {
         }
         Update: {
           id?: number
-          board_type?: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion' | null
+          board_type?: 'bamboo' | 'materials' | 'verification' | null
           title?: string
           content?: string
           author_id?: string | null
@@ -260,7 +260,7 @@ export interface Database {
           amount: number
           reason: string | null
           related_id: number | null
-          related_type: 'article' | 'post' | 'comment' | 'resource' | 'checkin' | null
+          related_type: 'article' | 'post' | 'comment' | 'resource' | 'checkin' | 'marketplace' | 'quiz' | null
           created_at: string
         }
         Insert: {
@@ -408,6 +408,105 @@ export interface Database {
           updated_at?: string
         }
       }
+      digital_materials: {
+        Row: {
+          id: number
+          author_id: string
+          title: string
+          description: string | null
+          file_url: string
+          thumbnail_url: string | null
+          subject_category: string | null
+          price: number
+          downloads_count: number
+          is_published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          author_id: string
+          title: string
+          description?: string | null
+          file_url: string
+          thumbnail_url?: string | null
+          subject_category?: string | null
+          price?: number
+          downloads_count?: number
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          author_id?: string
+          title?: string
+          description?: string | null
+          file_url?: string
+          thumbnail_url?: string | null
+          subject_category?: string | null
+          price?: number
+          downloads_count?: number
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      marketplace_purchases: {
+        Row: {
+          id: number
+          buyer_id: string
+          material_id: number
+          price_paid: number
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          buyer_id: string
+          material_id: number
+          price_paid: number
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          buyer_id?: string
+          material_id?: number
+          price_paid?: number
+          created_at?: string
+        }
+      }
+      quiz_leads: {
+        Row: {
+          id: number
+          quiz_type: string
+          result_type: string | null
+          result_summary: Json | null
+          email: string | null
+          name: string | null
+          user_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          quiz_type: string
+          result_type?: string | null
+          result_summary?: Record<string, unknown> | null
+          email?: string | null
+          name?: string | null
+          user_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          quiz_type?: string
+          result_type?: string | null
+          result_summary?: Record<string, unknown> | null
+          email?: string | null
+          name?: string | null
+          user_id?: string | null
+          created_at?: string
+        }
+      }
       downloads: {
         Row: {
           id: number
@@ -519,6 +618,94 @@ export interface Database {
           updated_at?: string
         }
       }
+      seminars: {
+        Row: {
+          id: number
+          title: string
+          description: string | null
+          format: 'offline' | 'online' | 'vod'
+          status: 'recruiting' | 'closed' | 'completed'
+          access_type: 'free' | 'point' | 'gold'
+          point_cost: number
+          thumbnail_url: string | null
+          event_date: string | null
+          location: string | null
+          max_participants: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          title: string
+          description?: string | null
+          format: 'offline' | 'online' | 'vod'
+          status?: 'recruiting' | 'closed' | 'completed'
+          access_type?: 'free' | 'point' | 'gold'
+          point_cost?: number
+          thumbnail_url?: string | null
+          event_date?: string | null
+          location?: string | null
+          max_participants?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          title?: string
+          description?: string | null
+          format?: 'offline' | 'online' | 'vod'
+          status?: 'recruiting' | 'closed' | 'completed'
+          access_type?: 'free' | 'point' | 'gold'
+          point_cost?: number
+          thumbnail_url?: string | null
+          event_date?: string | null
+          location?: string | null
+          max_participants?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      seminar_applications: {
+        Row: {
+          id: number
+          seminar_id: number
+          user_id: string | null
+          name: string
+          email: string
+          phone: string | null
+          academy_name: string | null
+          message: string | null
+          status: 'pending' | 'confirmed' | 'cancelled'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          seminar_id: number
+          user_id?: string | null
+          name: string
+          email: string
+          phone?: string | null
+          academy_name?: string | null
+          message?: string | null
+          status?: 'pending' | 'confirmed' | 'cancelled'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          seminar_id?: number
+          user_id?: string | null
+          name?: string
+          email?: string
+          phone?: string | null
+          academy_name?: string | null
+          message?: string | null
+          status?: 'pending' | 'confirmed' | 'cancelled'
+          created_at?: string
+          updated_at?: string
+        }
+      }
       news_sources: {
         Row: {
           id: number
@@ -567,7 +754,7 @@ export interface Database {
     Enums: {
       user_role: 'admin' | 'teacher' | 'academy_owner' | 'user'
       article_category: 'news' | 'column' | 'update' | 'event'
-      board_type: 'free' | 'qna' | 'tip' | 'market'
+      board_type: 'material_share' | 'regional_network' | 'job_board' | 'free_talk'
       user_level: 'bronze' | 'silver' | 'gold'
       file_type: 'pdf' | 'xlsx' | 'hwp' | 'docx' | 'pptx'
     }

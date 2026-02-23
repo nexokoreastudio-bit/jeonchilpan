@@ -7,19 +7,15 @@ import { Button } from '@/components/ui/button'
 
 interface DownloadResourceButtonProps {
   resourceId: number
-  downloadCost: number
   hasDownloaded: boolean
-  userPoint: number
 }
 
 /**
- * 자료 다운로드 버튼 컴포넌트
+ * 자료 다운로드 버튼 (초현실: 전부 무료)
  */
 export function DownloadResourceButton({
   resourceId,
-  downloadCost,
   hasDownloaded,
-  userPoint,
 }: DownloadResourceButtonProps) {
   const [loading, setLoading] = useState(false)
   const [downloaded, setDownloaded] = useState(hasDownloaded)
@@ -27,16 +23,10 @@ export function DownloadResourceButton({
 
   const handleDownload = async () => {
     if (downloaded) {
-      // 이미 다운로드한 경우 다시 다운로드
       const result = await downloadResource(resourceId)
       if (result.success && result.fileUrl) {
         window.open(result.fileUrl, '_blank')
       }
-      return
-    }
-
-    if (userPoint < downloadCost) {
-      setError(`포인트가 부족합니다. (필요: ${downloadCost}P)`)
       return
     }
 
@@ -48,12 +38,8 @@ export function DownloadResourceButton({
 
       if (result.success && result.fileUrl) {
         setDownloaded(true)
-        // 파일 다운로드
         window.open(result.fileUrl, '_blank')
-        // 페이지 새로고침하여 포인트 업데이트
-        setTimeout(() => {
-          window.location.reload()
-        }, 1000)
+        setTimeout(() => window.location.reload(), 800)
       } else {
         setError(result.error || '다운로드에 실패했습니다.')
       }
@@ -73,11 +59,9 @@ export function DownloadResourceButton({
       )}
       <Button
         onClick={handleDownload}
-        disabled={loading || (!downloaded && userPoint < downloadCost)}
+        disabled={loading}
         className={`w-full ${
-          downloaded
-            ? 'bg-green-600 hover:bg-green-700'
-            : 'bg-nexo-navy hover:bg-nexo-cyan'
+          downloaded ? 'bg-green-600 hover:bg-green-700' : 'bg-nexo-navy hover:bg-nexo-cyan'
         }`}
       >
         {loading ? (
@@ -90,12 +74,10 @@ export function DownloadResourceButton({
         ) : (
           <>
             <Download className="w-4 h-4 mr-2" />
-            {downloadCost > 0 ? `${downloadCost}P로 다운로드` : '무료 다운로드'}
+            다운로드
           </>
         )}
       </Button>
     </div>
   )
 }
-
-

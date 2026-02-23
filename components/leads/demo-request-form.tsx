@@ -18,11 +18,20 @@ export function DemoRequestForm() {
     phone: '',
     academy_name: '',
     region: '',
+    preferred_visit_date: '',
+    preferred_visit_time: '',
     message: '',
-    referrer_code: '',
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const TIME_SLOTS = [
+    { value: '', label: '선택하세요' },
+    { value: '오전 10시~12시', label: '오전 10시~12시' },
+    { value: '오후 2시~4시', label: '오후 2시~4시' },
+    { value: '오후 4시~6시', label: '오후 4시~6시' },
+    { value: '협의 후 결정', label: '협의 후 결정' },
+  ]
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -34,20 +43,29 @@ export function DemoRequestForm() {
     setError('')
     setLoading(true)
 
+    const visitInfo = `[시연 예약] 희망 방문일: ${formData.preferred_visit_date} / 희망 시간대: ${formData.preferred_visit_time}`
+    const fullMessage = formData.message.trim()
+      ? `${visitInfo}\n\n추가 요청사항: ${formData.message}`
+      : visitInfo
+
     try {
-      const result = await createDemoRequest(formData)
+      const result = await createDemoRequest({
+        ...formData,
+        message: fullMessage,
+        referrer_code: undefined,
+      })
 
       if (!result.success) {
-        setError(result.error || '상담 신청에 실패했습니다.')
+        setError(result.error || '예약 신청에 실패했습니다.')
         setLoading(false)
         return
       }
 
       // 성공 시 감사 페이지로 이동
-      alert('상담 신청이 완료되었습니다! 🎉\n빠른 시일 내에 연락드리겠습니다.')
+      alert('시연 예약 신청이 완료되었습니다! 🎉\n빠른 시일 내에 연락드려 방문 일정을 안내해 드리겠습니다.')
       router.push('/')
     } catch (err: any) {
-      setError(err.message || '상담 신청 중 오류가 발생했습니다.')
+      setError(err.message || '예약 신청 중 오류가 발생했습니다.')
       setLoading(false)
     }
   }
@@ -133,12 +151,50 @@ export function DemoRequestForm() {
         />
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="preferred_visit_date">방문 희망 날짜 *</Label>
+          <Input
+            id="preferred_visit_date"
+            name="preferred_visit_date"
+            type="date"
+            value={formData.preferred_visit_date}
+            onChange={handleChange}
+            required
+            disabled={loading}
+            min={new Date().toISOString().split('T')[0]}
+          />
+          <p className="text-xs text-gray-500">
+            쇼룸 방문 희망일을 선택해주세요
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="preferred_visit_time">방문 희망 시간대 *</Label>
+          <select
+            id="preferred_visit_time"
+            name="preferred_visit_time"
+            value={formData.preferred_visit_time}
+            onChange={handleChange}
+            required
+            disabled={loading}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {TIME_SLOTS.map((slot) => (
+              <option key={slot.value} value={slot.value}>
+                {slot.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="message">추가 요청사항</Label>
         <Textarea
           id="message"
           name="message"
-          placeholder="체험 일정이나 특별 요청사항을 입력해주세요"
+          placeholder="특별히 안내해 주실 사항이 있으면 입력해주세요"
           value={formData.message}
           onChange={handleChange}
           rows={4}
@@ -146,29 +202,12 @@ export function DemoRequestForm() {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="referrer_code">추천인 코드</Label>
-        <Input
-          id="referrer_code"
-          name="referrer_code"
-          type="text"
-          placeholder="NEXO-XXXX (선택사항)"
-          value={formData.referrer_code}
-          onChange={handleChange}
-          disabled={loading}
-          className="uppercase"
-        />
-        <p className="text-xs text-gray-500">
-          추천인 코드를 입력하시면 추가 혜택을 받으실 수 있습니다
-        </p>
-      </div>
-
       <Button type="submit" className="w-full" size="lg" disabled={loading}>
-        {loading ? '신청 중...' : '상담 신청하기'}
+        {loading ? '신청 중...' : '시연 예약 신청'}
       </Button>
 
       <p className="text-xs text-center text-gray-500">
-            제출하신 정보는 상담 신청 및 상담 목적으로만 사용됩니다.
+        제출하신 정보는 쇼룸 방문 예약 및 안내 목적으로만 사용됩니다.
       </p>
     </form>
   )

@@ -2,8 +2,11 @@ import type { Metadata } from 'next'
 import { Noto_Sans_KR, Noto_Serif_KR } from 'next/font/google'
 import './globals.css'
 import { HeaderClient } from '@/components/layout/header-client'
+import { Footer } from '@/components/layout/footer'
+import { PageSidebar } from '@/components/layout/page-sidebar'
 import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/json-ld'
 import { KakaoSDKLoader } from '@/components/kakao/kakao-sdk-loader'
+import { SalesAIChatbot } from '@/components/chat/sales-ai-chatbot'
 
 const notoSans = Noto_Sans_KR({
   subsets: ['latin'],
@@ -94,11 +97,16 @@ export default function RootLayout({
 
   return (
     <html lang="ko" className={`${notoSans.variable} ${notoSerif.variable}`}>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased flex flex-col min-h-screen">
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         <HeaderClient />
-        {children}
+        <main className="flex-1 flex">
+          <div className="flex-1 min-w-0">{children}</div>
+          <PageSidebar />
+        </main>
+        <Footer />
+        <SalesAIChatbot />
         {/* 카카오 SDK 로드 (JavaScript 키가 설정된 경우에만) */}
         {kakaoJsKey && <KakaoSDKLoader jsKey={kakaoJsKey} />}
       </body>

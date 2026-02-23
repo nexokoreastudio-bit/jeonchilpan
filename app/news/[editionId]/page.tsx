@@ -291,24 +291,24 @@ export default async function EditionPage({
           <DiscountBanner />
 
           {/* CTA 버튼 (상담 신청 / 견적 요청) */}
-          <div className="mt-8 p-6 bg-gradient-to-r from-nexo-navy to-nexo-cyan rounded-xl text-white">
+          <div className="mt-8 p-6 bg-gray-50 border border-gray-100 rounded-xl">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
-                <h3 className="text-xl font-bold mb-2">전자칠판 상담 및 견적 문의</h3>
-                <p className="text-white/90">구독자 전용 특별 할인 혜택을 받아보세요</p>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">학원 수업 환경 개선이 궁금하신가요?</h3>
+                <p className="text-gray-600 text-sm">이 자료는 큰 화면에 띄워 활용하시기 좋습니다. 학원에 맞는 디지털 도구를 직접 체험해보세요.</p>
               </div>
               <div className="flex gap-3">
                 <Link
                   href="/leads/demo"
-                  className="px-6 py-3 bg-white text-nexo-navy font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+                  className="px-5 py-2.5 bg-[#1a1a1a] text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
                 >
-                  상담 신청
+                  시연 예약
                 </Link>
                 <Link
                   href="/leads/quote"
-                  className="px-6 py-3 bg-nexo-cyan text-white font-semibold rounded-lg hover:bg-nexo-cyan/90 transition-colors"
+                  className="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  견적 요청
+                  견적 문의
                 </Link>
               </div>
             </div>

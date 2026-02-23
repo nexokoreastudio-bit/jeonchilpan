@@ -57,11 +57,8 @@ export async function GET() {
       typedPosts.forEach((post) => {
         const dateKey = format(new Date(post.created_at), 'yyyy-MM-dd')
         if (dailyCounts[dateKey]) {
-          if (post.board_type === 'review') {
-            dailyCounts[dateKey].reviews++
-          } else {
-            dailyCounts[dateKey].posts++
-          }
+          dailyCounts[dateKey].posts++
+          // Lean: board_type 'review' 제거됨, reviews는 0 유지
         }
       })
     }

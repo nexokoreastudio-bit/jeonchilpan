@@ -15,6 +15,8 @@ interface DemoRequestData {
   region: string
   message?: string
   referrer_code?: string
+  preferred_visit_date?: string
+  preferred_visit_time?: string
 }
 
 interface QuoteRequestData {
@@ -28,6 +30,14 @@ interface QuoteRequestData {
   quantity?: number
   message?: string
   referrer_code?: string
+}
+
+interface ConsultationRequestData {
+  name: string
+  email: string
+  phone?: string
+  academy_name?: string
+  message?: string
 }
 
 /**
@@ -47,7 +57,7 @@ export async function createDemoRequest(
       academy_name: data.academy_name || null,
       region: data.region,
       message: data.message || null,
-      referrer_code: data.referrer_code || null,
+      referrer_code: data.referrer_code || null, // 시연 예약에서는 미사용
       status: 'pending',
     }
 
@@ -68,6 +78,46 @@ export async function createDemoRequest(
     return { success: true, leadId: lead?.id }
   } catch (error: any) {
     console.error('상담 신청 오류:', error)
+    return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
+  }
+}
+
+/**
+ * 상담 스크립트 생성기 등 consultation 리드 생성
+ */
+export async function createConsultationRequest(
+  data: ConsultationRequestData
+): Promise<{ success: boolean; error?: string; leadId?: number }> {
+  try {
+    const supabase = await createClient()
+
+    const leadData: LeadInsert = {
+      type: 'consultation',
+      name: data.name,
+      email: data.email,
+      phone: data.phone || null,
+      academy_name: data.academy_name || null,
+      region: null,
+      message: data.message || null,
+      referrer_code: null,
+      status: 'pending',
+    }
+
+    const { data: lead, error } = await (supabase
+      .from('leads') as any)
+      .insert(leadData)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('상담 리드 생성 실패:', error)
+      return { success: false, error: '처리 중 오류가 발생했습니다.' }
+    }
+
+    revalidatePath('/admin/leads')
+    return { success: true, leadId: lead?.id }
+  } catch (error: any) {
+    console.error('상담 리드 오류:', error)
     return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
   }
 }

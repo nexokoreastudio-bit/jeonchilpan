@@ -1,3 +1,4 @@
+/* 미니멀/깔끔 스타일 - 흰 배경, 얇은 선, 최소 그림자 */
 .container {
   max-width: 1000px;
   margin: 0 auto;
@@ -10,23 +11,22 @@
 }
 
 .header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #1a1a1a;
-  margin-bottom: 16px;
-  font-family: 'Noto Serif KR', serif;
+  margin-bottom: 12px;
 }
 
 .subtitle {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   color: #666;
 }
 
 .tabs {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   margin-bottom: 24px;
-  border-bottom: 2px solid #e8e8e8;
+  border-bottom: 1px solid #e5e7eb;
   flex-wrap: wrap;
 }
 
@@ -34,18 +34,17 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 20px;
+  padding: 12px 16px;
   text-decoration: none;
-  color: #666;
+  color: #6b7280;
   font-weight: 500;
   border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  transition: all 0.2s;
+  margin-bottom: -1px;
+  transition: color 0.2s, border-color 0.2s;
 }
 
 .tab:hover {
   color: #1a1a1a;
-  background: #f5f5f5;
 }
 
 .tab.active {
@@ -61,45 +60,56 @@
 
 .actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 24px;
+}
+
+.pointHint {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.pointHint strong {
+  color: #00c4b4;
+  font-weight: 600;
 }
 
 .writeButton {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 10px 20px;
   background: #1a1a1a;
   color: white;
-  border-radius: 8px;
+  border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
 }
 
 .writeButton:hover {
   background: #00c4b4;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 196, 180, 0.3);
 }
 
 .empty {
   text-align: center;
-  padding: 80px 20px;
-  color: #999;
+  padding: 64px 20px;
+  color: #9ca3af;
 }
 
 .emptyWriteButton {
   display: inline-block;
   margin-top: 16px;
-  padding: 12px 24px;
+  padding: 10px 20px;
   background: #1a1a1a;
   color: white;
-  border-radius: 8px;
+  border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
 }
 
 .emptyWriteButton:hover {
@@ -114,19 +124,17 @@
 
 .postCard {
   display: block;
-  padding: 24px;
+  padding: 20px;
   background: white;
-  border: 1px solid #e8e8e8;
-  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   text-decoration: none;
   color: inherit;
-  transition: all 0.2s;
+  transition: border-color 0.2s;
 }
 
 .postCard:hover {
   border-color: #00c4b4;
-  box-shadow: 0 4px 12px rgba(0, 196, 180, 0.1);
-  transform: translateY(-2px);
 }
 
 .postHeader {
@@ -141,15 +149,15 @@
   align-items: center;
   gap: 12px;
   font-size: 0.875rem;
-  color: #666;
+  color: #6b7280;
 }
 
 .boardType {
-  padding: 4px 12px;
-  background: #f0f0f0;
+  padding: 4px 10px;
+  background: #f3f4f6;
   border-radius: 4px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #374151;
 }
 
 .author {
@@ -157,18 +165,18 @@
 }
 
 .date {
-  color: #999;
+  color: #9ca3af;
 }
 
 .updated {
   font-size: 0.75rem;
-  color: #999;
+  color: #9ca3af;
   font-style: italic;
 }
 
 .postTitle {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.125rem;
+  font-weight: 600;
   color: #1a1a1a;
   margin-bottom: 8px;
   line-height: 1.4;
@@ -176,9 +184,13 @@
 
 .postContent {
   font-size: 0.9375rem;
-  color: #666;
+  color: #6b7280;
   line-height: 1.6;
   margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .postFooter {
@@ -186,14 +198,29 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #f3f4f6;
 }
 
 .postStats {
   display: flex;
   gap: 16px;
   font-size: 0.875rem;
-  color: #999;
+  color: #9ca3af;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 원장님 생존기 - 공감 버튼 크기 확대 */
+.postCard[data-board="bamboo"] .statItem:first-child {
+  padding: 6px 12px;
+  background: rgba(0, 196, 180, 0.1);
+  border-radius: 8px;
+  font-weight: 600;
+  color: #00c4b4;
 }
 
 .hasImages {
@@ -206,7 +233,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 24px;
-  color: #666;
+  color: #6b7280;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
@@ -216,15 +243,10 @@
   color: #1a1a1a;
 }
 
-.backIcon {
-  width: 18px;
-  height: 18px;
-}
-
 .postDetail {
   background: white;
-  border: 1px solid #e8e8e8;
-  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 32px;
   margin-bottom: 32px;
 }
@@ -232,7 +254,7 @@
 .postDetailHeader {
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .postDetailMeta {
@@ -240,16 +262,29 @@
   align-items: center;
   gap: 12px;
   font-size: 0.875rem;
-  color: #666;
+  color: #6b7280;
   flex-wrap: wrap;
+  margin-bottom: 16px;
 }
 
 .postDetailTitle {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #1a1a1a;
   margin-bottom: 24px;
   line-height: 1.4;
+}
+
+.authorBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #374151;
+  font-weight: 600;
 }
 
 .postImages {
@@ -263,15 +298,17 @@
   width: 100%;
   max-width: 800px;
   height: auto;
-  border-radius: 8px;
-  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
 }
 
 .postDetailContent {
   font-size: 1rem;
-  line-height: 1.8;
-  color: #333;
+  line-height: 1.75;
+  color: #374151;
   margin-bottom: 32px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .postDetailFooter {
@@ -279,7 +316,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 24px;
-  border-top: 1px solid #e8e8e8;
+  border-top: 1px solid #e5e7eb;
 }
 
 .postActions {
@@ -294,27 +331,27 @@
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: background-color 0.2s, color 0.2s;
   border: none;
   cursor: pointer;
 }
 
 .editButton {
-  background: #f0f0f0;
+  background: #f3f4f6;
   color: #1a1a1a;
 }
 
 .editButton:hover {
-  background: #e0e0e0;
+  background: #e5e7eb;
 }
 
 .deleteButton {
-  background: #fee;
-  color: #c00;
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .deleteButton:hover {
-  background: #fdd;
+  background: #fee2e2;
 }
 
 .deleteButton:disabled {
@@ -330,7 +367,7 @@
 
 .deleteConfirmText {
   font-size: 0.875rem;
-  color: #666;
+  color: #6b7280;
 }
 
 .deleteConfirmButtons {
@@ -346,25 +383,25 @@
   font-weight: 500;
   border: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
 }
 
 .deleteConfirmButton {
-  background: #c00;
+  background: #dc2626;
   color: white;
 }
 
 .deleteConfirmButton:hover:not(:disabled) {
-  background: #a00;
+  background: #b91c1c;
 }
 
 .cancelButton {
-  background: #f0f0f0;
-  color: #333;
+  background: #f3f4f6;
+  color: #374151;
 }
 
 .cancelButton:hover:not(:disabled) {
-  background: #e0e0e0;
+  background: #e5e7eb;
 }
 
 .deleteConfirmButton:disabled,
@@ -375,68 +412,63 @@
 
 .commentsSection {
   background: white;
-  border: 1px solid #e8e8e8;
-  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 32px;
 }
 
 .commentsTitle {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #1a1a1a;
-  margin-bottom: 16px;
-}
-
-.commentsComingSoon {
-  color: #999;
-  font-style: italic;
+  margin-bottom: 20px;
 }
 
 .commentForm {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   padding-bottom: 24px;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .commentLoginPrompt {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   padding: 20px;
-  background: #f9f9f9;
-  border-radius: 8px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
   text-align: center;
 }
 
 .commentLoginPrompt p {
   margin-bottom: 12px;
-  color: #666;
+  color: #6b7280;
 }
 
 .commentsList {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .commentsLoading,
 .commentsEmpty {
   text-align: center;
-  color: #999;
-  padding: 40px 20px;
-  font-style: italic;
+  color: #9ca3af;
+  padding: 32px 20px;
 }
 
 .commentItem {
-  padding: 20px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  border: 1px solid #e8e8e8;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
 }
 
 .commentHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .commentAuthor {
@@ -456,12 +488,12 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #ddd;
+  background: #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  color: #666;
+  color: #6b7280;
   font-size: 0.875rem;
 }
 
@@ -472,29 +504,29 @@
 }
 
 .commentDate {
-  color: #999;
-  font-size: 0.875rem;
+  color: #9ca3af;
+  font-size: 0.8125rem;
 }
 
 .commentDeleteButton {
-  color: #999;
+  color: #9ca3af;
   padding: 4px;
 }
 
 .commentDeleteButton:hover {
-  color: #c00;
-  background: #fee;
+  color: #dc2626;
 }
 
 .commentContent {
-  color: #333;
+  color: #374151;
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
+  font-size: 0.9375rem;
 }
 
 .commentContent p {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .commentContent p:last-child {
@@ -503,11 +535,11 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 20px 16px;
+    padding: 24px 16px;
   }
 
   .header h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 
   .tabs {
@@ -528,7 +560,7 @@
   }
 
   .postDetailTitle {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
   }
 
   .commentsSection {
@@ -536,12 +568,11 @@
   }
 
   .commentItem {
-    padding: 16px;
+    padding: 12px;
   }
 
   .commentForm {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     padding-bottom: 20px;
   }
 }
-

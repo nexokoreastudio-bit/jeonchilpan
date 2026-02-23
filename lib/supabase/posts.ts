@@ -5,6 +5,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database'
 
+/** Lean 리뉴얼: board_type (대나무숲 + 공식 자료실 + 구독자 인증) */
+export type BoardType =
+  | 'bamboo'       // 원장님 대나무숲 - 익명/하소연
+  | 'materials'    // 넥소 공식 자료실 - 다운로드 전용
+  | 'verification' // 구독자 인증 요청 - 인증글 작성
+
 type Post = Database['public']['Tables']['posts']['Row']
 type PostRow = Database['public']['Tables']['posts']['Row']
 type PostInsert = Database['public']['Tables']['posts']['Insert']
@@ -23,7 +29,7 @@ export interface PostWithAuthor extends Post {
  * 중고장터(market) 게시글은 제외
  */
 export async function getPostsByBoardType(
-  boardType: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion' | null = null,
+  boardType: BoardType | null = null,
   limit: number = 20,
   offset: number = 0
 ): Promise<PostWithAuthor[]> {
@@ -42,10 +48,7 @@ export async function getPostsByBoardType(
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
 
-  // 중고장터 게시글은 항상 제외
-  query = query.neq('board_type', 'market')
-
-  if (boardType && boardType !== 'market') {
+  if (boardType) {
     query = query.eq('board_type', boardType)
   }
 
@@ -96,7 +99,7 @@ export interface PostWithNews extends PostWithAuthor {
  * 게시글 작성
  */
 export async function createPost(
-  boardType: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion',
+  boardType: BoardType,
   title: string,
   content: string,
   authorId: string,
@@ -115,7 +118,7 @@ export async function createPost(
       images: images || null,
       likes_count: 0,
       comments_count: 0,
-      rating: boardType === 'review' ? (rating || null) : null,
+      rating: null,
       is_best: false,
       is_verified_review: false,
       news_id: newsId || null,
@@ -141,18 +144,18 @@ export async function createPost(
 }
 
 /**
- * 게시글 수정
+ * 게시글 수정 (작성자 본인 또는 관리자)
  */
 export async function updatePost(
   postId: number,
   title: string,
   content: string,
-  authorId: string
+  userId: string,
+  boardType?: BoardType
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient()
 
-    // 작성자 확인
     const { data: postData } = await supabase
       .from('posts')
       .select('author_id')
@@ -160,14 +163,29 @@ export async function updatePost(
       .single()
 
     const post = postData as Pick<PostRow, 'author_id'> | null
+    if (!post) return { success: false, error: '게시글을 찾을 수 없습니다.' }
 
-    if (!post || post.author_id !== authorId) {
-      return { success: false, error: '권한이 없습니다.' }
+    const isAuthor = post.author_id === userId
+
+    // 관리자 권한 확인
+    let isAdmin = false
+    if (!isAuthor) {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', userId)
+        .single()
+      isAdmin = (profile as { role?: string } | null)?.role === 'admin'
+    }
+
+    if (!isAuthor && !isAdmin) {
+      return { success: false, error: '수정 권한이 없습니다.' }
     }
 
     const updateData: PostUpdate = {
       title,
       content,
+      ...(boardType && { board_type: boardType }),
       updated_at: new Date().toISOString(),
     }
 

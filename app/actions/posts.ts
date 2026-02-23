@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createPost as createPostQuery, deletePost as deletePostQuery } from '@/lib/supabase/posts'
+import { createPost as createPostQuery, deletePost as deletePostQuery, updatePost as updatePostQuery, type BoardType } from '@/lib/supabase/posts'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation'
  * 게시글 작성 서버 액션
  */
 export async function createPost(
-  boardType: 'free' | 'qna' | 'tip' | 'market' | 'review' | 'news_discussion',
+  boardType: BoardType,
   title: string,
   content: string,
   authorId: string,
@@ -26,11 +26,6 @@ export async function createPost(
       return { success: false, error: '인증되지 않은 사용자입니다.' }
     }
 
-    // 후기 작성 시 평점 필수 확인
-    if (boardType === 'review' && !rating) {
-      return { success: false, error: '후기 작성 시 평점을 선택해주세요.' }
-    }
-
     // 게시글 작성 (DB 트리거가 자동으로 포인트 지급)
     const result = await createPostQuery(boardType, title, content, authorId, images, rating, newsId)
 
@@ -44,6 +39,39 @@ export async function createPost(
     return result
   } catch (error: any) {
     console.error('게시글 작성 오류:', error)
+    return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
+  }
+}
+
+/**
+ * 게시글 수정 서버 액션
+ */
+export async function updatePost(
+  postId: number,
+  title: string,
+  content: string,
+  userId: string,
+  boardType?: BoardType
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user || user.id !== userId) {
+      return { success: false, error: '인증되지 않은 사용자입니다.' }
+    }
+
+    const result = await updatePostQuery(postId, title, content, userId, boardType)
+
+    if (result.success) {
+      revalidatePath('/community')
+      revalidatePath(`/community/${postId}`)
+      revalidatePath('/mypage')
+    }
+
+    return result
+  } catch (error: any) {
+    console.error('게시글 수정 오류:', error)
     return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
   }
 }

@@ -2,8 +2,6 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { SubscriberVerification } from '@/components/mypage/subscriber-verification'
 import { DiscountBadge } from '@/components/mypage/discount-badge'
-import { ReferralSection } from '@/components/mypage/referral-section'
-import { DailyCheckin } from '@/components/mypage/daily-checkin'
 import { Database } from '@/types/database'
 import styles from './mypage.module.css'
 
@@ -65,12 +63,6 @@ export default async function MyPage() {
         <SubscriberVerification userId={user.id} />
       )}
 
-      {/* 일일 출석 */}
-      <DailyCheckin />
-
-      {/* 추천인 시스템 */}
-      <ReferralSection userId={user.id} />
-
       {/* 사용자 정보 */}
       <div className={styles.section}>
         <h2>📋 내 정보</h2>
@@ -86,18 +78,6 @@ export default async function MyPage() {
           <div className={styles.infoRow}>
             <span className={styles.infoLabel}>학원명</span>
             <span className={styles.infoValue}>{userProfile.academy_name || '-'}</span>
-          </div>
-          <div className={styles.infoRow}>
-            <span className={styles.infoLabel}>포인트</span>
-            <span className={styles.infoValue}>{userProfile.point || 0}점</span>
-          </div>
-          <div className={styles.infoRow}>
-            <span className={styles.infoLabel}>레벨</span>
-            <span className={styles.infoValue}>
-              {userProfile.level === 'gold' ? '🥇 골드' : 
-               userProfile.level === 'silver' ? '🥈 실버' : 
-               '🥉 브론즈'}
-            </span>
           </div>
           <div className={styles.infoRow}>
             <span className={styles.infoLabel}>가입일</span>

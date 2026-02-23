@@ -25,43 +25,37 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
   }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-  }
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+  html {
+    /* 학원장님 연령대 고려 - 모바일에서도 글씨 큼직하게 */
+    font-size: 16px;
+  }
+  @media (min-width: 640px) {
+    html {
+      font-size: 17px;
+    }
+  }
+  @media (min-width: 1024px) {
+    html {
+      font-size: 18px;
+    }
+  }
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-white text-gray-900;
     font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
   }
 }
 
-/* 라이트바겐 스타일 개선 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+
 .container {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
 }
@@ -78,10 +72,7 @@
   }
 }
 
-/* NEXO 브랜드 폰트 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;700&display=swap');
-
-/* NEXO Weekly 뉴스레터 콘텐츠 스타일 */
+/* NEXO Weekly 뉴스레터 콘텐츠 */
 .newsletter-content {
   color: #1a1a1a;
   line-height: 1.8;
@@ -151,17 +142,15 @@
   margin: 2.5rem 0;
 }
 
-/* NEXO Insight 섹션 */
-.newsletter-content .bg-slate-50 {
-  background: #f8fafc;
+.newsletter-content .insight-section {
+  background: #f9fafb;
   padding: 1.5rem;
-  border-radius: 0.75rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
   margin-bottom: 2.5rem;
 }
 
-.newsletter-content .bg-nexo-navy {
+.newsletter-content .badge-navy {
   background: #1a1a1a;
   color: #fff;
   font-size: 0.75rem;
@@ -172,158 +161,32 @@
   margin-bottom: 1rem;
 }
 
-.newsletter-content .text-nexo-navy {
-  color: #1a1a1a;
-}
-
-.newsletter-content .text-nexo-cyan {
-  color: #00c4b4;
-}
-
-.newsletter-content .border-nexo-cyan {
-  border-color: #00c4b4;
-}
-
-.newsletter-content .text-gray-800 {
-  color: #1f2937;
-}
-
-.newsletter-content .text-gray-700 {
-  color: #374151;
-}
-
-.newsletter-content .text-gray-500 {
-  color: #6b7280;
-}
-
-.newsletter-content .text-gray-300 {
-  color: #d1d5db;
-}
-
-.newsletter-content .bg-gray-900 {
+.newsletter-content .footer-cta {
   background: #1a1a1a;
   color: #fff;
   padding: 2rem;
-  border-radius: 0.75rem;
+  border-radius: 6px;
   text-align: center;
   margin-top: 3rem;
 }
 
-.newsletter-content .bg-nexo-cyan {
+.newsletter-content .button-cyan {
   background: #00c4b4;
   color: #1a1a1a;
   font-weight: 700;
   padding: 0.75rem 2rem;
-  border-radius: 9999px;
+  border-radius: 6px;
   text-decoration: none;
   display: inline-block;
   transition: background-color 0.2s;
 }
 
-.newsletter-content .bg-nexo-cyan:hover {
+.newsletter-content .button-cyan:hover {
   background: #fff;
 }
 
-.newsletter-content .space-y-10 > * + * {
-  margin-top: 2.5rem;
-}
-
-.newsletter-content .space-y-2 > * + * {
-  margin-top: 0.5rem;
-}
-
-.newsletter-content .mb-4 {
-  margin-bottom: 1rem;
-}
-
-.newsletter-content .mb-3 {
-  margin-bottom: 0.75rem;
-}
-
-.newsletter-content .mb-6 {
-  margin-bottom: 1.5rem;
-}
-
-.newsletter-content .mb-8 {
-  margin-bottom: 2rem;
-}
-
-.newsletter-content .mt-12 {
-  margin-top: 3rem;
-}
-
-.newsletter-content .p-6 {
-  padding: 1.5rem;
-}
-
-.newsletter-content .p-8 {
-  padding: 2rem;
-}
-
-.newsletter-content .rounded-xl {
-  border-radius: 0.75rem;
-}
-
-.newsletter-content .border {
-  border-width: 1px;
-}
-
-.newsletter-content .border-slate-200 {
-  border-color: #e2e8f0;
-}
-
-.newsletter-content .shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.newsletter-content .flex {
-  display: flex;
-}
-
-.newsletter-content .items-center {
-  align-items: center;
-}
-
-.newsletter-content .gap-2 {
-  gap: 0.5rem;
-}
-
-.newsletter-content .leading-relaxed {
-  line-height: 1.625;
-}
-
-.newsletter-content .text-xs {
-  font-size: 0.75rem;
-}
-
-.newsletter-content .text-xl {
-  font-size: 1.25rem;
-}
-
-.newsletter-content .text-2xl {
-  font-size: 1.5rem;
-}
-
-.newsletter-content .text-lg {
-  font-size: 1.125rem;
-}
-
-.newsletter-content .text-sm {
-  font-size: 0.875rem;
-}
-
-.newsletter-content .font-bold {
+.newsletter-content-bold {
   font-weight: 700;
-}
-
-.newsletter-content .hover\:underline:hover {
-  text-decoration: underline;
-}
-
-.newsletter-content .transition-colors {
-  transition-property: color, background-color, border-color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
 }
 
 @media (max-width: 768px) {
@@ -335,32 +198,23 @@
     font-size: 1.125rem;
   }
 
-  .newsletter-content .bg-slate-50 {
-    padding: 1rem;
-  }
-
-  .newsletter-content .bg-gray-900 {
-    padding: 1.5rem;
-  }
-
   .newsletter-content h4 {
     font-size: 1.25rem;
   }
 }
 
-/* 현장 소식 이미지 스타일 (네이버 카페 스타일) */
+/* 현장 소식 이미지 */
 .field-news-image,
 .newsletter-content img.field-news-image {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 6px;
   margin: 16px 0;
   display: block;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
 }
 
 .field-news-image:hover {
   opacity: 0.9;
   transition: opacity 0.2s;
 }
-

@@ -44,9 +44,9 @@ export default async function FieldNewsPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>🏗️ 넥소 현장 소식</h1>
+        <h1>🏗️ 현장 소식</h1>
         <p className={styles.subtitle}>
-          전국 각지에서 진행되는 넥소 전자칠판 설치 현장을 소개합니다
+          전국 학원들의 수업 환경 개선 현장을 소개합니다. 실제 학원장님들의 도입 후기를 만나보세요.
         </p>
       </div>
 

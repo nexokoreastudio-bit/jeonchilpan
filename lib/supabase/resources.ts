@@ -37,10 +37,6 @@ export async function getAllResources(
 
   const resources = (data || []) as Resource[]
 
-  // 사용자 레벨에 따른 접근 가능 여부 확인
-  const levelOrder = { bronze: 1, silver: 2, gold: 3 }
-  const userLevelOrder = levelOrder[userLevel]
-
   // 다운로드 이력 확인 (사용자가 로그인한 경우)
   let downloadedResourceIds: number[] = []
   if (userId) {
@@ -52,14 +48,11 @@ export async function getAllResources(
     downloadedResourceIds = (downloads || []).map((d: any) => d.resource_id)
   }
 
-  return resources.map(resource => {
-    const resourceLevelOrder = levelOrder[resource.access_level]
-    return {
-      ...resource,
-      canAccess: resourceLevelOrder <= userLevelOrder,
-      hasDownloaded: downloadedResourceIds.includes(resource.id),
-    }
-  }) as ResourceWithAccess[]
+  return resources.map(resource => ({
+    ...resource,
+    canAccess: true,
+    hasDownloaded: downloadedResourceIds.includes(resource.id),
+  })) as ResourceWithAccess[]
 }
 
 /**
@@ -85,10 +78,6 @@ export async function getResourceById(
 
   const resource = data as Resource
 
-  // 접근 가능 여부 확인
-  const levelOrder = { bronze: 1, silver: 2, gold: 3 }
-  const canAccess = levelOrder[resource.access_level] <= levelOrder[userLevel]
-
   // 다운로드 이력 확인
   let hasDownloaded = false
   if (userId) {
@@ -104,13 +93,13 @@ export async function getResourceById(
 
   return {
     ...resource,
-    canAccess,
+    canAccess: true,
     hasDownloaded,
   } as ResourceWithAccess
 }
 
 /**
- * 자료 다운로드 처리
+ * 자료 다운로드 처리 (초현실: 로그인 사용자 전원 무료)
  */
 export async function downloadResource(
   resourceId: number,
@@ -120,22 +109,6 @@ export async function downloadResource(
   try {
     const supabase = await createClient()
 
-    // 사용자 정보 확인
-    const { data: userData } = await supabase
-      .from('users')
-      .select('point, level')
-      .eq('id', userId)
-      .single()
-
-    const user = userData as Pick<UserRow, 'point' | 'level'> | null
-
-    if (!user) {
-      return { success: false, error: '사용자를 찾을 수 없습니다.' }
-    }
-    
-    const userPoint = user.point || 0
-
-    // 자료 정보 확인
     const resource = await getResourceById(resourceId, userLevel, userId)
 
     if (!resource) {
@@ -146,42 +119,8 @@ export async function downloadResource(
       return { success: false, error: '접근 권한이 없습니다.' }
     }
 
-    // 포인트 확인
-    if (userPoint < resource.download_cost) {
-      return {
-        success: false,
-        error: `포인트가 부족합니다. (필요: ${resource.download_cost}, 현재: ${userPoint})`,
-      }
-    }
-
-    // 이미 다운로드한 경우 체크
     if (resource.hasDownloaded) {
       return { success: true, fileUrl: resource.file_url }
-    }
-
-    // 포인트 차감
-    if (resource.download_cost > 0) {
-      type UserUpdate = Database['public']['Tables']['users']['Update']
-      type PointLogInsert = Database['public']['Tables']['point_logs']['Insert']
-      
-      const userUpdateData: UserUpdate = { point: userPoint - resource.download_cost }
-      const { error: pointError } = await supabase
-        .from('users')
-        .update(userUpdateData as any as never)
-        .eq('id', userId)
-
-      if (pointError) {
-        return { success: false, error: '포인트 차감 실패' }
-      }
-
-      // 포인트 로그 기록
-      const pointLogData: PointLogInsert = {
-        user_id: userId,
-        amount: -resource.download_cost,
-        reason: 'download_resource',
-        related_id: resourceId,
-      }
-      await supabase.from('point_logs').insert(pointLogData as any as never)
     }
 
     // 다운로드 이력 기록

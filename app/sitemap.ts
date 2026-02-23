@@ -43,6 +43,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily' as const,
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}/seminar`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/quiz`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/community?board=bamboo`,
+      lastModified: new Date(),
+      changeFrequency: 'hourly' as const,
+      priority: 0.75,
+    },
+    {
+      url: `${baseUrl}/community?board=materials`,
+      lastModified: new Date(),
+      changeFrequency: 'hourly' as const,
+      priority: 0.75,
+    },
   ]
 
   try {
@@ -64,6 +88,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .order('published_at', { ascending: false })
       .limit(100) // 최근 100개만 (사이트맵 크기 제한 고려)
 
+    // 커뮤니티 게시글 (SEO용 - 검색 노출)
+    const { data: communityPosts } = await supabase
+      .from('posts')
+      .select('id, updated_at, created_at')
+      .order('created_at', { ascending: false })
+      .limit(200)
+
+    const communityRoutes = (communityPosts || []).map((post: { id: number; updated_at: string; created_at: string }) => ({
+      url: `${baseUrl}/community/${post.id}`,
+      lastModified: post.updated_at ? new Date(post.updated_at) : new Date(post.created_at),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    }))
+
+    // 세미나 목록
+    const { data: seminars } = await supabase
+      .from('seminars')
+      .select('id, updated_at')
+      .limit(50)
+
+    const seminarRoutes = (seminars || []).map((s: { id: number; updated_at: string }) => ({
+      url: `${baseUrl}/seminar/${s.id}`,
+      lastModified: s.updated_at ? new Date(s.updated_at) : new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }))
+
     const fieldNewsRoutes = (fieldNews || []).map((news: any) => ({
       url: `${baseUrl}/field/${news.id}`,
       lastModified: news.updated_at 
@@ -75,7 +126,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }))
     
-    return [...routes, ...editionRoutes, ...fieldNewsRoutes]
+    return [...routes, ...editionRoutes, ...communityRoutes, ...seminarRoutes, ...fieldNewsRoutes]
   } catch (error) {
     console.error('Sitemap 생성 오류:', error)
     return routes

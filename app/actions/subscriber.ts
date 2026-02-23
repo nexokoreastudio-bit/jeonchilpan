@@ -97,35 +97,46 @@ function validateSerialNumber(serial: string): boolean {
 
 /**
  * 구독자 인증 상태 조회
+ * requestPending: 인증글을 작성했으나 아직 승인 전
  */
 export async function getSubscriberStatus(userId: string) {
   try {
     const supabase = await createClient()
 
-    const { data: userData, error } = await supabase
-      .from('users')
-      .select('subscriber_verified, purchase_serial_number, verified_at, subscriber_verification_request, verification_requested_at')
-      .eq('id', userId)
-      .single()
+    const [userResult, postResult] = await Promise.all([
+      supabase
+        .from('users')
+        .select('subscriber_verified, purchase_serial_number, verified_at')
+        .eq('id', userId)
+        .single(),
+      supabase
+        .from('posts')
+        .select('id, created_at')
+        .eq('board_type', 'verification')
+        .eq('author_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ])
 
-    if (error) {
-      return { verified: false, error: error.message }
+    if (userResult.error) {
+      return { verified: false, error: userResult.error.message }
     }
 
-    const data = userData as {
+    const data = userResult.data as {
       subscriber_verified?: boolean
       purchase_serial_number?: string | null
       verified_at?: string | null
-      subscriber_verification_request?: boolean
-      verification_requested_at?: string | null
     } | null
+
+    const verificationPost = postResult.data as { id: number; created_at: string } | null
 
     return {
       verified: data?.subscriber_verified || false,
       serialNumber: data?.purchase_serial_number || null,
       verifiedAt: data?.verified_at || null,
-      requestPending: data?.subscriber_verification_request || false,
-      requestedAt: data?.verification_requested_at || null,
+      requestPending: !data?.subscriber_verified && !!verificationPost,
+      requestedAt: verificationPost?.created_at || null,
     }
   } catch (error: any) {
     return { verified: false, error: error.message }
@@ -133,64 +144,10 @@ export async function getSubscriberStatus(userId: string) {
 }
 
 /**
- * 구독자 인증 요청
+ * 구독자 인증 요청 - 인증글 작성 페이지로 리다이렉트 (클라이언트에서 처리)
  */
-export async function requestSubscriberVerification(userId: string): Promise<{ success: boolean; error?: string }> {
-  try {
-    const supabase = await createClient()
-
-    // 현재 사용자 확인
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user || user.id !== userId) {
-      return { success: false, error: '인증되지 않은 사용자입니다.' }
-    }
-
-    // 이미 인증된 사용자인지 확인
-    const { data: existingUserData } = await supabase
-      .from('users')
-      .select('subscriber_verified, subscriber_verification_request')
-      .eq('id', userId)
-      .single()
-
-    const existingUser = existingUserData as {
-      subscriber_verified?: boolean
-      subscriber_verification_request?: boolean
-    } | null
-
-    if (existingUser?.subscriber_verified) {
-      return { success: false, error: '이미 구독자 인증이 완료된 계정입니다.' }
-    }
-
-    if (existingUser?.subscriber_verification_request) {
-      return { success: false, error: '이미 구독자 인증 요청이 접수되었습니다. 관리자 승인을 기다려주세요.' }
-    }
-
-    // 구독자 인증 요청 업데이트
-    const updateData: any = {
-      subscriber_verification_request: true,
-      verification_requested_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }
-    
-    const { error: updateError } = await supabase
-      .from('users')
-      .update(updateData as any as never)
-      .eq('id', userId)
-
-    if (updateError) {
-      console.error('구독자 인증 요청 실패:', updateError)
-      return { success: false, error: '인증 요청 처리 중 오류가 발생했습니다.' }
-    }
-
-    // 캐시 무효화
-    revalidatePath('/mypage')
-    revalidatePath('/admin/users')
-
-    return { success: true }
-  } catch (error: any) {
-    console.error('구독자 인증 요청 오류:', error)
-    return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
-  }
+export async function requestSubscriberVerification(_userId: string): Promise<{ success: boolean; error?: string }> {
+  return { success: true }
 }
 
 /**
@@ -225,16 +182,10 @@ export async function setSubscriberStatus(
     // 관리자 클라이언트로 RLS 우회하여 업데이트
     const adminSupabase = await createAdminClient()
 
-    // 구독자 상태 업데이트
     const updateData: any = {
       subscriber_verified: verified,
       verified_at: verified ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
-    }
-
-    // 인증 완료 시 요청 상태 초기화
-    if (verified) {
-      updateData.subscriber_verification_request = false
     }
 
     if (serialNumber) {
@@ -293,28 +244,35 @@ export async function getUsersList(searchQuery?: string) {
     const { createAdminClient } = await import('@/lib/supabase/server')
     const adminSupabase = await createAdminClient()
     
+    const userColumns = 'id, email, nickname, subscriber_verified, purchase_serial_number, verified_at, created_at'
+
+    // 인증글 작성한 사용자 ID 목록 (승인 대기)
+    const { data: verificationAuthors } = await adminSupabase
+      .from('posts')
+      .select('author_id')
+      .eq('board_type', 'verification')
+    const verificationAuthorIds = new Set(
+      (verificationAuthors || []).map((p: { author_id: string | null }) => p.author_id).filter(Boolean) as string[]
+    )
+
     let query = adminSupabase
       .from('users')
-      .select('id, email, nickname, subscriber_verified, purchase_serial_number, verified_at, subscriber_verification_request, verification_requested_at, created_at')
+      .select(userColumns)
       .order('created_at', { ascending: false })
       .limit(100)
 
-    // 검색 쿼리가 있으면 필터링
     if (searchQuery && searchQuery.trim()) {
       const searchTerm = `%${searchQuery.trim()}%`
-      // Supabase의 or() 메서드에서 ilike 사용
-      // 와일드카드는 별표(*)로 표시하거나, 각 조건을 별도로 처리
-      // 더 안정적인 방법: 각 필드에 대해 별도로 필터링 후 결과 합치기
       const emailQuery = adminSupabase
         .from('users')
-        .select('id, email, nickname, subscriber_verified, purchase_serial_number, verified_at, subscriber_verification_request, verification_requested_at, created_at')
+        .select(userColumns)
         .ilike('email', searchTerm)
         .order('created_at', { ascending: false })
         .limit(100)
       
       const nicknameQuery = adminSupabase
         .from('users')
-        .select('id, email, nickname, subscriber_verified, purchase_serial_number, verified_at, subscriber_verification_request, verification_requested_at, created_at')
+        .select(userColumns)
         .ilike('nickname', searchTerm)
         .order('created_at', { ascending: false })
         .limit(100)
@@ -342,17 +300,20 @@ export async function getUsersList(searchQuery?: string) {
       })
       
       // 타입 변환
-      const users = uniqueUsers.slice(0, 100).map((user: any) => ({
-        id: String(user.id || ''),
-        email: user.email ? String(user.email) : null,
-        nickname: user.nickname ? String(user.nickname) : null,
-        subscriber_verified: Boolean(user.subscriber_verified),
-        purchase_serial_number: user.purchase_serial_number ? String(user.purchase_serial_number) : null,
-        verified_at: user.verified_at ? String(user.verified_at) : null,
-        subscriber_verification_request: Boolean(user.subscriber_verification_request),
-        verification_requested_at: user.verification_requested_at ? String(user.verification_requested_at) : null,
-        created_at: String(user.created_at || ''),
-      }))
+      const users = uniqueUsers.slice(0, 100).map((user: any) => {
+        const hasVerificationPost = verificationAuthorIds.has(String(user.id))
+        return {
+          id: String(user.id || ''),
+          email: user.email ? String(user.email) : null,
+          nickname: user.nickname ? String(user.nickname) : null,
+          subscriber_verified: Boolean(user.subscriber_verified),
+          purchase_serial_number: user.purchase_serial_number ? String(user.purchase_serial_number) : null,
+          verified_at: user.verified_at ? String(user.verified_at) : null,
+          subscriber_verification_request: hasVerificationPost && !user.subscriber_verified,
+          verification_requested_at: null as string | null,
+          created_at: String(user.created_at || ''),
+        }
+      })
 
       return { success: true, data: users }
     }
@@ -364,18 +325,20 @@ export async function getUsersList(searchQuery?: string) {
       return { success: false, error: error.message, data: [] }
     }
 
-    // 타입 변환
-    const users = (usersData || []).map((user: any) => ({
-      id: String(user.id || ''),
-      email: user.email ? String(user.email) : null,
-      nickname: user.nickname ? String(user.nickname) : null,
-      subscriber_verified: Boolean(user.subscriber_verified),
-      purchase_serial_number: user.purchase_serial_number ? String(user.purchase_serial_number) : null,
-      verified_at: user.verified_at ? String(user.verified_at) : null,
-      subscriber_verification_request: Boolean(user.subscriber_verification_request),
-      verification_requested_at: user.verification_requested_at ? String(user.verification_requested_at) : null,
-      created_at: String(user.created_at || ''),
-    }))
+    const users = (usersData || []).map((user: any) => {
+      const hasVerificationPost = verificationAuthorIds.has(String(user.id))
+      return {
+        id: String(user.id || ''),
+        email: user.email ? String(user.email) : null,
+        nickname: user.nickname ? String(user.nickname) : null,
+        subscriber_verified: Boolean(user.subscriber_verified),
+        purchase_serial_number: user.purchase_serial_number ? String(user.purchase_serial_number) : null,
+        verified_at: user.verified_at ? String(user.verified_at) : null,
+        subscriber_verification_request: hasVerificationPost && !user.subscriber_verified,
+        verification_requested_at: null as string | null,
+        created_at: String(user.created_at || ''),
+      }
+    })
 
     return { success: true, data: users }
   } catch (error: any) {

@@ -301,6 +301,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('crawled_news')
       .select('*')
+      .order('published_at', { ascending: false, nullsFirst: false })
       .order('crawled_at', { ascending: false })
       .range(offset, offset + limit - 1)
     
