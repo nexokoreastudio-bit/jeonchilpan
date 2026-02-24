@@ -14,22 +14,22 @@ if (!fs.existsSync(sharpPath)) {
 
 const sharp = require('sharp');
 const SIZE = 1200;
-const ASSETS = path.join(__dirname, '../assets/images');
-const LOGO_PATH = path.join(ASSETS, 'nexo_logo_black.png');
-const OUT_PATH = path.join(ASSETS, 'og-image.png');
+const PUBLIC_ASSETS = path.join(__dirname, '../public/assets/images');
+const LOGO_PATH = path.join(PUBLIC_ASSETS, 'jeonchilpan_og_logo.png');
+const OUT_PATH = path.join(PUBLIC_ASSETS, 'og-image.png');
 
 async function generate() {
   if (!fs.existsSync(LOGO_PATH)) {
     console.error('로고 파일을 찾을 수 없습니다:', LOGO_PATH);
     process.exit(1);
   }
-  // 카카오톡 썸네일 크롭 대비: 로고를 작게 해서 사방 여백을 넉넉히 둠
+  // 전칠판 로고를 1200x1200 캔버스에 맞게 크게 배치 (카카오톡 공유 시 전체 노출)
   const logoResized = await sharp(LOGO_PATH)
-    .resize(380, 200, { fit: 'inside' })
+    .resize(1100, 1100, { fit: 'inside' })
     .toBuffer();
   const logoMeta = await sharp(logoResized).metadata();
-  const w = logoMeta.width || 380;
-  const h = logoMeta.height || 200;
+  const w = logoMeta.width || 1100;
+  const h = logoMeta.height || 1100;
   const x = Math.round((SIZE - w) / 2);
   const y = Math.round((SIZE - h) / 2);
 
@@ -38,7 +38,7 @@ async function generate() {
       width: SIZE,
       height: SIZE,
       channels: 3,
-      background: { r: 250, g: 248, b: 243 }
+      background: { r: 255, g: 255, b: 255 }
     }
   })
     .composite([{ input: logoResized, left: x, top: y }])

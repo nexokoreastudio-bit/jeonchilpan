@@ -48,7 +48,7 @@ export const metadata: Metadata = {
         url: '/assets/images/og-image.png',
         width: 1200,
         height: 1200,
-        alt: 'NEXO Daily 로고',
+        alt: '전칠판 - NEXO Daily 로고',
       },
     ],
   },
