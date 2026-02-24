@@ -21,11 +21,11 @@ export function ShareButtons({ title, description, url, image }: ShareButtonsPro
     setHasNativeShare(typeof navigator !== 'undefined' && !!navigator.share)
   }, [])
   
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   // url prop이 있으면 사용, 없으면 baseUrl 사용 (서버와 클라이언트에서 동일한 값)
   const shareUrl = url || baseUrl
   const shareTitle = title
-  const shareDescription = description || 'NEXO Daily - 전자칠판 교육 정보 큐레이션'
+  const shareDescription = description || '전칠판 - 전국 학원장·선생님·공부방 운영자를 위한 전자칠판 소통·정보 교환 포털'
   const shareImage = image || `${baseUrl}/assets/images/og-image.png`
 
   // 카카오톡 공유

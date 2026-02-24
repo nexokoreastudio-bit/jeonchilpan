@@ -64,7 +64,7 @@ export default async function FieldNewsDetailPage({ params }: PageProps) {
     console.error('조회수 증가 실패:', err)
   })
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   const currentUrl = `${baseUrl}/field/${newsId}`
   
   // 첫 번째 이미지 URL 추출
@@ -223,7 +223,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const news = fieldNewsData as FieldNewsRow
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   const currentUrl = `${baseUrl}/field/${newsId}`
   
   // 첫 번째 이미지 URL 추출

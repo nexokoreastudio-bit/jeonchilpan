@@ -35,7 +35,7 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: '전칠판 | 한국 전자칠판 공개 커뮤니티 - NEXO 운영',
+  title: '전칠판 | 원장님들의 고민을 함께 나누는 공개 커뮤니티 - NEXO 운영',
   description: '한국 전자칠판·스마트보드 사용자들의 자료 공유와 소통 공간. NEXO가 운영합니다.',
   keywords: ['전칠판', '넥소 전자칠판', '학원장 모임', '강사 커뮤니티', '전자칠판 자료', '학원 구인구직', '지역 학원 네트워크'],
   openGraph: {
@@ -61,7 +61,7 @@ export default async function CommunityPage({ searchParams }: PageProps) {
 
   const selectedBoard = BOARD_TYPES.find(b => b.type === boardType) || BOARD_TYPES[0]
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   const communityUrl = boardType
     ? `${baseUrl}/community?board=${boardType}`
     : `${baseUrl}/community`

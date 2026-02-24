@@ -23,7 +23,7 @@ export default function LocationPage() {
 📍 주소: 인천광역시 서구 보듬로158 블루텍 527호 (제조동)
 (사진 안내 참고)
 
-🔗 상세 안내: ${process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'}/location`
+🔗 상세 안내: ${process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'}/location`
 
   return (
     <div className={styles.container}>

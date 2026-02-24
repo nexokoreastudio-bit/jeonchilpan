@@ -27,7 +27,7 @@ BEGIN
   cron_secret := 'your-cron-secret-key-here'; -- Netlify 환경 변수와 동일한 값으로 변경
   
   -- API URL 설정
-  api_url := 'https://daily-nexo.netlify.app/api/crawl-news';
+  api_url := 'https://jeonchilpan.netlify.app/api/crawl-news';
   
   -- HTTP 요청 실행
   SELECT status, content INTO response_status, response_body

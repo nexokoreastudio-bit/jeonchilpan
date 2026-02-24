@@ -19,7 +19,7 @@ SECURITY DEFINER
 AS $$
 DECLARE
   cron_secret TEXT := 'rVrXQdukfPxyZ27uOXqFMhyOe3PRWyV/v6ryHASpBlg='; -- ⚠️ Netlify CRON_SECRET과 동일한 값으로 변경하세요
-  api_url TEXT := 'https://daily-nexo.netlify.app/api/crawl-news';
+  api_url TEXT := 'https://jeonchilpan.netlify.app/api/crawl-news';
   response http_response;
 BEGIN
   -- HTTP POST 요청 실행

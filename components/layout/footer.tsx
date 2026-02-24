@@ -13,7 +13,7 @@ export function Footer() {
                 <span className="text-lg font-bold text-white tracking-tight">NEXO Daily</span>
               </Link>
               <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
-                NEXO가 운영하는 한국 전자칠판 공개 커뮤니티입니다.
+                NEXO가 운영하는 원장님들의 고민을 함께 나누는 공개 커뮤니티입니다.
                 입시 뉴스, 학원 운영 팁, 자료 공유를 통해 현장을 지원합니다.
               </p>
             </div>

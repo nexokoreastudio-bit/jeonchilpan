@@ -45,7 +45,7 @@ export default async function ReviewsPage({ searchParams }: PageProps) {
   const ratingStats = await getRatingStats()
 
   const totalReviews = Object.values(ratingStats).reduce((sum, count) => sum + count, 0)
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   
   // 구조화된 데이터 (AggregateRating 및 Review 스키마)
   const jsonLdData = {

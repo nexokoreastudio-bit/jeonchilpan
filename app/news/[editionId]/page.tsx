@@ -199,7 +199,7 @@ export default async function EditionPage({
   const prev = currentIndex > 0 ? allEditions[currentIndex - 1] : null
   const next = currentIndex < allEditions.length - 1 ? allEditions[currentIndex + 1] : null
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   const currentUrl = `${baseUrl}/news/${editionId}`
 
   return (
@@ -389,7 +389,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     : editionId
   
   const article = await getArticleByEditionId(dateOnlyEditionId)
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
 
   // article이 없어도 인사이트가 있을 수 있으므로 체크
   let insightData: { title: string; summary?: string; thumbnail_url?: string | null; published_at?: string } | null = null

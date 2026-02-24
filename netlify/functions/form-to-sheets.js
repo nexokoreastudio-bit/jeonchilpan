@@ -5,7 +5,7 @@ const { JWT } = require('google-auth-library');
 exports.handler = async (event, context) => {
     // CORS 헤더 설정 (보안 강화)
     const allowedOrigins = [
-        'https://daily-nexo.netlify.app',
+        'https://jeonchilpan.netlify.app',
         'http://localhost:3000',
         'http://localhost:3001',
         'http://localhost:3002',

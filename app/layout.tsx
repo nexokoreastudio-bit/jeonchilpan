@@ -8,15 +8,15 @@ import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/json-ld'
 import { KakaoSDKLoader } from '@/components/kakao/kakao-sdk-loader'
 import { SalesAIChatbot } from '@/components/chat/sales-ai-chatbot'
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'NEXO Daily - 전자칠판 교육 정보 큐레이션',
-    template: '%s | NEXO Daily',
+    default: '전칠판 - 전자칠판 사용자 소통·정보 포털',
+    template: '%s | 전칠판',
   },
-  description: '한국 전자칠판·스마트보드 사용자들의 자료 공유와 소통 공간. NEXO가 운영합니다. 입시 자료, 학원 운영 팁 제공.',
+  description: '전국 학원장·선생님·공부방 운영자를 위한 전자칠판 소통·정보 교환 포털. 자료 공유, 실시간 뉴스, AI 상담.',
   keywords: [
     '전자칠판',
     '스마트보드',
@@ -40,22 +40,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ko_KR',
     url: baseUrl,
-    siteName: 'NEXO Daily',
-    title: 'NEXO Daily - 전자칠판 교육 정보 큐레이션',
-    description: '한국 전자칠판·스마트보드 사용자들의 자료 공유와 소통 공간. NEXO가 운영합니다.',
+    siteName: '전칠판',
+    title: '전칠판 - 전자칠판 사용자 소통·정보 포털',
+    description: '전국 학원장·선생님·공부방 운영자를 위한 전자칠판 소통·정보 교환 포털. 자료 공유, 실시간 뉴스, AI 상담.',
     images: [
       {
         url: '/assets/images/og-image.png',
         width: 1200,
         height: 1200,
-        alt: '전칠판 - NEXO Daily 로고',
+        alt: '전칠판 커뮤니티 로고',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NEXO Daily - 전자칠판 교육 정보 큐레이션',
-    description: '한국 전자칠판·스마트보드 사용자들의 자료 공유와 소통 공간. NEXO가 운영합니다.',
+    title: '전칠판 - 전자칠판 사용자 소통·정보 포털',
+    description: '전국 학원장·선생님·공부방 운영자를 위한 전자칠판 소통·정보 교환 포털. 자료 공유, 실시간 뉴스, AI 상담.',
     images: ['/assets/images/og-image.png'],
   },
   robots: {

@@ -29,7 +29,7 @@ export function ReferralSection({ userId }: { userId: string }) {
   }
 
   const referralUrl = referralCode
-    ? `${process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'}/signup?ref=${referralCode}`
+    ? `${process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'}/signup?ref=${referralCode}`
     : ''
 
   const copyReferralLink = async () => {

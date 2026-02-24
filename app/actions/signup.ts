@@ -36,7 +36,7 @@ export async function signup(data: SignupData): Promise<{ success: boolean; erro
           phone: data.phone || '',
           referrer_code: data.referrer_code || '',
         },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'}/auth/callback`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'}/auth/callback`,
       },
     })
 

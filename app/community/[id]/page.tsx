@@ -72,7 +72,7 @@ export default async function PostDetailPage({ params }: PageProps) {
   // 뉴스 토론 게시글인 경우 뉴스 정보 가져오기
   const newsData = post.news_id ? await getNewsById(post.news_id) : null
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   const currentUrl = `${baseUrl}/community/${post.id}`
   
   // 게시판 타입에 따른 구조화된 데이터
@@ -277,7 +277,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   const currentUrl = `${baseUrl}/community/${post.id}`
   const boardInfo = post.board_type && post.board_type in BOARD_TYPE_INFO 
     ? BOARD_TYPE_INFO[post.board_type as keyof typeof BOARD_TYPE_INFO] 

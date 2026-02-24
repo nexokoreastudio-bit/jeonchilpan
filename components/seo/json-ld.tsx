@@ -20,7 +20,7 @@ export function JsonLd({ data }: JsonLdProps) {
  * Organization 스키마 (회사 정보)
  */
 export function OrganizationJsonLd() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   
   return (
     <JsonLd
@@ -30,7 +30,7 @@ export function OrganizationJsonLd() {
         name: 'NEXO Korea',
         url: baseUrl,
         logo: `${baseUrl}/assets/images/nexo_logo_black.png`,
-        description: '넥소 전자칠판 사용자들을 위한 교육 정보 큐레이션 및 커뮤니티 플랫폼',
+        description: '전국 학원장·선생님·공부방 운영자를 위한 전자칠판 소통·정보 교환 포털',
         sameAs: [
           // 소셜 미디어 링크 추가 가능
         ],
@@ -59,7 +59,7 @@ export function NewsArticleJsonLd({
   author?: string
   url: string
 }) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   const imageUrl = image 
     ? (image.startsWith('http') ? image : `${baseUrl}${image}`)
     : `${baseUrl}/assets/images/og-image.png`
@@ -107,7 +107,7 @@ export function ForumJsonLd({
   description: string
   url: string
 }) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   return (
     <JsonLd
       data={{
@@ -119,7 +119,7 @@ export function ForumJsonLd({
         url,
         isPartOf: {
           '@type': 'WebSite',
-          name: 'NEXO Daily',
+          name: '전칠판',
           url: baseUrl,
         },
         about: {
@@ -136,16 +136,16 @@ export function ForumJsonLd({
  * WebSite 스키마 (사이트 정보)
  */
 export function WebSiteJsonLd() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   
   return (
     <JsonLd
       data={{
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        name: 'NEXO Daily',
+        name: '전칠판',
         url: baseUrl,
-        description: '넥소 전자칠판 사용자들을 위한 교육 정보 큐레이션 및 커뮤니티 플랫폼',
+        description: '전국 학원장·선생님·공부방 운영자를 위한 전자칠판 소통·정보 교환 포털',
         potentialAction: {
           '@type': 'SearchAction',
           target: {

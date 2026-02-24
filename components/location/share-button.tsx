@@ -6,7 +6,7 @@ import styles from '@/app/location/location.module.css'
 export function ShareButton() {
   const [copied, setCopied] = useState(false)
 
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : 'https://daily-nexo.netlify.app/location'
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : 'https://jeonchilpan.netlify.app/location'
 
   const shareText = `🚗 검단 지식산업센터 제조동 527호 (주)넥소 오시는 길 안내
 

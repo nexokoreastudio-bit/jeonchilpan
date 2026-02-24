@@ -13,7 +13,7 @@ exports.handler = async (event, context) => {
 
   try {
     // 크롤링 API 호출
-    const baseUrl = process.env.URL || process.env.DEPLOY_URL || 'https://daily-nexo.netlify.app'
+    const baseUrl = process.env.URL || process.env.DEPLOY_URL || 'https://jeonchilpan.netlify.app'
     const cronSecret = process.env.CRON_SECRET || 'your-secret-key'
     
     const response = await fetch(`${baseUrl}/api/crawl-news`, {

@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Trigger Netlify Crawl
         run: |
-          curl -X POST https://daily-nexo.netlify.app/api/crawl-news \
+          curl -X POST https://jeonchilpan.netlify.app/api/crawl-news \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -d '{}'

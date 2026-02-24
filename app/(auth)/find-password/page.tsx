@@ -17,7 +17,7 @@ export default function FindPasswordPage() {
   const baseUrl =
     typeof window !== 'undefined'
       ? window.location.origin
-      : process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+      : process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

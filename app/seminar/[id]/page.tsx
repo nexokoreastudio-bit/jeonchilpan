@@ -149,7 +149,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!seminar)
     return { title: '세미나를 찾을 수 없습니다' }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daily-nexo.netlify.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
 
   return {
     title: `${seminar.title} | 세미나 - NEXO Daily`,

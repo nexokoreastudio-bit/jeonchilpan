@@ -317,7 +317,7 @@ export default async function HomePage() {
         <MonitoringDashboard leadStats={leadStats} engagementStats={engagementStats} />
       </CollapsibleSection>
 
-      {/* 전칠판 - 한국 전자칠판 공개 커뮤니티 */}
+      {/* 전칠판 - 원장님들의 고민을 함께 나누는 공개 커뮤니티 */}
       {(postsByBoard.all.length > 0 ||
         postsByBoard.notice.length > 0 ||
         postsByBoard.bamboo.length > 0 ||
@@ -328,7 +328,7 @@ export default async function HomePage() {
           <div className="border-b border-gray-100 bg-slate-50/50 px-4 py-3">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-sm font-bold text-slate-800">
-                전칠판 - 한국 전자칠판 공개 커뮤니티
+                전칠판 - 원장님들의 고민을 함께 나누는 공개 커뮤니티
               </h2>
               {(engagementStats.postsThisWeek > 0 || engagementStats.commentsThisWeek > 0) && (
                 <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white bg-[#00c4b4] rounded">
