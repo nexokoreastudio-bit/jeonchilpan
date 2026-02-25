@@ -22,7 +22,7 @@ export function MainLayout({
 
   return (
     <main className="flex-1 min-h-screen bg-[#f4f6f8]">
-      <div className="flex flex-col lg:flex-row container mx-auto max-w-7xl px-4 md:px-6 py-8 md:py-10 gap-6 xl:gap-8">
+      <div className="flex flex-col lg:flex-row container mx-auto max-w-7xl px-3 sm:px-4 md:px-6 py-5 sm:py-8 md:py-10 gap-4 sm:gap-6 xl:gap-8">
         <div className="flex-1 min-w-0">{children}</div>
         {sidebar}
       </div>

@@ -221,3 +221,37 @@
   opacity: 0.9;
   transition: opacity 0.2s;
 }
+
+/* ========== 모바일 UI/UX 최적화 (768px 이하, 웹은 유지) ========== */
+@media (max-width: 768px) {
+  /* iOS safe-area (노치, 홈 인디케이터) */
+  body {
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  /* 터치 타겟 - 작은 버튼에 패딩 보강 (개별 컴포넌트에서 min-h 적용) */
+  input[type='search'],
+  input[type='text'],
+  input[type='email'],
+  input[type='tel'],
+  input[type='password'] {
+    font-size: 16px; /* iOS 줌 방지 */
+  }
+
+  /* 스크롤 개선 - 모바일에서 부드러운 스크롤 */
+  html {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 가로 스크롤 영역 (탭 등) */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 모바일에서 탭/버튼 터치 피드백 */
+  .tap-highlight {
+    -webkit-tap-highlight-color: rgba(0, 196, 180, 0.15);
+  }
+}

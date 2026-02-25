@@ -24,11 +24,11 @@ export function SearchInput() {
           placeholder="검색어를 입력해 주세요."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="flex-1 h-9 pl-10 pr-4 border border-slate-200 rounded-l-md text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00c4b4]/30 focus:border-[#00c4b4]"
+          className="flex-1 h-11 sm:h-9 pl-10 pr-4 border border-slate-200 rounded-l-md text-base sm:text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00c4b4]/30 focus:border-[#00c4b4]"
         />
         <button
           type="submit"
-          className="h-9 px-4 bg-slate-600 text-white text-sm font-medium rounded-r-md hover:bg-slate-700 transition-colors shrink-0"
+          className="h-11 sm:h-9 px-4 bg-slate-600 text-white text-sm font-medium rounded-r-md hover:bg-slate-700 transition-colors shrink-0 flex items-center justify-center min-w-[44px] sm:min-w-0"
         >
           검색
         </button>

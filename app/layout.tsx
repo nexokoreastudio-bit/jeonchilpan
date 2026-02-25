@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { HeaderClient } from '@/components/layout/header-client'
 import { Footer } from '@/components/layout/footer'
@@ -74,6 +74,12 @@ export const metadata: Metadata = {
     // google: 'your-google-verification-code',
     // naver: 'your-naver-verification-code',
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover', // iOS 노치·홈 인디케이터 영역 활용
 }
 
 export default function RootLayout({

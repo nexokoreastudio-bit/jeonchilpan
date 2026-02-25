@@ -65,6 +65,8 @@ const MEGA_NAV = [
     href: '#',
     columns: [
       { title: '더보기', items: [
+        { name: '로그인', href: '/login' },
+        { name: '회원가입', href: '/signup' },
         { name: '세미나', href: '/seminar' },
         { name: '고객 후기', href: '/reviews' },
         { name: '현장 소식', href: '/field' },
@@ -86,7 +88,7 @@ const MEGA_NAV = [
   },
 ]
 
-// 플랫 링크 (모바일용)
+// 플랫 링크 (모바일용) - 로그인/마이페이지 제외 (상단에 별도 배치)
 const ALL_NAV_LINKS = MEGA_NAV.flatMap((n) =>
   n.columns.flatMap((c) => c.items.map((i) => ({ href: i.href, name: i.name })))
 )
@@ -94,6 +96,7 @@ const ALL_NAV_LINKS = MEGA_NAV.flatMap((n) =>
 
 export function HeaderClient() {
   const [isAdmin, setIsAdmin] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [loading, setLoading] = useState(true)
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -139,6 +142,7 @@ export function HeaderClient() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!mounted) return
       if (user) {
+        setIsLoggedIn(true)
         const { data: profileData } = await supabase
           .from('users')
           .select('role')
@@ -148,14 +152,23 @@ export function HeaderClient() {
         const profile = profileData as { role: string | null } | null
         if (profile && profile.role === 'admin') setIsAdmin(true)
         else setIsAdmin(false)
-      } else setIsAdmin(false)
+      } else {
+        setIsLoggedIn(false)
+        setIsAdmin(false)
+      }
       setLoading(false)
     }
     checkAdmin()
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return
-      if (session?.user) checkAdmin()
-      else { setIsAdmin(false); setLoading(false) }
+      if (session?.user) {
+        setIsLoggedIn(true)
+        checkAdmin()
+      } else {
+        setIsLoggedIn(false)
+        setIsAdmin(false)
+        setLoading(false)
+      }
     })
     return () => { mounted = false; subscription.unsubscribe() }
   }, [])
@@ -166,49 +179,49 @@ export function HeaderClient() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-sm">
-      {/* 1. 상단 유틸리티 바 - 코인판 스타일 (즐겨찾기, 시작페이지, 야간모드) */}
-      <div className="bg-slate-50 border-b border-slate-100 py-3 mb-2">
-        <div className="container mx-auto px-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 text-xs text-slate-600">
-            <Link href="/" className="flex items-center gap-1 hover:text-slate-800 transition-colors">
-              <Home className="w-3.5 h-3.5" />
+      {/* 1. 상단 유틸리티 바 - 모바일: 압축, 웹: 그대로 */}
+      <div className="bg-slate-50 border-b border-slate-100 py-2 md:py-3 mb-2">
+        <div className="container mx-auto px-3 md:px-4 flex items-center justify-between gap-2 md:gap-4">
+          <div className="flex items-center gap-2 md:gap-3 text-xs text-slate-600 min-h-[44px] md:min-h-0 items-center">
+            <Link href="/" className="flex items-center gap-1 hover:text-slate-800 transition-colors py-2 -my-2 px-1 -mx-1 md:py-0 md:my-0 md:px-0 md:mx-0">
+              <Home className="w-3.5 h-3.5 shrink-0" />
               <span className="hidden sm:inline">홈</span>
             </Link>
-            <span className="text-slate-300">|</span>
-            <button type="button" onClick={handleAddFavorite} className="flex items-center gap-1 hover:text-slate-800 transition-colors">
-              <Star className="w-3.5 h-3.5" />
-              즐겨찾기 추가
+            <span className="text-slate-300 hidden sm:inline">|</span>
+            <button type="button" onClick={handleAddFavorite} className="flex items-center gap-1 hover:text-slate-800 transition-colors py-2 -my-2 px-1 -mx-1 md:py-0 md:my-0 md:px-0 md:mx-0">
+              <Star className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">즐겨찾기 추가</span>
             </button>
-            <span className="text-slate-300">|</span>
-            <button type="button" onClick={handleSetHomepage} className="flex items-center gap-1 hover:text-slate-800 transition-colors">
+            <span className="text-slate-300 hidden sm:inline">|</span>
+            <button type="button" onClick={handleSetHomepage} className="hidden sm:flex items-center gap-1 hover:text-slate-800 transition-colors">
               시작페이지 설정
             </button>
-            <span className="text-slate-300">|</span>
+            <span className="text-slate-300 hidden md:inline">|</span>
             <button
               type="button"
               onClick={() => setDarkMode((d) => !d)}
-              className="flex items-center gap-1 hover:text-slate-800 transition-colors"
+              className="flex items-center gap-1 hover:text-slate-800 transition-colors py-2 -my-2 px-1 -mx-1 md:py-0 md:my-0 md:px-0 md:mx-0"
               aria-label="야간 모드"
             >
-              {darkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-              야간 모드
+              {darkMode ? <Sun className="w-3.5 h-3.5 shrink-0" /> : <Moon className="w-3.5 h-3.5 shrink-0" />}
+              <span className="hidden sm:inline">야간 모드</span>
             </button>
           </div>
           <span className="text-xs text-slate-500 hidden sm:inline">NEXO Daily</span>
         </div>
       </div>
 
-      {/* 2. 검색 섹션 - 로고 | 검색 */}
-      <div className="border-b border-slate-100 py-0.5 mt-0 mb-0">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-3 lg:gap-6">
-            {/* 로고 */}
-            <Link href="/" className="shrink-0 flex items-center gap-2">
-              <img src="/assets/images/jeonchilpan_logo.png" alt="전칠판" className="h-24 w-auto" />
+      {/* 2. 검색 섹션 - 모바일: 세로 배치·작은 로고, 웹: 가로 */}
+      <div className="border-b border-slate-100 py-2 md:py-0.5 mt-0 mb-0">
+        <div className="container mx-auto px-3 md:px-4">
+          <div className="flex flex-col sm:flex-row items-center gap-3 lg:gap-6">
+            {/* 로고 - 모바일 작게 */}
+            <Link href="/" className="shrink-0 flex items-center gap-2 self-start sm:self-center">
+              <img src="/assets/images/jeonchilpan_logo.png" alt="전칠판" className="h-14 sm:h-20 md:h-24 w-auto" />
             </Link>
 
-            {/* 검색바 */}
-            <div className="flex-1 min-w-0 max-w-xl">
+            {/* 검색바 - 모바일 풀폭 */}
+            <div className="flex-1 w-full sm:min-w-0 max-w-xl">
               <SearchInput />
             </div>
           </div>
@@ -312,6 +325,40 @@ export function HeaderClient() {
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-slate-600 bg-slate-800 py-4">
           <div className="container px-4">
+            {/* 로그인/마이페이지 - 모바일에서 최상단 노출 */}
+            <div className="flex gap-2 mb-4 pb-4 border-b border-slate-600">
+              {loading ? (
+                <span className="px-4 py-3 text-sm text-slate-400">로딩 중...</span>
+              ) : isLoggedIn ? (
+                <Link
+                  href="/mypage"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex-1 px-4 py-3 text-sm font-semibold rounded-lg text-center min-h-[44px] flex items-center justify-center bg-[#00c4b4] text-white hover:bg-[#00a396]"
+                >
+                  마이페이지
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      'flex-1 px-4 py-3 text-sm font-semibold rounded-lg text-center min-h-[44px] flex items-center justify-center',
+                      pathname === '/login' ? 'text-[#00c4b4] bg-slate-600' : 'bg-[#00c4b4] text-white hover:bg-[#00a396]'
+                    )}
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex-1 px-4 py-3 text-sm font-semibold rounded-lg text-center min-h-[44px] flex items-center justify-center border border-slate-500 text-slate-200 hover:bg-slate-600"
+                  >
+                    회원가입
+                  </Link>
+                </>
+              )}
+            </div>
             <div className="grid grid-cols-2 gap-2">
               {ALL_NAV_LINKS.map((item, i) => (
                 <Link

@@ -73,14 +73,14 @@ export function SalesAIChatbot() {
       <>
         <Link
           href="/leads/quote"
-          className="fixed bottom-24 right-6 z-40 px-4 py-2 rounded-lg bg-[#00c4b4] text-white text-sm font-medium shadow-lg hover:bg-[#00a396] transition-colors"
+          className="fixed right-4 sm:right-6 z-40 px-4 py-3 sm:py-2 rounded-lg bg-[#00c4b4] text-white text-sm font-medium shadow-lg hover:bg-[#00a396] transition-colors min-h-[44px] sm:min-h-0 flex items-center [touch-action:manipulation] bottom-[max(6rem,calc(5rem+env(safe-area-inset-bottom)))] sm:bottom-24"
         >
           전자칠판 10% 할인가 견적 받기
         </Link>
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-[100] w-14 h-14 rounded-full bg-[#1a1a1a] text-white shadow-lg hover:bg-[#00c4b4] transition-colors flex items-center justify-center cursor-pointer [touch-action:manipulation]"
+          className="fixed right-4 sm:right-6 z-[100] w-14 h-14 rounded-full bg-[#1a1a1a] text-white shadow-lg hover:bg-[#00c4b4] transition-colors flex items-center justify-center cursor-pointer [touch-action:manipulation] bottom-[max(1.5rem,env(safe-area-inset-bottom))] sm:bottom-6"
           aria-label="넥소 전자칠판 상담 열기"
         >
           <MessageCircle className="w-6 h-6" />
@@ -90,7 +90,7 @@ export function SalesAIChatbot() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] w-[380px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+    <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-[100] w-full sm:w-[380px] sm:max-w-[calc(100vw-2rem)] max-h-[85vh] sm:max-h-none sm:rounded-2xl rounded-t-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden sm:mb-0 mb-[env(safe-area-inset-bottom,0)] bg-white" style={{ backgroundColor: '#ffffff' }}>
       <div className="flex items-center justify-between px-4 py-3 bg-[#1a1a1a] text-white">
         <span className="font-semibold">넥소 전자칠판 상담</span>
         {!contactSubmitted && (
@@ -112,7 +112,7 @@ export function SalesAIChatbot() {
 
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3 min-h-[280px] max-h-[400px]"
+        className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3 min-h-[280px] max-h-[400px] bg-white"
       >
         {messages.length === 0 && (
           <div className="space-y-3">
@@ -170,7 +170,7 @@ export function SalesAIChatbot() {
       </div>
 
       {showContactForm && !contactSubmitted && (
-        <div className="px-4 pb-2 space-y-2">
+        <div className="px-4 pb-2 space-y-2 bg-white">
           <input
             type="text"
             placeholder="이름 *"
@@ -195,7 +195,7 @@ export function SalesAIChatbot() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="p-4 border-t flex gap-2">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-slate-200 flex gap-2 bg-white">
         <input
           type="text"
           value={input}
@@ -227,7 +227,7 @@ export function SalesAIChatbot() {
         </Button>
       </form>
 
-      <div className="px-4 pb-3 space-y-2">
+      <div className="px-4 pb-3 space-y-2 bg-white">
         <div className="flex flex-wrap gap-2 justify-center">
           <Link
             href="/leads/demo"

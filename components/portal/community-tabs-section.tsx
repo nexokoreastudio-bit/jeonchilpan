@@ -55,13 +55,13 @@ export function CommunityTabsSection({ postsByBoard }: CommunityTabsSectionProps
     <div>
       {/* 탭 - 코인판 커뮤니티글박스 스타일 */}
       <div className="border-b border-gray-100">
-        <div className="flex gap-0 overflow-x-auto">
+        <div className="flex gap-0 overflow-x-auto overscroll-x-contain">
           {TABS.map((tab) => (
             <button
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
+              className={`px-4 py-3 sm:py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 -mb-px min-h-[44px] sm:min-h-0 flex items-center [touch-action:manipulation] ${
                 activeTab === tab.key
                   ? 'bg-white text-[#00c4b4] border-[#00c4b4]'
                   : 'bg-slate-50/30 text-slate-600 hover:text-slate-800 hover:bg-slate-50/60 border-transparent'

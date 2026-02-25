@@ -297,7 +297,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-[#f4f6f8]">
       {/* 포털형 2단: 콘텐츠 | 우측 사이드바 */}
-      <div className="flex flex-col lg:flex-row container mx-auto max-w-7xl px-4 md:px-6 py-8 md:py-10 gap-6 xl:gap-8">
+      <div className="flex flex-col lg:flex-row container mx-auto max-w-7xl px-3 sm:px-4 md:px-6 py-5 sm:py-8 md:py-10 gap-4 sm:gap-6 xl:gap-8">
         <div className="flex-1 min-w-0 flex flex-col gap-4 md:gap-6">
           {/* 콘텐츠 영역 - 배너와 공간을 나누지 않음, 항상 full width */}
           <div className="flex-1 min-w-0 space-y-2 md:space-y-3">
@@ -325,7 +325,7 @@ export default async function HomePage() {
         postsByBoard.job.length > 0 ||
         postsByBoard.verification.length > 0) && (
         <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
-          <div className="border-b border-gray-100 bg-slate-50/50 px-4 py-3">
+          <div className="border-b border-gray-100 bg-slate-50/50 px-3 sm:px-4 py-3">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-sm font-bold text-slate-800">
                 전칠판 - 원장님들의 고민을 함께 나누는 공개 커뮤니티
@@ -370,8 +370,8 @@ export default async function HomePage() {
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
           </div>
-          <div className="relative min-h-[420px] md:min-h-[480px] flex items-end">
-            <div className="container mx-auto max-w-4xl px-4 pb-14 md:pb-20">
+          <div className="relative min-h-[320px] sm:min-h-[420px] md:min-h-[480px] flex items-end">
+            <div className="container mx-auto max-w-4xl px-3 sm:px-4 pb-10 sm:pb-14 md:pb-20">
               <span className="inline-block px-3 py-1 text-xs font-semibold text-[#00c4b4] bg-white/10 rounded-full mb-5">
                 📌 오늘의 인사이트
               </span>
@@ -421,14 +421,14 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
-        <div className="container mx-auto max-w-6xl px-6 py-12 md:py-14">
+        <div className="container mx-auto max-w-6xl px-3 sm:px-6 py-8 sm:py-12 md:py-14">
           
           {editionsWithInsights.filter(edition => edition.insightsCount > 0).length === 0 ? (
             <div className="text-center py-20 text-slate-500 text-sm">
               발행된 인사이트가 없습니다.
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8 md:gap-10">
               {editionsWithInsights
                 .filter(edition => {
                   // 인사이트가 있고, relatedInsights가 배열인 발행호만 표시
@@ -470,7 +470,7 @@ export default async function HomePage() {
                           />
                         </div>
                       )}
-                      <div className="p-6 flex-1 flex flex-col">
+                      <div className="p-4 sm:p-6 flex-1 flex flex-col">
                         <div className="flex items-center gap-2 mb-4">
                           <span className="text-xs text-gray-500">
                             {formatEditionDate(edition.edition_id)}

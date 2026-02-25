@@ -5,8 +5,8 @@ export function Footer() {
   return (
     <footer className="mt-auto bg-[#0f172a] text-slate-300">
       <div className="container mx-auto max-w-6xl px-4">
-        <div className="py-12 md:py-16">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
+        <div className="py-8 sm:py-12 md:py-16">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10 md:gap-8">
             {/* 브랜드 영역 */}
             <div className="md:col-span-5">
               <Link href="/" className="inline-block mb-5">
@@ -23,7 +23,7 @@ export function Footer() {
               <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-5">
                 바로가기
               </h3>
-              <nav className="flex flex-wrap gap-x-6 gap-y-1">
+              <nav className="flex flex-wrap gap-x-6 gap-y-2 sm:gap-y-1">
                 <Link href="/news" className="text-sm text-slate-400 hover:text-white transition-colors">
                   발행호
                 </Link>
