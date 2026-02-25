@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { isWebView, WEBVIEW_MESSAGE } from '@/lib/utils/is-webview'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,9 +19,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [mounted, setMounted] = useState(false)
+  const [inWebView, setInWebView] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    if (typeof window !== 'undefined') setInWebView(isWebView())
     const urlError = searchParams.get('error')
     if (urlError) setError(decodeURIComponent(urlError))
 
@@ -39,6 +42,10 @@ export default function LoginPage() {
   }, [searchParams])
 
   const handleGoogleLogin = async () => {
+    if (typeof window !== 'undefined' && isWebView()) {
+      alert(WEBVIEW_MESSAGE)
+      return
+    }
     setError('')
     setLoading(true)
     try {
@@ -211,6 +218,12 @@ export default function LoginPage() {
                 <span className="bg-card px-2 text-muted-foreground">또는</span>
               </div>
             </div>
+
+            {inWebView && (
+              <div className="p-3 text-xs bg-amber-50 border border-amber-200 rounded-lg text-amber-800">
+                ⚠️ 인앱 브라우저에서는 Google 로그인이 차단됩니다. Chrome 또는 Safari에서 접속해 주세요.
+              </div>
+            )}
 
             <Button
               type="button"

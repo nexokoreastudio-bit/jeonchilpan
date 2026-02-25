@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { isWebView, WEBVIEW_MESSAGE } from '@/lib/utils/is-webview'
 import { signup } from '@/app/actions/signup'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,6 +26,11 @@ export default function SignupPage() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [inWebView, setInWebView] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') setInWebView(isWebView())
+  }, [])
 
   // URL 파라미터에서 추천인 코드 읽기
   useEffect(() => {
@@ -36,6 +42,10 @@ export default function SignupPage() {
   }, [searchParams])
 
   const handleGoogleSignup = async () => {
+    if (typeof window !== 'undefined' && isWebView()) {
+      alert(WEBVIEW_MESSAGE)
+      return
+    }
     setError('')
     setLoading(true)
     try {
@@ -243,6 +253,12 @@ export default function SignupPage() {
                 <span className="bg-card px-2 text-muted-foreground">또는</span>
               </div>
             </div>
+
+            {inWebView && (
+              <div className="p-3 text-xs bg-amber-50 border border-amber-200 rounded-lg text-amber-800">
+                ⚠️ 인앱 브라우저에서는 Google 로그인이 차단됩니다. Chrome 또는 Safari에서 접속해 주세요.
+              </div>
+            )}
 
             <Button
               type="button"
