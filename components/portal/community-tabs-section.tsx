@@ -6,24 +6,15 @@ import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import type { PostWithAuthor } from '@/lib/supabase/posts'
 
-type BoardType = 'all' | 'notice' | 'bamboo' | 'materials' | 'job' | 'verification'
+type BoardType = 'all' | 'notice' | 'materials' | 'resources' | 'bamboo'
 
 const TABS: { key: BoardType; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'notice', label: '공지사항' },
-  { key: 'bamboo', label: '대나무숲' },
   { key: 'materials', label: '자료공유' },
-  { key: 'job', label: '구인/구직' },
-  { key: 'verification', label: '구독자 인증' },
+  { key: 'resources', label: '자료실' },
+  { key: 'bamboo', label: '자유게시판' },
 ]
-
-const BOARD_LABELS: Record<string, string> = {
-  notice: '공지',
-  bamboo: '대나무숲',
-  materials: '자료공유',
-  job: '구인/구직',
-  verification: '인증',
-}
 
 function isNewPost(createdAt: string): boolean {
   const created = new Date(createdAt).getTime()
@@ -37,16 +28,21 @@ interface CommunityTabsSectionProps {
     notice: PostWithAuthor[]
     bamboo: PostWithAuthor[]
     materials: PostWithAuthor[]
-    job: PostWithAuthor[]
-    verification: PostWithAuthor[]
+    resources: Array<{
+      id: number
+      title: string
+      downloads_count: number
+      created_at: string
+    }>
   }
 }
 
 export function CommunityTabsSection({ postsByBoard }: CommunityTabsSectionProps) {
   const [activeTab, setActiveTab] = useState<BoardType>('all')
-  const posts = postsByBoard[activeTab]
+  const posts = activeTab === 'resources' ? [] : postsByBoard[activeTab]
+  const resources = postsByBoard.resources
 
-  if (posts.length === 0 && activeTab === 'all') {
+  if (activeTab !== 'resources' && posts.length === 0 && activeTab === 'all') {
     const allEmpty = Object.values(postsByBoard).every((arr) => arr.length === 0)
     if (allEmpty) return null
   }
@@ -73,7 +69,31 @@ export function CommunityTabsSection({ postsByBoard }: CommunityTabsSectionProps
         </div>
       </div>
       <div className="divide-y divide-gray-100">
-        {posts.length === 0 ? (
+        {activeTab === 'resources' ? (
+          resources.length === 0 ? (
+            <p className="py-8 text-center text-slate-500 text-sm">자료가 없습니다.</p>
+          ) : (
+            resources.slice(0, 8).map((resource) => (
+              <Link
+                key={resource.id}
+                href="/resources"
+                className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50/50 group border-l-2 border-transparent hover:border-[#00c4b4]/50 transition-colors"
+              >
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-medium text-slate-800 group-hover:text-[#00c4b4] line-clamp-1 truncate">
+                    {resource.title}
+                  </h3>
+                </div>
+                <div className="flex items-center gap-2 shrink-0 text-xs min-w-[120px] justify-end">
+                  <span className="text-slate-500">{resource.downloads_count.toLocaleString()}회</span>
+                  <span className="text-slate-400 shrink-0">
+                    {format(new Date(resource.created_at), 'M.d', { locale: ko })}
+                  </span>
+                </div>
+              </Link>
+            ))
+          )
+        ) : posts.length === 0 ? (
           <p className="py-8 text-center text-slate-500 text-sm">게시글이 없습니다.</p>
         ) : (
           posts.slice(0, 8).map((post) => (
@@ -110,10 +130,10 @@ export function CommunityTabsSection({ postsByBoard }: CommunityTabsSectionProps
       </div>
       <div className="px-4 py-2.5 bg-slate-50/30 border-t border-gray-100">
         <Link
-          href="/community"
+          href={activeTab === 'resources' ? '/resources' : '/community'}
           className="text-xs font-medium text-[#00c4b4] hover:text-[#00a396] transition-colors"
         >
-          전칠판 전체 보기 →
+          {activeTab === 'resources' ? '자료실 전체 보기 →' : '전칠판 전체 보기 →'}
         </Link>
       </div>
     </div>

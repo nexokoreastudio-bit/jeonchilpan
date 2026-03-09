@@ -19,8 +19,8 @@ import styles from '../community.module.css'
 
 const BOARD_TYPE_INFO = {
   notice: { label: '공지사항', icon: MessageSquare },
-  bamboo: { label: '원장님 대나무숲', icon: MessageSquare },
-  materials: { label: '공유자료실', icon: FileStack },
+  bamboo: { label: '자유게시판', icon: MessageSquare },
+  materials: { label: '자료공유', icon: FileStack },
   job: { label: '구인/구직', icon: Briefcase },
   verification: { label: '구독자 인증', icon: BadgeCheck },
 } as const
@@ -327,5 +327,4 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
   }
 }
-
 

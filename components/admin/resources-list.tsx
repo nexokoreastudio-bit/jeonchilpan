@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { deleteResource, getResourcesForAdmin } from '@/app/actions/resources'
 import { SafeImage } from '@/components/safe-image'
 import Link from 'next/link'
+import { classifyResourceCategory, RESOURCE_CATEGORY_LABELS, type ResourceCategoryKey } from '@/lib/utils/resource-category'
 
 type Resource = Database['public']['Tables']['resources']['Row']
 
@@ -38,6 +39,7 @@ const LEVEL_LABELS = {
 export function ResourcesList() {
   const [resources, setResources] = useState<Resource[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState<'all' | ResourceCategoryKey>('all')
 
   useEffect(() => {
     loadResources()
@@ -96,9 +98,51 @@ export function ResourcesList() {
     )
   }
 
+  const resourcesWithCategory = resources.map((resource) => ({
+    ...resource,
+    derivedCategory: classifyResourceCategory(resource.title, resource.description),
+  }))
+
+  const categoryCounts = resourcesWithCategory.reduce<Record<string, number>>((acc, resource) => {
+    const key = resource.derivedCategory
+    acc[key] = (acc[key] || 0) + 1
+    return acc
+  }, {})
+
+  const filteredResources = selectedCategory === 'all'
+    ? resourcesWithCategory
+    : resourcesWithCategory.filter((resource) => resource.derivedCategory === selectedCategory)
+
   return (
     <div className="space-y-4">
-      {resources.map((resource) => {
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setSelectedCategory('all')}
+          className={`px-3 py-1.5 rounded-full text-sm border ${
+            selectedCategory === 'all'
+              ? 'bg-nexo-navy text-white border-nexo-navy'
+              : 'bg-white text-slate-700 border-slate-300'
+          }`}
+        >
+          전체 ({resources.length})
+        </button>
+        {(Object.keys(RESOURCE_CATEGORY_LABELS) as ResourceCategoryKey[]).map((key) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setSelectedCategory(key)}
+            className={`px-3 py-1.5 rounded-full text-sm border ${
+              selectedCategory === key
+                ? 'bg-nexo-navy text-white border-nexo-navy'
+                : 'bg-white text-slate-700 border-slate-300'
+            }`}
+          >
+            {RESOURCE_CATEGORY_LABELS[key]} ({categoryCounts[key] || 0})
+          </button>
+        ))}
+      </div>
+      {filteredResources.map((resource) => {
         const FileIcon = resource.file_type
           ? FILE_TYPE_ICONS[resource.file_type] || File
           : File
@@ -132,6 +176,9 @@ export function ResourcesList() {
                     </h3>
                     <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">
                       {resource.file_type ? FILE_TYPE_LABELS[resource.file_type] : '파일'}
+                    </span>
+                    <span className="px-2 py-1 text-xs font-medium bg-slate-100 text-slate-700 rounded border border-slate-200">
+                      {RESOURCE_CATEGORY_LABELS[resource.derivedCategory]}
                     </span>
                   </div>
 

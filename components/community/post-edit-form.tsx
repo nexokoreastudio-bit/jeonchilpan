@@ -136,10 +136,8 @@ export function PostEditForm({
           </SelectTrigger>
           <SelectContent>
             {initialBoardType === 'notice' && <SelectItem value="notice">공지사항</SelectItem>}
-            <SelectItem value="bamboo">원장님 대나무숲</SelectItem>
-            <SelectItem value="materials">공유자료실</SelectItem>
-            <SelectItem value="job">구인/구직</SelectItem>
-            <SelectItem value="verification">구독자 인증 요청</SelectItem>
+            <SelectItem value="materials">자료공유</SelectItem>
+            <SelectItem value="bamboo">자유게시판</SelectItem>
           </SelectContent>
         </Select>
       </div>

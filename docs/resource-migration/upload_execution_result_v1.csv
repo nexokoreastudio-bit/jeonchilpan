@@ -1,0 +1,5 @@
+run_date,batch_no,target_count,uploaded_found_in_db,status
+2026-03-06,batch_1,22,22,done
+2026-03-06,batch_2,22,22,done
+2026-03-06,batch_3,19,19,done
+2026-03-06,batch_4,17,17,done

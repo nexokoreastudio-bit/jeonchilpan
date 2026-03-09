@@ -17,8 +17,9 @@ const MEGA_NAV = [
     icon: Home,
     columns: [
       { title: 'NEXO 콘텐츠', items: [
-        { name: '오늘의 인사이트', href: '/' },
-        { name: '발행호 전체', href: '/news' },
+        { name: '전칠판 홈으로 이동', href: '/' },
+        { name: '오늘의 인사이트 모아보기', href: '/news' },
+        { name: '전체 기사 보기', href: '/news/crawled' },
       ]},
       { title: 'NEXO 신뢰', items: [
         { name: '고객 후기', href: '/reviews' },

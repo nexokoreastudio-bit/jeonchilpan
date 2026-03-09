@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 interface DownloadResourceButtonProps {
   resourceId: number
   hasDownloaded: boolean
+  compact?: boolean
+  className?: string
 }
 
 /**
@@ -16,6 +18,8 @@ interface DownloadResourceButtonProps {
 export function DownloadResourceButton({
   resourceId,
   hasDownloaded,
+  compact = false,
+  className = '',
 }: DownloadResourceButtonProps) {
   const [loading, setLoading] = useState(false)
   const [downloaded, setDownloaded] = useState(hasDownloaded)
@@ -60,7 +64,7 @@ export function DownloadResourceButton({
       <Button
         onClick={handleDownload}
         disabled={loading}
-        className={`w-full ${
+        className={`${compact ? 'h-9 px-3 text-sm' : 'w-full'} ${className} ${
           downloaded ? 'bg-green-600 hover:bg-green-700' : 'bg-nexo-navy hover:bg-nexo-cyan'
         }`}
       >
@@ -69,7 +73,7 @@ export function DownloadResourceButton({
         ) : downloaded ? (
           <>
             <Check className="w-4 h-4 mr-2" />
-            다시 다운로드
+            {compact ? '다시' : '다시 다운로드'}
           </>
         ) : (
           <>

@@ -1,9 +1,10 @@
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getPostsByBoardType, type BoardType } from '@/lib/supabase/posts'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { FileStack, MessageSquare, BadgeCheck, FileText, Briefcase } from 'lucide-react'
+import { FileStack, MessageSquare, FileText, Library } from 'lucide-react'
 import type { Metadata } from 'next'
 import { ForumJsonLd } from '@/components/seo/json-ld'
 import styles from './community.module.css'
@@ -20,13 +21,12 @@ function isNewPost(createdAt: string): boolean {
 const BOARD_TYPES = [
   { type: null, label: '전체', icon: MessageSquare },
   { type: 'notice', label: '공지사항', icon: Megaphone },
-  { type: 'bamboo', label: '원장님 대나무숲', icon: MessageSquare },
-  { type: 'materials', label: '공유자료실', icon: FileStack },
-  { type: 'job', label: '구인/구직', icon: Briefcase },
-  { type: 'verification', label: '구독자 인증', icon: BadgeCheck },
+  { type: 'materials', label: '자료공유', icon: FileStack },
+  { type: 'resources', label: '자료실', icon: Library },
+  { type: 'bamboo', label: '자유게시판', icon: MessageSquare },
 ] as const
 
-const VALID_BOARD_TYPES: BoardType[] = ['notice', 'bamboo', 'materials', 'job', 'verification']
+const VALID_BOARD_TYPES: BoardType[] = ['notice', 'bamboo', 'materials']
 
 interface PageProps {
   searchParams: {
@@ -51,10 +51,14 @@ export default async function CommunityPage({ searchParams }: PageProps) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // 게시판 타입 파싱
-  const boardType =
-    searchParams.board && VALID_BOARD_TYPES.includes(searchParams.board as BoardType)
-      ? (searchParams.board as BoardType)
-      : null
+  const requestedBoard = searchParams.board || ''
+  if (requestedBoard === 'resources') {
+    redirect('/resources')
+  }
+
+  const boardType = requestedBoard && VALID_BOARD_TYPES.includes(requestedBoard as BoardType)
+    ? (requestedBoard as BoardType)
+    : null
 
   // 게시글 목록 가져오기
   const posts = await getPostsByBoardType(boardType)
@@ -70,7 +74,7 @@ export default async function CommunityPage({ searchParams }: PageProps) {
     <>
       <ForumJsonLd
         name="전칠판 - NEXO Daily 전자칠판 커뮤니티"
-        description="넥소 전자칠판 사용자들의 자료 공유, 지역 네트워크, 구인구직, 자유소통 공간. 학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 전칠판."
+        description="넥소 전자칠판 사용자들의 공지, 자료공유, 자유게시판 소통 공간. 학원장과 강사들의 실질적인 네트워킹을 위한 전칠판."
         url={communityUrl}
       />
     <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-start">
@@ -80,20 +84,13 @@ export default async function CommunityPage({ searchParams }: PageProps) {
               💬 전칠판
               {boardType === 'materials' && (
                 <span className="text-slate-600 font-normal ml-1">
-                  {' > '}공유자료실
-                </span>
-              )}
-              {boardType === 'job' && (
-                <span className="text-slate-600 font-normal ml-1">
-                  {' > '}구인/구직
+                  {' > '}자료공유
                 </span>
               )}
             </h1>
             <p className="text-slate-500 text-xs mt-0.5">
               {boardType === 'materials'
-                ? '템플릿·자료를 공유하고 큰 화면에서 활용하세요'
-                : boardType === 'job'
-                ? '학원 선생님 구인·구직 정보를 나눠보세요'
+                ? '수업 템플릿·자료를 공유하고 현장에서 바로 활용하세요'
                 : '학원장과 강사들의 실질적인 네트워킹과 역량 강화를 위한 전문가 플랫폼'}
             </p>
           </div>
@@ -193,5 +190,3 @@ export default async function CommunityPage({ searchParams }: PageProps) {
     </>
   )
 }
-
-

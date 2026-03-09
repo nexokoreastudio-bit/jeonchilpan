@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { setSubscriberStatus, getUsersList } from '@/app/actions/subscriber'
+import { setSubscriberStatus } from '@/app/actions/subscriber'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Search, CheckCircle2, XCircle, Loader2, AlertCircle } from 'lucide-react'
+import { Search, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 
 interface User {
   id: string
@@ -41,20 +41,15 @@ export function UsersList({ initialUsers, searchQuery = '' }: UsersListProps) {
     setLoading(true)
     setMessage(null)
     try {
-      const result = await getUsersList(search)
-      if (result.success) {
-        setUsers(result.data || [])
-        // URL 업데이트
-        const params = new URLSearchParams(searchParams.toString())
-        if (search) {
-          params.set('search', search)
-        } else {
-          params.delete('search')
-        }
-        router.push(`/admin/users?${params.toString()}`)
+      const params = new URLSearchParams(searchParams.toString())
+      if (search.trim()) {
+        params.set('search', search.trim())
       } else {
-        setMessage({ type: 'error', text: result.error || '사용자 목록을 불러오는데 실패했습니다.' })
+        params.delete('search')
       }
+      const queryString = params.toString()
+      router.push(queryString ? `/admin/users?${queryString}` : '/admin/users')
+      router.refresh()
     } catch (error) {
       setMessage({ type: 'error', text: '오류가 발생했습니다.' })
     } finally {
@@ -68,25 +63,18 @@ export function UsersList({ initialUsers, searchQuery = '' }: UsersListProps) {
     try {
       const result = await setSubscriberStatus(userId, !currentStatus)
       if (result.success) {
-        // 서버에서 최신 데이터 다시 불러오기
-        const refreshResult = await getUsersList(search)
-        if (refreshResult.success && refreshResult.data) {
-          setUsers(refreshResult.data)
-        } else {
-          // 새로고침 실패 시 로컬 상태만 업데이트
-          setUsers(users.map(user => 
-            user.id === userId 
-              ? { ...user, subscriber_verified: !currentStatus, verified_at: !currentStatus ? new Date().toISOString() : null }
-              : user
-          ))
-        }
+        // 즉시 반응을 위한 로컬 업데이트 (서버 refresh로 최종 동기화)
+        setUsers(users.map(user =>
+          user.id === userId
+            ? { ...user, subscriber_verified: !currentStatus, verified_at: !currentStatus ? new Date().toISOString() : null }
+            : user
+        ))
         setMessage({ 
           type: 'success', 
           text: !currentStatus 
             ? '구독자로 설정되었습니다.' 
             : '구독자 인증이 해제되었습니다.' 
         })
-        // 페이지 새로고침하여 모든 상태 동기화
         router.refresh()
       } else {
         setMessage({ type: 'error', text: result.error || '상태 변경에 실패했습니다.' })

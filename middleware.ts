@@ -14,14 +14,12 @@ export const config = {
   matcher: [
     /*
      * 다음 경로를 제외한 모든 요청 경로와 일치:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public 폴더의 파일들
-     * - 기존 HTML 파일들 (점진적 마이그레이션)
+     * - api (API routes) - Supabase Auth rate limit 방지
+     * - _next/static, _next/image (정적 파일)
+     * - favicon.ico, robots.txt, sitemap.xml
+     * - 이미지/HTML 확장자
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html)$).*)',
+    '/((?!api|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html)$).*)',
   ],
 }
 

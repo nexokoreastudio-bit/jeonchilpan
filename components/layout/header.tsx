@@ -77,7 +77,13 @@ export async function Header() {
               href="/news"
               className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
             >
-              발행호 목록
+              인사이트 모아보기
+            </Link>
+            <Link
+              href="/news/crawled"
+              className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
+            >
+              전체 기사
             </Link>
             <Link
               href="/community"

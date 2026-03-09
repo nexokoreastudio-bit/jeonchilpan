@@ -9,6 +9,7 @@ import { Calendar, ArrowRight } from 'lucide-react'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { CrawledNewsSection } from '@/components/news/crawled-news-section'
+import { NewsRotationBar } from '@/components/news/news-rotation-bar'
 import { ConsultingCheatSheet } from '@/components/consulting-cheat-sheet'
 import { PortalSidebar } from '@/components/portal/portal-sidebar'
 import { CommunityTabsSection } from '@/components/portal/community-tabs-section'
@@ -24,6 +25,16 @@ import {
 import { MonitoringDashboard } from '@/components/portal/monitoring-dashboard'
 import { CollapsibleSection } from '@/components/portal/collapsible-section'
 import { CenterBanner } from '@/components/shared/center-banner'
+import { classifyResourceCategory, RESOURCE_CATEGORY_LABELS, type ResourceCategoryKey } from '@/lib/utils/resource-category'
+
+const MAIN_PROMO_VIDEO = '/assets/images/banners/main-banner.mp4'
+const HOME_FILE_TYPE_LABELS: Record<string, string> = {
+  pdf: 'PDF',
+  xlsx: 'Excel',
+  hwp: '한글',
+  docx: 'Word',
+  pptx: 'PPT',
+}
 
 // 날짜 포맷팅 유틸리티 함수
 function formatEditionDate(editionId: string | null): string {
@@ -75,8 +86,7 @@ export default async function HomePage() {
     notice: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
     bamboo: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
     materials: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
-    job: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
-    verification: [] as Awaited<ReturnType<typeof getPostsByBoardType>>,
+    resources: [] as Array<{ id: number; title: string; downloads_count: number; created_at: string }>,
   }
   let popularPosts: Awaited<ReturnType<typeof getPopularPosts>> = []
   let latestPostsForSidebar: Awaited<ReturnType<typeof getLatestPosts>> = []
@@ -90,6 +100,18 @@ export default async function HomePage() {
     postsThisWeek: 0,
     commentsThisWeek: 0,
   }
+  let resourceTotalCount = 0
+  let resourceTotalDownloads = 0
+  let topResourceCategories: Array<{ key: ResourceCategoryKey; count: number }> = []
+  let featuredResources: Array<{
+    id: number
+    title: string
+    description: string | null
+    file_type: string | null
+    downloads_count: number
+    created_at: string
+    category: ResourceCategoryKey
+  }> = []
 
   try {
     const supabase = await createClient()
@@ -105,13 +127,12 @@ export default async function HomePage() {
       postsNotice,
       postsBamboo,
       postsMaterials,
-      postsJob,
-      postsVerification,
       popularPostsData,
       latestPostsForSidebarData,
       latestCommentsData,
       noticesData,
       educationNewsData,
+      resourcesData,
     ] = await Promise.all([
       getInsights(),
       getReviews('latest', 3, 0),
@@ -126,13 +147,17 @@ export default async function HomePage() {
       getPostsByBoardType('notice', 10, 0),
       getPostsByBoardType('bamboo', 10, 0),
       getPostsByBoardType('materials', 10, 0),
-      getPostsByBoardType('job', 10, 0),
-      getPostsByBoardType('verification', 10, 0),
       getPopularPosts(10),
       getLatestPosts(10),
       getLatestComments(10),
       getPortalNotices(5),
       getPortalEducationNews(5),
+      supabase
+        .from('resources')
+        .select('id, title, description, file_type, downloads_count, created_at')
+        .order('created_at', { ascending: false })
+        .limit(80)
+        .then(({ data }) => data || []),
     ] as const)
     allInsights = insights
     latestReviews = reviews
@@ -143,15 +168,74 @@ export default async function HomePage() {
       notice: postsNotice,
       bamboo: postsBamboo,
       materials: postsMaterials,
-      job: postsJob,
-      verification: postsVerification,
+      resources: [],
     }
     popularPosts = popularPostsData
     latestPostsForSidebar = latestPostsForSidebarData
     latestComments = latestCommentsData
     notices = noticesData
     educationNews = educationNewsData
-    const [leadStatsData, engagementStatsData] = await Promise.all([
+
+    type HomeResource = {
+      id: number
+      title: string
+      description: string | null
+      file_type: string | null
+      downloads_count: number
+      created_at: string
+      category: ResourceCategoryKey
+    }
+
+    const resourcesWithCategory: HomeResource[] = ((resourcesData || []) as any[]).map((resource) => ({
+      id: resource.id,
+      title: resource.title || '제목 없음',
+      description: resource.description || null,
+      file_type: resource.file_type || null,
+      downloads_count: resource.downloads_count || 0,
+      created_at: resource.created_at || new Date(0).toISOString(),
+      category: classifyResourceCategory(resource.title || '', resource.description),
+    }))
+    resourceTotalCount = resourcesWithCategory.length
+    resourceTotalDownloads = resourcesWithCategory.reduce(
+      (sum, resource) => sum + (resource.downloads_count || 0),
+      0
+    )
+
+    const categoryCounts = resourcesWithCategory.reduce<Record<ResourceCategoryKey, number>>(
+      (acc, resource) => {
+        acc[resource.category] = (acc[resource.category] || 0) + 1
+        return acc
+      },
+      {} as Record<ResourceCategoryKey, number>
+    )
+
+    topResourceCategories = (Object.entries(categoryCounts) as Array<[ResourceCategoryKey, number]>)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([key, count]) => ({ key, count }))
+
+    featuredResources = resourcesWithCategory
+      .sort((a, b) => {
+        const downloadDiff = (b.downloads_count || 0) - (a.downloads_count || 0)
+        if (downloadDiff !== 0) return downloadDiff
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      })
+      .slice(0, 4)
+    postsByBoard.resources = resourcesWithCategory
+      .slice()
+      .sort((a, b) => {
+        const downloadDiff = (b.downloads_count || 0) - (a.downloads_count || 0)
+        if (downloadDiff !== 0) return downloadDiff
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      })
+      .slice(0, 8)
+      .map((resource) => ({
+        id: resource.id,
+        title: resource.title,
+        downloads_count: resource.downloads_count || 0,
+        created_at: resource.created_at,
+      }))
+  const [leadStatsData, engagementStatsData] = await Promise.all([
       getPortalLeadStats(),
       getPortalEngagementStats(),
     ])
@@ -301,6 +385,133 @@ export default async function HomePage() {
         <div className="flex-1 min-w-0 flex flex-col gap-4 md:gap-6">
           {/* 콘텐츠 영역 - 배너와 공간을 나누지 않음, 항상 full width */}
           <div className="flex-1 min-w-0 space-y-2 md:space-y-3">
+      {/* 메인 프로모션 배너 */}
+      <section className="hidden sm:block bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+        <Link href="/leads/quote" className="block">
+          <div className="relative aspect-[180/51] bg-gray-50">
+            <video
+              className="absolute inset-0 h-full w-full object-cover"
+              src={MAIN_PROMO_VIDEO}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            />
+          </div>
+        </Link>
+      </section>
+
+      {/* 크롤링 뉴스 1줄 로테이션 바 */}
+      {educationNews.length > 0 && (
+        <NewsRotationBar items={educationNews} />
+      )}
+
+      {/* 자료실 유입 특화 섹션 */}
+      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+        <div className="border-b border-gray-100 bg-slate-50/70 px-4 sm:px-5 py-4">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-semibold tracking-wide text-[#00a396] uppercase">NEXO 자료실</p>
+              <h2 className="text-base sm:text-lg font-bold text-slate-800 mt-1">원장님이 바로 쓰는 상담·수업 자료</h2>
+              <p className="text-slate-500 text-xs sm:text-sm mt-1">
+                학부모 상담, 반 운영, 수업 설계에 바로 쓰는 실무형 템플릿을 모아두었습니다.
+              </p>
+            </div>
+            <Link
+              href="/resources"
+              className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-[#00c4b4] hover:text-[#00a396] transition-colors shrink-0"
+            >
+              자료실 전체 보기
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+
+        <div className="px-4 sm:px-5 py-4 sm:py-5">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-1 grid grid-cols-2 lg:grid-cols-1 gap-3">
+              <div className="rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-3">
+                <p className="text-[11px] text-slate-500">전체 자료</p>
+                <p className="text-lg font-bold text-slate-800 mt-0.5">{resourceTotalCount.toLocaleString()}개</p>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-3">
+                <p className="text-[11px] text-slate-500">누적 다운로드</p>
+                <p className="text-lg font-bold text-slate-800 mt-0.5">{resourceTotalDownloads.toLocaleString()}회</p>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-3 col-span-2 lg:col-span-1">
+                <p className="text-[11px] text-slate-500 mb-2">인기 카테고리</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {topResourceCategories.length > 0 ? (
+                    topResourceCategories.map((category) => (
+                      <Link
+                        key={category.key}
+                        href={`/resources?category=${category.key}`}
+                        className="inline-flex items-center gap-1 rounded-full border border-[#00c4b4]/30 bg-[#00c4b4]/5 px-2.5 py-1 text-[11px] font-medium text-[#007d73]"
+                      >
+                        {RESOURCE_CATEGORY_LABELS[category.key]}
+                        <span className="text-[#00a396]">{category.count}</span>
+                      </Link>
+                    ))
+                  ) : (
+                    <span className="text-xs text-slate-400">자료 준비중</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-2 rounded-lg border border-slate-200 overflow-hidden">
+              <ul className="divide-y divide-slate-100">
+                {featuredResources.length > 0 ? (
+                  featuredResources.map((resource, index) => (
+                    <li key={resource.id} className="flex items-center justify-between gap-3 px-3 sm:px-4 py-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-[11px] font-semibold text-slate-600">
+                            {index + 1}
+                          </span>
+                          <span className="text-[11px] text-slate-500">
+                            {RESOURCE_CATEGORY_LABELS[resource.category]}
+                          </span>
+                          {resource.file_type && (
+                            <span className="text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                              {HOME_FILE_TYPE_LABELS[resource.file_type] || resource.file_type.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm font-semibold text-slate-800 line-clamp-1">{resource.title}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          다운로드 {resource.downloads_count.toLocaleString()}회
+                        </p>
+                      </div>
+                      <Link
+                        href="/resources"
+                        className="shrink-0 inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:border-[#00c4b4]/40 hover:text-[#00897f] transition-colors"
+                      >
+                        받기
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-6 text-sm text-slate-500">표시할 자료가 없습니다.</li>
+                )}
+              </ul>
+            </div>
+          </div>
+
+          <div className="sm:hidden mt-4 text-right">
+            <Link
+              href="/resources"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-[#00c4b4] hover:text-[#00a396] transition-colors"
+            >
+              자료실 전체 보기
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* 최상단: 실시간 현황 (접기/펼치기) */}
       <CollapsibleSection
         title="실시간 현황"
@@ -322,8 +533,7 @@ export default async function HomePage() {
         postsByBoard.notice.length > 0 ||
         postsByBoard.bamboo.length > 0 ||
         postsByBoard.materials.length > 0 ||
-        postsByBoard.job.length > 0 ||
-        postsByBoard.verification.length > 0) && (
+        postsByBoard.resources.length > 0) && (
         <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
           <div className="border-b border-gray-100 bg-slate-50/50 px-3 sm:px-4 py-3">
             <div className="flex items-center gap-2 flex-wrap">
@@ -417,7 +627,7 @@ export default async function HomePage() {
               </p>
             </div>
             <Link href="/news" className="hidden md:flex items-center gap-2 text-sm font-medium text-[#00c4b4] hover:text-[#00a396] transition-colors shrink-0">
-              발행호 전체 보기 <ArrowRight className="w-4 h-4" />
+              오늘의 인사이트 모아보기 <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -516,21 +726,22 @@ export default async function HomePage() {
       <section className="py-16 md:py-20 bg-[#1a1a1a] text-white">
         <div className="container mx-auto max-w-2xl px-4 text-center">
           <p className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4">
-            학원장·강사님들이 매일 모이는 곳
+            넥소 전자칠판 카톡 정보방
           </p>
           <h2 className="text-xl md:text-2xl font-bold mb-3">
-            매일 아침 8시, 뭐가 카톡으로 와 있을까?
+            전자칠판 사용법부터 시연·견적 문의까지, 한 번에 받아보세요
           </h2>
           <p className="text-white/70 text-sm md:text-base mb-8">
-            입시 뉴스부터 자료 공유까지. 넥소 정보방에서 함께 나눠보세요.
+            넥소 전자칠판 사용법, 수업 활용법, 설치 사례, 시연 문의, 견적 문의 등
+            전자칠판 관련 핵심 정보를 카톡으로 빠르게 확인할 수 있습니다.
           </p>
           <a
-            href={process.env.NEXT_PUBLIC_KAKAO_OPEN_CHAT_URL || 'https://open.kakao.com/o/sample'}
+            href="https://invite.kakao.com/tc/OYA6XOhnGN"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-[#FEE500] text-[#1a1a1a] font-bold text-sm hover:bg-[#f5dc00] transition-colors"
           >
-            정보방 입장하기
+            카톡 정보방 입장하기
             <ArrowRight className="w-5 h-5" />
           </a>
         </div>

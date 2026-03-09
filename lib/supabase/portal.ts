@@ -266,7 +266,7 @@ export async function getPortalEngagementStats(): Promise<PortalEngagementStats>
       .from('posts')
       .select('id', { count: 'exact', head: true })
       .gte('created_at', startOfWeek.toISOString())
-      .in('board_type', ['bamboo', 'materials', 'job', 'verification']),
+      .in('board_type', ['bamboo', 'materials']),
     supabase
       .from('comments')
       .select('id', { count: 'exact', head: true })

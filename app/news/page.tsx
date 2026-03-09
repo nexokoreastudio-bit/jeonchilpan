@@ -113,7 +113,7 @@ export default async function NewsArchivePage({ searchParams }: PageProps) {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>📰 발행호 목록</h1>
+        <h1>📰 오늘의 인사이트 모아보기</h1>
         <p className={styles.subtitle}>
           NEXO Daily가 큐레이션한 교육 인사이트 아카이브
         </p>

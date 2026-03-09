@@ -12,6 +12,7 @@ import { Upload, FileText, X, Image as ImageIcon } from 'lucide-react'
 import { uploadImageToStorage } from '@/app/actions/upload-image'
 import { compressImage, needsCompression } from '@/lib/utils/image-compress'
 import { SafeImage } from '@/components/safe-image'
+import { classifyResourceCategory, RESOURCE_CATEGORY_LABELS } from '@/lib/utils/resource-category'
 
 interface ResourceWriteFormProps {
   userId: string
@@ -46,6 +47,7 @@ export function ResourceWriteForm({ userId, initialData }: ResourceWriteFormProp
   const [uploadingImage, setUploadingImage] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const derivedCategory = classifyResourceCategory(title, description)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -271,6 +273,9 @@ export function ResourceWriteForm({ userId, initialData }: ResourceWriteFormProp
           required
           className="mt-1"
         />
+        <p className="mt-2 text-xs text-slate-500">
+          자동 분류: <span className="font-medium text-slate-700">{RESOURCE_CATEGORY_LABELS[derivedCategory]}</span>
+        </p>
       </div>
 
       {/* 설명 */}

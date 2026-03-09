@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc -p tsconfig.typecheck.json --noEmit",
     "deploy:check": "npm run type-check && npm run build",
     "generate-og-image": "node scripts/generate-og-image.js",
     "setup-qrcode": "node scripts/setup-qrcode.js",

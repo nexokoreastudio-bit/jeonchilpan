@@ -5,13 +5,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database'
 
-/** Lean 리뉴얼: board_type (대나무숲 + 공식 자료실 + 구독자 인증 + 공지사항 + 구인구직) */
+/** Lean 리뉴얼: 운영 게시판 타입 */
 export type BoardType =
-  | 'bamboo'       // 원장님 대나무숲 - 익명/하소연
-  | 'materials'    // 공유자료실 - 다운로드 전용
-  | 'verification' // 구독자 인증 요청 - 인증글 작성
-  | 'notice'       // 공지사항 - 관리자 전용
-  | 'job'          // 학원 선생님 구인/구직
+  | 'bamboo'       // 자유게시판
+  | 'materials'    // 자료공유
+  | 'verification' // (레거시)
+  | 'notice'       // 공지사항
+  | 'job'          // (레거시)
 
 type Post = Database['public']['Tables']['posts']['Row']
 type PostRow = Database['public']['Tables']['posts']['Row']
@@ -62,8 +62,8 @@ export async function getPostsByBoardType(
     return (data || []) as PostWithAuthor[]
   }
 
-  // 전체/대나무숲/자료실/인증: 공지글 상단 고정
-  const needsNoticePinned = boardType === null || ['bamboo', 'materials', 'verification', 'job'].includes(boardType)
+  // 전체/자유게시판/자료공유: 공지글 상단 고정
+  const needsNoticePinned = boardType === null || ['bamboo', 'materials'].includes(boardType)
 
   if (needsNoticePinned) {
     const [noticeRes, boardRes] = await Promise.all([
@@ -83,6 +83,7 @@ export async function getPostsByBoardType(
         : supabase
             .from('posts')
             .select(selectQuery)
+            .in('board_type', ['notice', 'bamboo', 'materials'])
             .order('created_at', { ascending: false })
             .range(0, Math.max(offset + limit + 99, 199)) // 공지 제외 후 충분한 목록 확보
     ])
@@ -406,4 +407,3 @@ export async function deletePost(
     return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
   }
 }
-

@@ -70,7 +70,7 @@ export function EditionNavigation({
 
         <Link href="/news" className={styles.archiveButton}>
           <Calendar className={styles.icon} />
-          <span>발행호 목록</span>
+          <span>인사이트 모아보기</span>
         </Link>
 
         {nextEditionId ? (
@@ -94,5 +94,4 @@ export function EditionNavigation({
     </nav>
   )
 }
-
 
