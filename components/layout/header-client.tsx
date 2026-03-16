@@ -230,6 +230,20 @@ export function HeaderClient() {
         </div>
       </div>
 
+      {/* 2.5 전광판 광고 바 */}
+      <Link
+        href="/smartstore"
+        className="block border-y border-[#8a6a00] bg-[#2a2200] hover:bg-[#3a2f00] transition-colors"
+      >
+        <div className="container mx-auto px-3 md:px-4">
+          <div className="py-2.5 text-center text-[#ffe866] text-sm font-semibold">
+            <span className="smartstore-glow mr-2">●</span>
+            <span className="smartstore-text-glow">2026년 소상공인스마트상점 모집중!! 4월1일 마감 빨리신청하세요</span>
+            <span className="smartstore-glow ml-2">●</span>
+          </div>
+        </div>
+      </Link>
+
       {/* 3. 메뉴 바 - 개별 드롭다운 (호버 시 해당 메뉴만) */}
       <div className="bg-slate-800 pt-2 pb-2 mt-2">
         <div className="container mx-auto px-4">
@@ -384,6 +398,43 @@ export function HeaderClient() {
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        .smartstore-glow {
+          color: #ffd23a;
+          animation: smartstore-blink 1.1s steps(2, start) infinite;
+        }
+
+        .smartstore-text-glow {
+          animation: smartstore-text-blink 1.1s steps(2, start) infinite;
+        }
+
+        @keyframes smartstore-blink {
+          0%,
+          49% {
+            opacity: 1;
+            text-shadow: 0 0 0 transparent;
+          }
+          50%,
+          100% {
+            opacity: 0.35;
+            text-shadow: 0 0 8px rgba(255, 210, 58, 0.9);
+          }
+        }
+
+        @keyframes smartstore-text-blink {
+          0%,
+          49% {
+            opacity: 1;
+            text-shadow: 0 0 0 transparent;
+          }
+          50%,
+          100% {
+            opacity: 0.75;
+            text-shadow: 0 0 10px rgba(255, 224, 102, 0.5);
+          }
+        }
+      `}</style>
     </header>
   )
 }

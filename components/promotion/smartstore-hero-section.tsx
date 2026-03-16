@@ -15,7 +15,11 @@ export function SmartstoreHeroSection() {
         </div>
 
         <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white leading-tight">
-          전자칠판 도입, 지금 지원사업과 함께 준비하세요
+          전자칠판 도입,
+          <br />
+          <span className="inline-block smartstore-headline-twinkle">
+            2026 소상공인 스마트상점을 통해 준비하세요
+          </span>
         </h2>
         <p className="mt-3 text-sm sm:text-base text-slate-200/90 max-w-3xl">
           지원 대상, 준비 서류, 신청 절차를 한 번에 확인하고 바로 상담받을 수 있습니다.
@@ -32,7 +36,7 @@ export function SmartstoreHeroSection() {
           </div>
           <div className="rounded-md border border-white/20 bg-white/5 px-3 py-2 text-xs text-slate-100 flex items-center gap-2">
             <BadgeCheck className="w-4 h-4 text-[#7df6ec]" />
-            시연·견적 상담 즉시 연결
+            신청이 어렵다면? 상담신청을 통해 신청절자를 알려드립니다.
           </div>
         </div>
 
@@ -45,14 +49,16 @@ export function SmartstoreHeroSection() {
             <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
-            href="/leads/quote?campaign=smartstore"
+            href="https://2026-nexo-polic-y-fund.netlify.app/?partner_code=johanju"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-md border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/20 transition-colors"
           >
-            신청 상담받기
+            신청상담 바로가기
           </Link>
         </div>
       </div>
+
     </section>
   )
 }
-
