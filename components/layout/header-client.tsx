@@ -28,6 +28,7 @@ const MEGA_NAV = [
       { title: 'NEXO 체험', items: [
         { name: '시연 신청', href: '/leads/demo' },
         { name: '세미나', href: '/seminar' },
+        { name: '스마트상점 모집', href: '/smartstore' },
       ]},
       { title: 'NEXO 혜택', items: [
         { name: '구독자 할인', href: '/benefits' },

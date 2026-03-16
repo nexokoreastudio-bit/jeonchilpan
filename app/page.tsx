@@ -25,6 +25,8 @@ import {
 import { MonitoringDashboard } from '@/components/portal/monitoring-dashboard'
 import { CollapsibleSection } from '@/components/portal/collapsible-section'
 import { CenterBanner } from '@/components/shared/center-banner'
+import { SmartstoreHeroSection } from '@/components/promotion/smartstore-hero-section'
+import { SmartstorePopupBanner } from '@/components/promotion/smartstore-popup-banner'
 import { classifyResourceCategory, RESOURCE_CATEGORY_LABELS, type ResourceCategoryKey } from '@/lib/utils/resource-category'
 
 const MAIN_PROMO_VIDEO = '/assets/images/banners/main-banner.mp4'
@@ -380,11 +382,15 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#f4f6f8]">
+      <SmartstorePopupBanner />
       {/* 포털형 2단: 콘텐츠 | 우측 사이드바 */}
       <div className="flex flex-col lg:flex-row container mx-auto max-w-7xl px-3 sm:px-4 md:px-6 py-5 sm:py-8 md:py-10 gap-4 sm:gap-6 xl:gap-8">
         <div className="flex-1 min-w-0 flex flex-col gap-4 md:gap-6">
           {/* 콘텐츠 영역 - 배너와 공간을 나누지 않음, 항상 full width */}
           <div className="flex-1 min-w-0 space-y-2 md:space-y-3">
+      {/* 소상공인 스마트상점 모집 히어로 */}
+      <SmartstoreHeroSection />
+
       {/* 메인 프로모션 배너 */}
       <section className="hidden sm:block bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
         <Link href="/leads/quote" className="block">

@@ -110,6 +110,12 @@ export async function Header() {
               자료실
             </Link>
             <Link
+              href="/smartstore"
+              className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
+            >
+              스마트상점 모집
+            </Link>
+            <Link
               href="/field"
               className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
             >
