@@ -12,6 +12,16 @@ import { ChevronDown, Menu, Home, Star, Sun, Moon } from 'lucide-react'
 // 전칠판 커뮤니티 스타일: 메가메뉴 구조 (2단계 네비)
 const MEGA_NAV = [
   {
+    name: '2026년 소상공인스마트 상점',
+    href: '/smartstore',
+    columns: [
+      { title: '스마트상점 모집', items: [
+        { name: '모집 안내', href: '/smartstore' },
+        { name: '신청절차 자세히 보기', href: 'https://2026-nexo-polic-y-fund.netlify.app/?partner_code=johanju' },
+      ]},
+    ],
+  },
+  {
     name: 'NEXO',
     href: '/',
     icon: Home,
@@ -26,7 +36,7 @@ const MEGA_NAV = [
         { name: '현장 소식', href: '/field' },
       ]},
       { title: 'NEXO 체험', items: [
-        { name: '시연 신청', href: '/leads/demo' },
+        { name: '상담신청', href: '/leads/consultation' },
         { name: '세미나', href: '/seminar' },
         { name: '스마트상점 모집', href: '/smartstore' },
       ]},
@@ -63,6 +73,15 @@ const MEGA_NAV = [
     ],
   },
   {
+    name: '현장소식',
+    href: '/field',
+    columns: [
+      { title: '현장소식', items: [
+        { name: '현장소식 전체', href: '/field' },
+      ]},
+    ],
+  },
+  {
     name: '더보기',
     href: '#',
     columns: [
@@ -71,20 +90,18 @@ const MEGA_NAV = [
         { name: '회원가입', href: '/signup' },
         { name: '세미나', href: '/seminar' },
         { name: '고객 후기', href: '/reviews' },
-        { name: '현장 소식', href: '/field' },
         { name: '구독자 할인', href: '/benefits' },
         { name: '오시는 길', href: '/location' },
       ]},
     ],
   },
   {
-    name: '시연신청',
-    href: '/leads/demo',
+    name: '상담신청',
+    href: '/leads/consultation',
     highlight: true,
     columns: [
-      { title: '시연신청', items: [
-        { name: '시연 신청', href: '/leads/demo' },
-        { name: '견적 요청', href: '/leads/quote' },
+      { title: '상담신청', items: [
+        { name: '상담신청', href: '/leads/consultation' },
       ]},
     ],
   },

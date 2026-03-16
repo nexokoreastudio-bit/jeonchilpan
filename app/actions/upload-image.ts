@@ -95,6 +95,30 @@ export async function uploadImageToStorage(
     
     // 관리자 클라이언트로 Storage에 업로드 (RLS 우회)
     const adminSupabase = await createAdminClient()
+    const bucketName = 'field-news'
+
+    // 버킷이 없으면 자동 생성 (최초 1회)
+    const { data: bucketData, error: bucketError } = await adminSupabase.storage.getBucket(bucketName)
+    const bucketNotFound =
+      bucketError?.message?.toLowerCase().includes('not found') ||
+      String(bucketError?.statusCode || '') === '404'
+    if (!bucketData && bucketNotFound) {
+      const { error: createBucketError } = await adminSupabase.storage.createBucket(bucketName, {
+        public: true,
+        fileSizeLimit: 10 * 1024 * 1024, // 10MB
+      })
+      if (createBucketError) {
+        return {
+          success: false,
+          error: String(`Storage 버킷 생성 실패: ${createBucketError.message || 'unknown error'}`),
+        }
+      }
+    } else if (bucketError && !bucketNotFound) {
+      return {
+        success: false,
+        error: String(`Storage 버킷 확인 실패: ${bucketError.message || 'unknown error'}`),
+      }
+    }
     
     // Storage에 업로드 (최대 3회 재시도)
     let uploadError: any = null
@@ -104,7 +128,7 @@ export async function uploadImageToStorage(
     
     while (retryCount < maxRetries) {
       const { data, error } = await adminSupabase.storage
-        .from('field-news')
+        .from(bucketName)
         .upload(finalFileName, buffer, {
           contentType: contentType,
           upsert: false,
@@ -148,7 +172,7 @@ export async function uploadImageToStorage(
       if (uploadError.message?.includes('Bucket not found') || uploadError.error === 'Bucket not found') {
         return {
           success: false,
-          error: String('Storage 버킷이 없습니다. Supabase 대시보드에서 "field-news" 버킷을 생성해주세요.'),
+          error: String('Storage 버킷 생성/조회에 실패했습니다. 관리자에게 문의해주세요.'),
         }
       }
       
@@ -169,7 +193,7 @@ export async function uploadImageToStorage(
 
     // 공개 URL 생성
     const { data: urlData } = adminSupabase.storage
-      .from('field-news')
+      .from(bucketName)
       .getPublicUrl(finalFileName)
 
     // Supabase urlData를 plain object로 변환

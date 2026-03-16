@@ -127,6 +127,43 @@ export function FieldNewsWriteForm({ userId, initialData }: FieldNewsWriteFormPr
   
   // 미리보기 모달 상태
   const [showPreview, setShowPreview] = useState(false)
+
+  const handleImageFiles = async (files: File[]) => {
+    if (files.length === 0) return
+
+    setUploadingImages(true)
+    const newImages: string[] = []
+
+    for (const file of files) {
+      try {
+        let base64Data: string
+        if (needsCompression(file)) {
+          base64Data = await compressImage(file)
+        } else {
+          const reader = new FileReader()
+          base64Data = await new Promise<string>((resolve, reject) => {
+            reader.onload = () => resolve(reader.result as string)
+            reader.onerror = () => reject(new Error('파일 읽기 실패'))
+            reader.readAsDataURL(file)
+          })
+        }
+
+        const uploadResult = await uploadImageToStorage(base64Data, file.name || `pasted-${Date.now()}.png`)
+        if (uploadResult.success && uploadResult.url) {
+          newImages.push(uploadResult.url)
+        } else {
+          console.error('이미지 업로드 실패:', uploadResult.error)
+          setError(uploadResult.error || '이미지 업로드에 실패했습니다.')
+        }
+      } catch (error: any) {
+        console.error('이미지 업로드 실패:', error)
+        setError(error.message || '이미지 업로드 중 오류가 발생했습니다.')
+      }
+    }
+
+    setImages((prev) => [...prev, ...newImages])
+    setUploadingImages(false)
+  }
   
   // 텍스트 변경 시 자동 파싱 및 제목 생성
   useEffect(() => {
@@ -361,13 +398,6 @@ export function FieldNewsWriteForm({ userId, initialData }: FieldNewsWriteFormPr
           location: parsedData.location || location || null,
           installation_date: installationDate || null,
           images: imageUrls.length > 0 ? imageUrls : null,
-          store_name: parsedData.storeName || null,
-          model: parsedData.model || null,
-          additional_cables: parsedData.additionalCables || null,
-          stand: parsedData.stand || null,
-          wall_mount: parsedData.wallMount || null,
-          payment: parsedData.payment || null,
-          notes: parsedData.notes || null,
         })
       } else {
         // 작성 모드
@@ -378,13 +408,6 @@ export function FieldNewsWriteForm({ userId, initialData }: FieldNewsWriteFormPr
           installation_date: installationDate || null,
           images: imageUrls.length > 0 ? imageUrls : null, // 이미지 URL 배열
           author_id: userId,
-          store_name: parsedData.storeName || null,
-          model: parsedData.model || null,
-          additional_cables: parsedData.additionalCables || null,
-          stand: parsedData.stand || null,
-          wall_mount: parsedData.wallMount || null,
-          payment: parsedData.payment || null,
-          notes: parsedData.notes || null,
         })
       }
 
@@ -541,49 +564,31 @@ ufile_3588설치 완료`}
                 multiple
                 className="hidden"
                 onChange={async (e) => {
-                  const files = Array.from(e.target.files || [])
-                  if (files.length === 0) return
-
-                  setUploadingImages(true)
-                  const newImages: string[] = []
-
-                  for (const file of files) {
-                    try {
-                      let base64Data: string
-                      
-                      // 압축이 필요한 경우
-                      if (needsCompression(file)) {
-                        base64Data = await compressImage(file)
-                      } else {
-                        // 압축이 필요 없는 경우 직접 base64로 변환
-                        const reader = new FileReader()
-                        base64Data = await new Promise<string>((resolve, reject) => {
-                          reader.onload = () => resolve(reader.result as string)
-                          reader.onerror = () => reject(new Error('파일 읽기 실패'))
-                          reader.readAsDataURL(file)
-                        })
-                      }
-
-                      const uploadResult = await uploadImageToStorage(base64Data, file.name)
-                      if (uploadResult.success && uploadResult.url) {
-                        newImages.push(uploadResult.url)
-                      } else {
-                        console.error('이미지 업로드 실패:', uploadResult.error)
-                        setError(uploadResult.error || '이미지 업로드에 실패했습니다.')
-                      }
-                    } catch (error: any) {
-                      console.error('이미지 업로드 실패:', error)
-                      setError(error.message || '이미지 업로드 중 오류가 발생했습니다.')
-                    }
-                  }
-
-                  setImages([...images, ...newImages])
-                  setUploadingImages(false)
+                  const files = Array.from(e.target.files || []).filter((file) => file.type.startsWith('image/'))
+                  await handleImageFiles(files)
                   if (fileInputRef.current) {
                     fileInputRef.current.value = ''
                   }
                 }}
               />
+              <div
+                tabIndex={0}
+                onPaste={(e) => {
+                  const items = Array.from(e.clipboardData.items || [])
+                  const imageFiles = items
+                    .filter((item) => item.type.startsWith('image/'))
+                    .map((item) => item.getAsFile())
+                    .filter((file): file is File => file !== null)
+
+                  if (imageFiles.length > 0) {
+                    e.preventDefault()
+                    void handleImageFiles(imageFiles)
+                  }
+                }}
+                className="rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-600"
+              >
+                맥북 스크린샷을 복사한 뒤 여기에서 <strong>Cmd + V</strong>로 바로 붙여넣을 수 있습니다.
+              </div>
               <Button
                 type="button"
                 variant="outline"
@@ -815,5 +820,3 @@ ufile_3588설치 완료`}
     </div>
   )
 }
-
-

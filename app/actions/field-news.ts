@@ -74,13 +74,6 @@ export async function createFieldNews(
       author_id: data.author_id,
       is_published: false, // 기본값은 임시저장
       views: 0,
-      ...(data.store_name && { store_name: data.store_name } as any),
-      ...(data.model && { model: data.model } as any),
-      ...(data.additional_cables && { additional_cables: data.additional_cables } as any),
-      ...(data.stand && { stand: data.stand } as any),
-      ...(data.wall_mount && { wall_mount: data.wall_mount } as any),
-      ...(data.payment && { payment: data.payment } as any),
-      ...(data.notes && { notes: data.notes } as any),
     } as any
     
     if (process.env.NODE_ENV === 'development') {
@@ -166,13 +159,6 @@ export async function updateFieldNews(
       installation_date: data.installation_date,
       images: data.images,
       updated_at: new Date().toISOString(),
-      ...(data.store_name !== undefined && { store_name: data.store_name } as any),
-      ...(data.model !== undefined && { model: data.model } as any),
-      ...(data.additional_cables !== undefined && { additional_cables: data.additional_cables } as any),
-      ...(data.stand !== undefined && { stand: data.stand } as any),
-      ...(data.wall_mount !== undefined && { wall_mount: data.wall_mount } as any),
-      ...(data.payment !== undefined && { payment: data.payment } as any),
-      ...(data.notes !== undefined && { notes: data.notes } as any),
     } as any
     
     const { error } = await (adminSupabase
@@ -407,4 +393,3 @@ export async function incrementFieldNewsViews(
     return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
   }
 }
-
