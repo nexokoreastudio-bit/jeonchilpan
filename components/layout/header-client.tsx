@@ -112,6 +112,8 @@ const ALL_NAV_LINKS = MEGA_NAV.flatMap((n) =>
   n.columns.flatMap((c) => c.items.map((i) => ({ href: i.href, name: i.name })))
 )
 
+const isExternalHref = (href: string) => /^https?:\/\//i.test(href)
+
 
 export function HeaderClient() {
   const [isAdmin, setIsAdmin] = useState(false)
@@ -315,6 +317,8 @@ export function HeaderClient() {
                                   <li key={`${link.href}-${link.name}`}>
                                     <Link
                                       href={link.href}
+                                      target={isExternalHref(link.href) ? '_blank' : undefined}
+                                      rel={isExternalHref(link.href) ? 'noopener noreferrer' : undefined}
                                       className={cn(
                                         'block px-3 py-2 text-sm transition-colors',
                                         isActive(link.href)
@@ -397,6 +401,8 @@ export function HeaderClient() {
                 <Link
                   key={`${item.href}-${item.name}-${i}`}
                   href={item.href}
+                  target={isExternalHref(item.href) ? '_blank' : undefined}
+                  rel={isExternalHref(item.href) ? 'noopener noreferrer' : undefined}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     'px-4 py-3 text-sm font-medium rounded-lg',

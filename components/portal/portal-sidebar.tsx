@@ -237,19 +237,19 @@ export function PortalSidebar({
           </div>
         </div>
 
-        {/* 시연신청 CTA - 넥소 배너 */}
+        {/* 상담신청 CTA - 넥소 배너 */}
         <div className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
           <div className="border-b border-gray-100 bg-[#00c4b4]/5 px-4 py-2.5">
             <span className="text-xs font-bold text-slate-600">NEXO</span>
           </div>
           <div className="p-4">
-          <p className="text-sm font-semibold text-slate-800 mb-2">전자칠판 시연</p>
-          <p className="text-xs text-slate-500 mb-4 leading-relaxed">쇼룸에서 직접 체험해보세요</p>
+          <p className="text-sm font-semibold text-slate-800 mb-2">전자칠판 상담신청</p>
+          <p className="text-xs text-slate-500 mb-4 leading-relaxed">도입 상담부터 신청 절차까지 안내해드립니다</p>
           <Link
-            href="/leads/demo"
+            href="/leads/consultation"
             className="inline-flex items-center gap-1 text-sm font-bold text-[#00c4b4] hover:text-[#00a396] transition-colors"
           >
-            전자칠판 시연 예약
+            상담신청 바로가기
             <ChevronRight className="w-3 h-3" />
           </Link>
           </div>

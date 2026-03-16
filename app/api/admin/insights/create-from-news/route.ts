@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     // 요청 본문 파싱
     const body = await request.json()
-    const { url, title, category, summary, thumbnail_url, published_at } = body
+    const { url, title, category, published_at } = body
 
     if (!url || !title) {
       return NextResponse.json(
@@ -42,6 +42,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const titleBasedSummary = `제목 기반 요약: ${title}`
+
     // 인사이트 생성 (크롤링된 뉴스의 summary와 기타 정보 전달)
     const result = await createInsight(
       url,
@@ -49,8 +51,8 @@ export async function POST(request: NextRequest) {
       undefined, // editionId는 선택사항
       undefined, // publishDate는 선택사항
       title, // 크롤링된 뉴스의 제목 직접 전달
-      summary, // 크롤링된 뉴스의 요약 전달
-      thumbnail_url, // 썸네일 URL 전달
+      titleBasedSummary, // 제목 기반 요약 전달 (외부 본문 크롤링 최소화)
+      undefined, // 썸네일 URL 전달 안함
       published_at ? published_at.split('T')[0] : undefined // 발행 날짜 전달
     )
 
@@ -86,4 +88,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

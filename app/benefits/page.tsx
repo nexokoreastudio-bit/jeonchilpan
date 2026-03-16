@@ -25,7 +25,7 @@ export default async function BenefitsPage() {
           <ul className="space-y-3">
             <li className="flex items-start gap-2">
               <CheckCircle2 className="w-5 h-5 text-[#00c4b4] flex-shrink-0 mt-0.5" />
-              <span>추가 구매 시 할인 적용</span>
+              <span>전자칠판 구매 시 할인 적용(견적요청시 안내)</span>
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle2 className="w-5 h-5 text-[#00c4b4] flex-shrink-0 mt-0.5" />
@@ -60,10 +60,10 @@ export default async function BenefitsPage() {
 
           <div className="px-6 pb-8 pt-2 border-t border-gray-100 text-center">
             <Link
-              href="/leads/demo"
+              href="/leads/consultation"
               className="text-[#00c4b4] hover:underline font-medium"
             >
-              전자칠판 시연 예약 →
+              전자칠판 상담신청 →
             </Link>
           </div>
           </div>

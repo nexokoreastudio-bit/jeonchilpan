@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { processReferralSignup, generateUserReferralCode } from '@/app/actions/referral'
 import { Database } from '@/types/database'
+import { LEGAL_VERSION } from '@/lib/legal'
 
 type UserInsert = Database['public']['Tables']['users']['Insert']
 
@@ -15,6 +16,11 @@ interface SignupData {
   academy_name?: string
   phone?: string
   referrer_code?: string
+  terms_agreed: boolean
+  privacy_agreed: boolean
+  marketing_agreed?: boolean
+  consent_version?: string
+  consented_at?: string
 }
 
 /**
@@ -24,6 +30,12 @@ interface SignupData {
 export async function signup(data: SignupData): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient()
+    if (!data.terms_agreed || !data.privacy_agreed) {
+      return { success: false, error: '이용약관 및 개인정보처리방침 동의가 필요합니다.' }
+    }
+
+    const consentedAt = data.consented_at || new Date().toISOString()
+    const consentVersion = data.consent_version || `${LEGAL_VERSION.terms}|${LEGAL_VERSION.privacy}`
 
     // 회원가입
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
@@ -35,6 +47,11 @@ export async function signup(data: SignupData): Promise<{ success: boolean; erro
           academy_name: data.academy_name || '',
           phone: data.phone || '',
           referrer_code: data.referrer_code || '',
+          terms_agreed: true,
+          privacy_agreed: true,
+          marketing_agreed: Boolean(data.marketing_agreed),
+          consent_version: consentVersion,
+          consented_at: consentedAt,
         },
         emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'}/auth/callback`,
       },
@@ -76,4 +93,3 @@ export async function signup(data: SignupData): Promise<{ success: boolean; erro
     return { success: false, error: error.message || '회원가입 중 오류가 발생했습니다.' }
   }
 }
-

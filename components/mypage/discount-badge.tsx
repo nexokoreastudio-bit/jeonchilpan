@@ -21,10 +21,10 @@ export function DiscountBadge({ isVerified, verifiedAt }: DiscountBadgeProps) {
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-bold text-amber-900 mb-2">
-              🎁 구독자 인증 시 10% 할인 혜택
+              🎁 구독자 인증 시 할인 혜택
             </h3>
             <p className="text-sm text-amber-800 mb-3">
-              전자칠판 구매 시 구독자 인증을 완료하시면 <strong>10% 할인</strong>이 적용됩니다.
+              전자칠판 구매 시 구독자 인증을 완료하시면 <strong>할인 혜택</strong>이 적용됩니다.
             </p>
             <p className="text-xs text-amber-700">
               💡 구매하신 제품의 시리얼 번호를 입력하여 인증하세요.
@@ -46,7 +46,7 @@ export function DiscountBadge({ isVerified, verifiedAt }: DiscountBadgeProps) {
             ✅ 구독자 인증 완료
           </h3>
           <p className="text-sm text-green-800 mb-2">
-            <strong className="text-lg">10% 할인</strong> 혜택이 적용됩니다.
+            <strong className="text-lg">할인</strong> 혜택이 적용됩니다.
           </p>
           {verifiedAt && (
             <p className="text-xs text-green-700">
@@ -55,7 +55,7 @@ export function DiscountBadge({ isVerified, verifiedAt }: DiscountBadgeProps) {
           )}
           <div className="mt-3 p-3 bg-white rounded-lg border border-green-200">
             <p className="text-sm font-semibold text-green-900">
-              🛒 전자칠판 구매 시 자동으로 10% 할인이 적용됩니다
+              🛒 전자칠판 구매 시 자동으로 할인 혜택이 적용됩니다
             </p>
           </div>
         </div>
@@ -63,5 +63,4 @@ export function DiscountBadge({ isVerified, verifiedAt }: DiscountBadgeProps) {
     </div>
   )
 }
-
 

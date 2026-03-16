@@ -42,7 +42,7 @@ export default async function AdminLeadsPage() {
       <div className="max-w-7xl mx-auto">
         <header className="mb-6">
           <h1 className="text-xl font-bold text-slate-900">리드 관리</h1>
-          <p className="mt-0.5 text-sm text-slate-500">상담·견적·시연 신청을 관리하세요</p>
+          <p className="mt-0.5 text-sm text-slate-500">상담신청 접수 현황을 관리하세요</p>
         </header>
 
         {/* 간단한 요약 */}
@@ -61,4 +61,3 @@ export default async function AdminLeadsPage() {
     </div>
   )
 }
-

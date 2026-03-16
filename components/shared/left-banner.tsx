@@ -18,29 +18,29 @@ export function LeftBanner({ fixed = false }: { fixed?: boolean }) {
     >
       <div className="flex flex-row md:flex-col gap-4 md:sticky md:top-24">
         <Link
-          href="/leads/demo"
+          href="/leads/consultation"
           className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-b from-[#00c4b4]/90 to-[#00a396] text-white shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
         >
           <span className="text-2xl mb-2">🖥️</span>
           <span className="text-xs font-bold text-center leading-tight">
             전자칠판
             <br />
-            10% 할인가
+            상담신청
             <br />
-            견적받기
+            안내받기
           </span>
           <span className="mt-2 text-[10px] flex items-center gap-1">
-            시연 예약
+            상담신청
             <ArrowRight className="w-3 h-3" />
           </span>
         </Link>
         <Link
-          href="/leads/quote"
+          href="/leads/consultation"
           className="flex flex-col items-center p-3 rounded-lg border-2 border-slate-200 bg-white hover:border-[#00c4b4] hover:bg-slate-50 transition-colors"
         >
           <span className="text-lg">📋</span>
           <span className="text-[10px] font-semibold text-slate-700 mt-1 text-center">
-            견적 문의
+            상담신청
           </span>
         </Link>
       </div>

@@ -62,7 +62,7 @@ export function SubscriberVerification({ userId }: SubscriberVerificationProps) 
           <h2 className="text-xl font-bold text-gray-900">구독자 인증 완료</h2>
         </div>
         <p className="text-sm text-gray-600">
-          ✅ 구독자 인증이 완료되었습니다. <strong className="text-[#00c4b4]">10% 할인</strong> 혜택이 적용됩니다.
+          ✅ 구독자 인증이 완료되었습니다. <strong className="text-[#00c4b4]">할인</strong> 혜택이 적용됩니다.
         </p>
       </div>
     )
@@ -109,7 +109,7 @@ export function SubscriberVerification({ userId }: SubscriberVerificationProps) 
       <p className="text-sm text-gray-600 mb-4">
         <strong>인증글</strong>을 작성하면 관리자가 확인 후 승인해드립니다.
         시리얼 번호 없이도 간편하게 인증할 수 있어요.
-        인증 완료 시 <strong className="text-[#00c4b4]">10% 할인</strong> 혜택이 적용됩니다.
+        인증 완료 시 <strong className="text-[#00c4b4]">할인</strong> 혜택이 적용됩니다.
       </p>
       <p className="text-xs text-gray-500 mb-4">
         예: &quot;OO학원 원장 홍길동입니다. 넥소 전자칠판 사용 중입니다.&quot;

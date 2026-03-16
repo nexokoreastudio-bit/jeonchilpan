@@ -393,7 +393,7 @@ export default async function HomePage() {
 
       {/* 메인 프로모션 배너 */}
       <section className="hidden sm:block bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
-        <Link href="/leads/quote" className="block">
+        <Link href="/leads/consultation" className="block">
           <div className="relative aspect-[180/51] bg-gray-50">
             <video
               className="absolute inset-0 h-full w-full object-cover"
@@ -521,7 +521,7 @@ export default async function HomePage() {
       {/* 최상단: 실시간 현황 (접기/펼치기) */}
       <CollapsibleSection
         title="실시간 현황"
-        subtitle="시연·견적 문의와 고객 후기를 한눈에"
+        subtitle="상담신청 현황과 고객 후기를 한눈에"
         badge={
           ((leadStats?.demoThisWeek ?? 0) > 0 || (leadStats?.quoteThisWeek ?? 0) > 0 || engagementStats.postsThisWeek > 0 || engagementStats.commentsThisWeek > 0) ? (
             <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white bg-[#00c4b4] rounded">
@@ -735,10 +735,10 @@ export default async function HomePage() {
             넥소 전자칠판 카톡 정보방
           </p>
           <h2 className="text-xl md:text-2xl font-bold mb-3">
-            전자칠판 사용법부터 시연·견적 문의까지, 한 번에 받아보세요
+            전자칠판 사용법부터 상담신청 안내까지, 한 번에 받아보세요
           </h2>
           <p className="text-white/70 text-sm md:text-base mb-8">
-            넥소 전자칠판 사용법, 수업 활용법, 설치 사례, 시연 문의, 견적 문의 등
+            넥소 전자칠판 사용법, 수업 활용법, 설치 사례, 상담신청 안내 등
             전자칠판 관련 핵심 정보를 카톡으로 빠르게 확인할 수 있습니다.
           </p>
           <a

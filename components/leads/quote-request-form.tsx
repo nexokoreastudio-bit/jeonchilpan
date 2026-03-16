@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { LEGAL_VERSION, nowIsoString } from '@/lib/legal'
 
 export function QuoteRequestForm() {
   const router = useRouter()
@@ -30,6 +31,11 @@ export function QuoteRequestForm() {
     quantity: '',
     message: '',
     referrer_code: '',
+  })
+  const [agreements, setAgreements] = useState({
+    terms: false,
+    privacy: false,
+    marketing: false,
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -52,8 +58,28 @@ export function QuoteRequestForm() {
     setLoading(true)
 
     try {
+      if (!agreements.terms || !agreements.privacy) {
+        setError('이용약관 및 개인정보처리방침 동의가 필요합니다.')
+        setLoading(false)
+        return
+      }
+
+      const consentedAt = nowIsoString()
+      const consentBlock =
+        `[개인정보 동의]\n` +
+        `- terms_agreed: true\n` +
+        `- privacy_agreed: true\n` +
+        `- marketing_agreed: ${agreements.marketing}\n` +
+        `- consent_version: ${LEGAL_VERSION.terms}|${LEGAL_VERSION.privacy}\n` +
+        `- consented_at: ${consentedAt}`
+
+      const fullMessage = formData.message?.trim()
+        ? `${consentBlock}\n\n[요청 메모]\n${formData.message.trim()}`
+        : consentBlock
+
       const result = await createQuoteRequest({
         ...formData,
+        message: fullMessage,
         quantity: formData.quantity ? parseInt(formData.quantity) : undefined,
       })
 
@@ -244,11 +270,45 @@ export function QuoteRequestForm() {
         {loading ? '요청 중...' : '견적 요청하기'}
       </Button>
 
+      <div className="rounded-md border border-slate-200 p-3 space-y-2 text-xs text-slate-600">
+        <label className="flex items-start gap-2">
+          <input
+            type="checkbox"
+            checked={agreements.terms}
+            onChange={(e) => setAgreements((prev) => ({ ...prev, terms: e.target.checked }))}
+            disabled={loading}
+            className="mt-0.5"
+            required
+          />
+          <span>[필수] <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline">이용약관</a>에 동의합니다.</span>
+        </label>
+        <label className="flex items-start gap-2">
+          <input
+            type="checkbox"
+            checked={agreements.privacy}
+            onChange={(e) => setAgreements((prev) => ({ ...prev, privacy: e.target.checked }))}
+            disabled={loading}
+            className="mt-0.5"
+            required
+          />
+          <span>[필수] <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">개인정보처리방침</a>에 동의합니다.</span>
+        </label>
+        <label className="flex items-start gap-2">
+          <input
+            type="checkbox"
+            checked={agreements.marketing}
+            onChange={(e) => setAgreements((prev) => ({ ...prev, marketing: e.target.checked }))}
+            disabled={loading}
+            className="mt-0.5"
+          />
+          <span>[선택] 마케팅 정보 수신에 동의합니다.</span>
+        </label>
+      </div>
+
       <p className="text-xs text-center text-gray-500">
         제출하신 정보는 견적 산출 및 상담 목적으로만 사용됩니다.
       </p>
     </form>
   )
 }
-
 

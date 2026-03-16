@@ -179,8 +179,8 @@ export default async function CommunityPage({ searchParams }: PageProps) {
       <div className="mt-8 pt-6 border-t border-gray-100">
         <p className="text-sm text-slate-500 text-center">
           자료 공유 게시판에 올리시는 템플릿·자료는 큰 화면에 띄워 보시기 좋게 활용하시면 효과적입니다.{' '}
-          <Link href="/leads/demo" className="text-[#00c4b4] hover:underline font-medium">
-            전자칠판 시연 예약
+          <Link href="/leads/consultation" className="text-[#00c4b4] hover:underline font-medium">
+            전자칠판 상담신청
           </Link>
         </p>
       </div>

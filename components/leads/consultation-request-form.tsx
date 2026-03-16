@@ -1,16 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createDemoRequest } from '@/app/actions/leads'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { createConsultationRequest } from '@/app/actions/leads'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { LEGAL_VERSION, nowIsoString } from '@/lib/legal'
 
-export function DemoRequestForm() {
+export function ConsultationRequestForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const campaign = searchParams.get('campaign') || ''
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
@@ -19,6 +21,7 @@ export function DemoRequestForm() {
     phone: '',
     academy_name: '',
     region: '',
+    request_type: '상담신청',
     preferred_visit_date: '',
     preferred_visit_time: '',
     message: '',
@@ -29,27 +32,14 @@ export function DemoRequestForm() {
     marketing: false,
   })
 
-  const TIME_SLOTS = [
-    { value: '', label: '선택하세요' },
-    { value: '오전 10시~12시', label: '오전 10시~12시' },
-    { value: '오후 2시~4시', label: '오후 2시~4시' },
-    { value: '오후 4시~6시', label: '오후 4시~6시' },
-    { value: '협의 후 결정', label: '협의 후 결정' },
-  ]
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-
-    const visitInfo = `[시연 예약] 희망 방문일: ${formData.preferred_visit_date} / 희망 시간대: ${formData.preferred_visit_time}`
 
     try {
       if (!agreements.terms || !agreements.privacy) {
@@ -59,6 +49,14 @@ export function DemoRequestForm() {
       }
 
       const consentedAt = nowIsoString()
+      const metaLines = [
+        `[신청유형] ${formData.request_type}`,
+        formData.region ? `[지역] ${formData.region}` : '',
+        formData.preferred_visit_date ? `[희망일] ${formData.preferred_visit_date}` : '',
+        formData.preferred_visit_time ? `[희망시간] ${formData.preferred_visit_time}` : '',
+        campaign ? `[캠페인] ${campaign}` : '',
+      ].filter(Boolean)
+
       const consentBlock =
         `[개인정보 동의]\n` +
         `- terms_agreed: true\n` +
@@ -67,27 +65,28 @@ export function DemoRequestForm() {
         `- consent_version: ${LEGAL_VERSION.terms}|${LEGAL_VERSION.privacy}\n` +
         `- consented_at: ${consentedAt}`
 
-      const fullMessage = formData.message.trim()
-        ? `${visitInfo}\n\n${consentBlock}\n\n추가 요청사항: ${formData.message}`
-        : `${visitInfo}\n\n${consentBlock}`
+      const fullMessage = `${metaLines.join('\n')}\n\n${consentBlock}${
+        formData.message.trim() ? `\n\n[요청 메모]\n${formData.message.trim()}` : ''
+      }`
 
-      const result = await createDemoRequest({
-        ...formData,
+      const result = await createConsultationRequest({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        academy_name: formData.academy_name || undefined,
         message: fullMessage,
-        referrer_code: undefined,
       })
 
       if (!result.success) {
-        setError(result.error || '예약 신청에 실패했습니다.')
+        setError(result.error || '상담 신청에 실패했습니다.')
         setLoading(false)
         return
       }
 
-      // 성공 시 감사 페이지로 이동
-      alert('시연 예약 신청이 완료되었습니다! 🎉\n빠른 시일 내에 연락드려 방문 일정을 안내해 드리겠습니다.')
+      alert('상담 신청이 완료되었습니다. 빠른 시일 내에 안내드리겠습니다.')
       router.push('/')
     } catch (err: any) {
-      setError(err.message || '예약 신청 중 오류가 발생했습니다.')
+      setError(err.message || '상담 신청 중 오류가 발생했습니다.')
       setLoading(false)
     }
   }
@@ -103,112 +102,74 @@ export function DemoRequestForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="name">이름 *</Label>
-          <Input
-            id="name"
-            name="name"
-            type="text"
-            placeholder="홍길동"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
+          <Input id="name" name="name" value={formData.name} onChange={handleChange} required disabled={loading} />
         </div>
-
         <div className="space-y-2">
           <Label htmlFor="email">이메일 *</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="example@email.com"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
+          <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required disabled={loading} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="phone">연락처 *</Label>
-          <Input
-            id="phone"
-            name="phone"
-            type="tel"
-            placeholder="010-0000-0000"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
+          <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleChange} required disabled={loading} />
         </div>
-
         <div className="space-y-2">
           <Label htmlFor="academy_name">학원명</Label>
-          <Input
-            id="academy_name"
-            name="academy_name"
-            type="text"
-            placeholder="학원명 (선택사항)"
-            value={formData.academy_name}
-            onChange={handleChange}
-            disabled={loading}
-          />
+          <Input id="academy_name" name="academy_name" value={formData.academy_name} onChange={handleChange} disabled={loading} />
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="region">지역 *</Label>
-        <Input
-          id="region"
-          name="region"
-          type="text"
-          placeholder="예: 서울 노원구"
-          value={formData.region}
-          onChange={handleChange}
-          required
-          disabled={loading}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="preferred_visit_date">방문 희망 날짜 *</Label>
-          <Input
-            id="preferred_visit_date"
-            name="preferred_visit_date"
-            type="date"
-            value={formData.preferred_visit_date}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-2 md:col-span-1">
+          <Label htmlFor="request_type">문의 유형 *</Label>
+          <select
+            id="request_type"
+            name="request_type"
+            value={formData.request_type}
             onChange={handleChange}
-            required
             disabled={loading}
-            min={new Date().toISOString().split('T')[0]}
-          />
-          <p className="text-xs text-gray-500">
-            쇼룸 방문 희망일을 선택해주세요
-          </p>
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          >
+            <option value="상담신청">상담신청</option>
+            <option value="시연상담">시연상담</option>
+            <option value="견적상담">견적상담</option>
+          </select>
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="preferred_visit_time">방문 희망 시간대 *</Label>
+        <div className="space-y-2 md:col-span-1">
+          <Label htmlFor="region">지역</Label>
+          <Input id="region" name="region" value={formData.region} onChange={handleChange} disabled={loading} />
+        </div>
+        <div className="space-y-2 md:col-span-1">
+          <Label htmlFor="preferred_visit_time">희망 시간대</Label>
           <select
             id="preferred_visit_time"
             name="preferred_visit_time"
             value={formData.preferred_visit_time}
             onChange={handleChange}
-            required
             disabled={loading}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
-            {TIME_SLOTS.map((slot) => (
-              <option key={slot.value} value={slot.value}>
-                {slot.label}
-              </option>
-            ))}
+            <option value="">선택하세요</option>
+            <option value="오전">오전</option>
+            <option value="오후">오후</option>
+            <option value="협의 후 결정">협의 후 결정</option>
           </select>
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="preferred_visit_date">희망 날짜</Label>
+        <Input
+          id="preferred_visit_date"
+          name="preferred_visit_date"
+          type="date"
+          value={formData.preferred_visit_date}
+          onChange={handleChange}
+          disabled={loading}
+          min={new Date().toISOString().split('T')[0]}
+        />
       </div>
 
       <div className="space-y-2">
@@ -216,17 +177,13 @@ export function DemoRequestForm() {
         <Textarea
           id="message"
           name="message"
-          placeholder="특별히 안내해 주실 사항이 있으면 입력해주세요"
+          rows={4}
           value={formData.message}
           onChange={handleChange}
-          rows={4}
           disabled={loading}
+          placeholder="상담 시 필요한 내용을 입력해주세요."
         />
       </div>
-
-      <Button type="submit" className="w-full" size="lg" disabled={loading}>
-        {loading ? '신청 중...' : '시연 예약 신청'}
-      </Button>
 
       <div className="rounded-md border border-slate-200 p-3 space-y-2 text-xs text-slate-600">
         <label className="flex items-start gap-2">
@@ -263,8 +220,12 @@ export function DemoRequestForm() {
         </label>
       </div>
 
+      <Button type="submit" className="w-full" size="lg" disabled={loading}>
+        {loading ? '신청 중...' : '상담신청'}
+      </Button>
+
       <p className="text-xs text-center text-gray-500">
-        제출하신 정보는 쇼룸 방문 예약 및 안내 목적으로만 사용됩니다.
+        제출하신 정보는 상담 안내 목적으로만 사용됩니다.
       </p>
     </form>
   )

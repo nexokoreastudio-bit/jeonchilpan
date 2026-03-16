@@ -298,16 +298,16 @@ export default async function EditionPage({
                 </div>
                 <div className="flex gap-3 shrink-0">
                   <Link
-                    href="/leads/demo"
+                    href="/leads/consultation"
                     className="px-5 py-2.5 bg-[#1a1a1a] text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
                   >
-                    시연 예약
+                    상담신청
                   </Link>
                   <Link
-                    href="/leads/quote"
+                    href="/leads/consultation"
                     className="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    견적 문의
+                    상담신청
                   </Link>
                 </div>
               </div>
@@ -468,4 +468,3 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
   }
 }
-

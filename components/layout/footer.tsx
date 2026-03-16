@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { MapPin, ExternalLink } from 'lucide-react'
+import { BUSINESS_INFO } from '@/lib/legal'
 
 export function Footer() {
   return (
@@ -43,10 +44,10 @@ export function Footer() {
                   현장 소식
                 </Link>
                 <Link
-                  href="/leads/demo"
+                  href="/leads/consultation"
                   className="text-sm font-semibold text-[#00c4b4] hover:text-[#00e5d4] transition-colors inline-flex items-center gap-1.5"
                 >
-                  시연신청
+                  상담신청
                   <ExternalLink className="w-3.5 h-3.5 opacity-60" />
                 </Link>
               </nav>
@@ -65,7 +66,7 @@ export function Footer() {
                   href="tel:032-569-5771"
                   className="block text-sm text-slate-400 hover:text-white transition-colors"
                 >
-                  032-569-5771
+                  {BUSINESS_INFO.phone}
                 </a>
                 <Link
                   href="/location"
@@ -79,7 +80,27 @@ export function Footer() {
           </div>
 
           {/* 하단 */}
-          <div className="pt-10 border-t border-slate-700/50">
+          <div className="pt-10 border-t border-slate-700/50 space-y-3">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+              <Link href="/terms" className="hover:text-white transition-colors">
+                이용약관
+              </Link>
+              <Link href="/privacy" className="hover:text-white transition-colors">
+                개인정보처리방침
+              </Link>
+            </div>
+            <div className="text-xs text-slate-500 leading-6">
+              <p>
+                상호: {BUSINESS_INFO.companyName} | 대표자: {BUSINESS_INFO.representative} | 사업자등록번호:{' '}
+                {BUSINESS_INFO.businessNumber}
+              </p>
+              <p>
+                통신판매업 신고번호: {BUSINESS_INFO.ecommerceNumber} | 주소: {BUSINESS_INFO.address}
+              </p>
+              <p>
+                개인정보보호책임자: {BUSINESS_INFO.privacyOfficer} | 이메일: {BUSINESS_INFO.email}
+              </p>
+            </div>
             <p className="text-xs text-slate-500">
               © NEXO Daily. 학원장·강사님을 위한 교육 정보 플랫폼.
             </p>

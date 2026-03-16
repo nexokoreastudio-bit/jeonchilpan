@@ -93,6 +93,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'dimg.donga.com',
       },
+      {
+        protocol: 'https',
+        hostname: '2026-nexo-polic-y-fund.netlify.app',
+      },
     ],
     // 프로덕션에서 이미지 최적화 활성화
     unoptimized: false,
@@ -169,4 +173,3 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
-

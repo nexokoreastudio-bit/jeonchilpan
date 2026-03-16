@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { normalizeReferralCode } from '@/lib/utils/referral'
+import { LEGAL_VERSION, nowIsoString } from '@/lib/legal'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -27,6 +28,11 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [inWebView, setInWebView] = useState(false)
+  const [agreements, setAgreements] = useState({
+    terms: false,
+    privacy: false,
+    marketing: false,
+  })
 
   useEffect(() => {
     if (typeof window !== 'undefined') setInWebView(isWebView())
@@ -103,6 +109,11 @@ export default function SignupPage() {
         academy_name: formData.academy_name || '',
         phone: formData.phone || '',
         referrer_code: formData.referrer_code || '',
+        terms_agreed: agreements.terms,
+        privacy_agreed: agreements.privacy,
+        marketing_agreed: agreements.marketing,
+        consent_version: `${LEGAL_VERSION.terms}|${LEGAL_VERSION.privacy}`,
+        consented_at: nowIsoString(),
       })
 
       if (!result.success) {
@@ -219,26 +230,45 @@ export default function SignupPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="referrer_code">추천인 코드 (선택사항)</Label>
-              <Input
-                id="referrer_code"
-                name="referrer_code"
-                type="text"
-                placeholder="NEXO-XXXX 형식으로 입력"
-                value={formData.referrer_code}
-                onChange={handleChange}
-                disabled={loading}
-                className="uppercase"
-              />
-              {formData.referrer_code && (
-                <p className="text-xs text-green-600">
-                  ✅ 추천인 코드가 적용되었습니다! 가입 시 양쪽 모두 포인트를 받습니다.
-                </p>
-              )}
-              <p className="text-xs text-gray-500">
-                추천인 코드로 가입하면 신규 회원 +100P, 추천인 +50P를 받습니다! 💰
-              </p>
+            <input type="hidden" name="referrer_code" value={formData.referrer_code} readOnly />
+
+            <div className="rounded-md border border-slate-200 p-3 space-y-2 text-xs text-slate-600">
+              <label className="flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  checked={agreements.terms}
+                  onChange={(e) => setAgreements((prev) => ({ ...prev, terms: e.target.checked }))}
+                  disabled={loading}
+                  className="mt-0.5"
+                  required
+                />
+                <span>
+                  [필수] <Link href="/terms" target="_blank" className="underline">이용약관</Link>에 동의합니다.
+                </span>
+              </label>
+              <label className="flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  checked={agreements.privacy}
+                  onChange={(e) => setAgreements((prev) => ({ ...prev, privacy: e.target.checked }))}
+                  disabled={loading}
+                  className="mt-0.5"
+                  required
+                />
+                <span>
+                  [필수] <Link href="/privacy" target="_blank" className="underline">개인정보처리방침</Link>에 동의합니다.
+                </span>
+              </label>
+              <label className="flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  checked={agreements.marketing}
+                  onChange={(e) => setAgreements((prev) => ({ ...prev, marketing: e.target.checked }))}
+                  disabled={loading}
+                  className="mt-0.5"
+                />
+                <span>[선택] 마케팅 정보 수신에 동의합니다.</span>
+              </label>
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
@@ -300,4 +330,3 @@ export default function SignupPage() {
     </div>
   )
 }
-

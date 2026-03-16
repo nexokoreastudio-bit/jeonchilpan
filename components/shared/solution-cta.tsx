@@ -39,7 +39,7 @@ const CONTENT = {
   default: {
     title: '수업 환경 개선이 궁금하신가요?',
     desc: '넥소 전자칠판 쇼룸에서 미리 예약 후 방문하시면 직접 체험해보실 수 있습니다.',
-    linkText: '시연 예약하기',
+    linkText: '상담신청 하기',
   },
   compact: {
     title: '전자칠판 시연',
@@ -49,7 +49,7 @@ const CONTENT = {
   inline: {
     title: '학원 수업에 도움이 되는 도구',
     desc: '전자칠판 쇼룸에서 미리 예약 후 방문하세요.',
-    linkText: '시연 예약하기',
+    linkText: '상담신청 하기',
   },
 }
 
@@ -61,7 +61,7 @@ export function SolutionCta({ variant = 'default', className }: SolutionCtaProps
     <div className={cn(v.wrapper, className)}>
       <h3 className={v.title}>{c.title}</h3>
       <p className={v.desc}>{c.desc}</p>
-      <Link href="/leads/demo" className={v.link}>
+      <Link href="/leads/consultation" className={v.link}>
         {c.linkText}
         <ArrowRight className="w-4 h-4 flex-shrink-0" />
       </Link>

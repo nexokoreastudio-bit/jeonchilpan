@@ -199,8 +199,6 @@ export default function CrawledNewsAdminPage() {
           url: newsItem.url,
           title: newsItem.title,
           category: mapNewsCategoryToInsightCategory(newsItem.category),
-          summary: newsItem.summary, // 크롤링된 뉴스의 요약 전달
-          thumbnail_url: newsItem.thumbnail_url, // 썸네일 URL 전달
           published_at: newsItem.published_at, // 발행 날짜 전달
         }),
       })
@@ -515,4 +513,3 @@ export default function CrawledNewsAdminPage() {
     </div>
   )
 }
-

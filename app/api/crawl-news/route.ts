@@ -82,8 +82,6 @@ export async function POST(request: NextRequest) {
       url: string
       source: string
       category: '입시' | '학업' | '취업' | '교육정책' | '기타'
-      summary?: string
-      thumbnail_url?: string
       published_at?: string
     }> = []
     
@@ -165,8 +163,6 @@ async function saveCrawledNews(
     url: string
     source: string
     category: '입시' | '학업' | '취업' | '교육정책' | '기타'
-    summary?: string
-    thumbnail_url?: string
     published_at?: string
   }>,
   supabase: Awaited<ReturnType<typeof createClient>>
@@ -193,10 +189,10 @@ async function saveCrawledNews(
       // 1차: URL 중복 체크
       const { data: existingByUrlRaw } = await supabase
         .from('crawled_news')
-        .select('id, title, summary, thumbnail_url, published_at, crawled_at')
+        .select('id, title, published_at, crawled_at')
         .eq('url', item.url)
         .maybeSingle()
-      const existingByUrl = existingByUrlRaw as { id: number; title: string; summary: string | null; thumbnail_url: string | null; published_at: string | null; crawled_at: string } | null
+      const existingByUrl = existingByUrlRaw as { id: number; title: string; published_at: string | null; crawled_at: string } | null
       
       if (existingByUrl) {
         // 기존 기사 정보 업데이트 (요약, 썸네일 등이 개선되었을 수 있음)
@@ -206,17 +202,6 @@ async function saveCrawledNews(
         }
         
         let hasUpdate = false
-        
-        // 요약이 더 길거나 썸네일이 없으면 업데이트
-        if (item.summary && (!existingByUrl.summary || item.summary.length > (existingByUrl.summary?.length || 0))) {
-          updateData.summary = item.summary
-          hasUpdate = true
-        }
-        
-        if (item.thumbnail_url && !existingByUrl.thumbnail_url) {
-          updateData.thumbnail_url = item.thumbnail_url
-          hasUpdate = true
-        }
         
         // 제목이 변경되었을 수 있음 (예: 업데이트된 기사)
         if (item.title !== existingByUrl.title) {
@@ -264,8 +249,6 @@ async function saveCrawledNews(
           url: item.url,
           source: item.source,
           category: item.category,
-          summary: item.summary,
-          thumbnail_url: item.thumbnail_url,
           published_at: item.published_at,
         })
       
@@ -300,7 +283,7 @@ export async function GET(request: NextRequest) {
     
     let query = supabase
       .from('crawled_news')
-      .select('*')
+      .select('id, title, url, source, category, published_at, crawled_at, is_featured, view_count')
       .order('published_at', { ascending: false, nullsFirst: false })
       .order('crawled_at', { ascending: false })
       .range(offset, offset + limit - 1)
@@ -373,4 +356,3 @@ export async function GET(request: NextRequest) {
     )
   }
 }
-

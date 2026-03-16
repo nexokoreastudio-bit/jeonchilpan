@@ -335,8 +335,6 @@ export async function parseRssFeed(rssUrl: string, source: string): Promise<Craw
             url,
             source,
             category: categorizeNews(title, summary),
-            summary: summary && summary.length > 0 ? summary : undefined,
-            thumbnail_url: thumbnailUrl,
             published_at: pubDateMatch 
               ? (() => {
                   try {
@@ -449,4 +447,3 @@ export async function crawlNewsFromHtml(
     return []
   }
 }
-

@@ -30,7 +30,7 @@ export function CenterBanner({ variant = 'primary', className }: CenterBannerPro
         <span className="text-3xl">🖥️</span>
         <div>
           <p className="font-semibold text-sm md:text-base">
-            전자칠판 10% 할인가 견적 받기
+            전자칠판 상담신청 안내 받기
           </p>
           <p className="text-xs md:text-sm opacity-80 mt-0.5">
             쇼룸 방문 후 직접 체험해보세요
@@ -38,7 +38,7 @@ export function CenterBanner({ variant = 'primary', className }: CenterBannerPro
         </div>
       </div>
       <Link
-        href="/leads/demo"
+        href="/leads/consultation"
         className={cn(
           'inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm shrink-0 transition-colors',
           variant === 'primary'
@@ -46,7 +46,7 @@ export function CenterBanner({ variant = 'primary', className }: CenterBannerPro
             : 'bg-[#00c4b4] text-white hover:bg-[#00a396]'
         )}
       >
-        시연 신청
+        상담신청
         <ArrowRight className="w-4 h-4" />
       </Link>
     </div>

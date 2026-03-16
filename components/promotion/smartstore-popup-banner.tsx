@@ -63,7 +63,7 @@ export function SmartstorePopupBanner() {
             모집 안내 보기
           </Link>
           <Link
-            href="/leads/quote?campaign=smartstore_popup"
+            href="/leads/consultation?campaign=smartstore_popup"
             className="inline-flex items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
             onClick={() => setOpen(false)}
           >

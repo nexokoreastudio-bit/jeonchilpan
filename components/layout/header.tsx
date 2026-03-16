@@ -128,16 +128,10 @@ export async function Header() {
               레벨별 혜택
             </Link>
             <Link
-              href="/leads/demo"
+              href="/leads/consultation"
               className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
             >
-              상담 신청
-            </Link>
-            <Link
-              href="/leads/quote"
-              className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
-            >
-              견적 요청
+              상담신청
             </Link>
             <Link
               href="/location"

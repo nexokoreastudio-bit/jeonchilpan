@@ -17,10 +17,10 @@ export function DiscountBanner() {
           </div>
           <div>
             <h3 className="text-base font-semibold text-gray-900 mb-1">
-              🎁 구독자 인증 시 10% 할인 혜택
+              🎁 구독자 인증 시 할인 혜택
             </h3>
             <p className="text-sm text-gray-600">
-              전자칠판 구매 시 구독자 인증을 완료하시면 <strong className="text-gray-800">10% 할인</strong>이 자동 적용됩니다
+              전자칠판 구매 시 구독자 인증을 완료하시면 <strong className="text-gray-800">할인 혜택</strong>이 자동 적용됩니다
             </p>
           </div>
         </div>
@@ -35,5 +35,4 @@ export function DiscountBanner() {
     </div>
   )
 }
-
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { TrendingUp, TrendingDown, ChevronRight } from 'lucide-react'
 import type { PortalLeadStats, PortalEngagementStats } from '@/lib/supabase/portal'
@@ -20,23 +20,6 @@ interface MonitoringDashboardProps {
 function calcChangePercent(current: number, last: number): number {
   if (last === 0) return current > 0 ? 100 : 0
   return Math.round(((current - last) / last) * 100)
-}
-
-function createInitialOffset(now: Date) {
-  const minutes = now.getHours() * 60 + now.getMinutes()
-  const day = now.getDate()
-
-  const demoWeek = Math.floor(minutes / 720) + (day % 2)
-  const quoteWeek = Math.floor(minutes / 840) + (day % 2)
-  const demoMonth = Math.floor(day * 0.6) + Math.floor(minutes / 720)
-  const quoteMonth = Math.floor(day * 0.5) + Math.floor(minutes / 840)
-
-  return {
-    demoWeek: Math.max(1, demoWeek),
-    quoteWeek: Math.max(1, quoteWeek),
-    demoMonth: Math.max(3, demoMonth),
-    quoteMonth: Math.max(2, quoteMonth),
-  }
 }
 
 function ChangeBadge({ value }: { value: number }) {
@@ -59,106 +42,13 @@ function ChangeBadge({ value }: { value: number }) {
 
 export function MonitoringDashboard({ leadStats, engagementStats }: MonitoringDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('leads')
-  const [newFlags, setNewFlags] = useState({ demo: false, quote: false })
-  const [simCounts, setSimCounts] = useState<{
-    demoWeek: number
-    demoMonth: number
-    quoteWeek: number
-    quoteMonth: number
-  } | null>(null)
-  const updateTimerRef = useRef<number | null>(null)
-  const hideNewTimerRef = useRef<{ demo: number | null; quote: number | null }>({ demo: null, quote: null })
-
-  const displayLeadStats = useMemo(() => {
-    if (!leadStats || !simCounts) return null
-
-    const demoThisWeek = simCounts.demoWeek
-    const quoteThisWeek = simCounts.quoteWeek
-    const demoThisMonth = simCounts.demoMonth
-    const quoteThisMonth = simCounts.quoteMonth
-
-    return {
-      ...leadStats,
-      demoThisWeek,
-      quoteThisWeek,
-      demoThisMonth,
-      quoteThisMonth,
-      demoChangePercent: calcChangePercent(demoThisWeek, leadStats.demoLastWeek),
-      quoteChangePercent: calcChangePercent(quoteThisWeek, leadStats.quoteLastWeek),
-    }
-  }, [leadStats, simCounts])
-
-  useEffect(() => {
-    if (!leadStats) return
-
-    const offset = createInitialOffset(new Date())
-    // 첫 진입 시 수치를 1건씩 먼저 올려 NEW를 즉시 노출
-    setSimCounts({
-      demoWeek: leadStats.demoThisWeek + offset.demoWeek + 1,
-      quoteWeek: leadStats.quoteThisWeek + offset.quoteWeek + 1,
-      demoMonth: leadStats.demoThisMonth + offset.demoMonth + 1,
-      quoteMonth: leadStats.quoteThisMonth + offset.quoteMonth + 1,
-    })
-    setNewFlags({ demo: true, quote: true })
-
-    if (hideNewTimerRef.current.demo) window.clearTimeout(hideNewTimerRef.current.demo)
-    if (hideNewTimerRef.current.quote) window.clearTimeout(hideNewTimerRef.current.quote)
-    hideNewTimerRef.current.demo = window.setTimeout(() => {
-      setNewFlags((old) => ({ ...old, demo: false }))
-    }, 10000)
-    hideNewTimerRef.current.quote = window.setTimeout(() => {
-      setNewFlags((old) => ({ ...old, quote: false }))
-    }, 10000)
-
-    const scheduleNextUpdate = () => {
-      const nextDelay = (120 + Math.floor(Math.random() * 121)) * 60 * 1000 // 2~4시간
-      updateTimerRef.current = window.setTimeout(() => {
-        const incDemo = Math.random() < 0.6
-        const incQuote = Math.random() < 0.55
-
-        setSimCounts((prev) => {
-          if (!prev) return prev
-          return {
-            demoWeek: prev.demoWeek + (incDemo ? 1 : 0),
-            demoMonth: prev.demoMonth + (incDemo ? 1 : 0),
-            quoteWeek: prev.quoteWeek + (incQuote ? 1 : 0),
-            quoteMonth: prev.quoteMonth + (incQuote ? 1 : 0),
-          }
-        })
-
-        if (incDemo) {
-          setNewFlags((old) => ({ ...old, demo: true }))
-          if (hideNewTimerRef.current.demo) window.clearTimeout(hideNewTimerRef.current.demo)
-          hideNewTimerRef.current.demo = window.setTimeout(() => {
-            setNewFlags((old) => ({ ...old, demo: false }))
-          }, 10000)
-        }
-
-        if (incQuote) {
-          setNewFlags((old) => ({ ...old, quote: true }))
-          if (hideNewTimerRef.current.quote) window.clearTimeout(hideNewTimerRef.current.quote)
-          hideNewTimerRef.current.quote = window.setTimeout(() => {
-            setNewFlags((old) => ({ ...old, quote: false }))
-          }, 10000)
-        }
-
-        scheduleNextUpdate()
-      }, nextDelay)
-    }
-
-    scheduleNextUpdate()
-
-    return () => {
-      if (updateTimerRef.current) window.clearTimeout(updateTimerRef.current)
-    }
-  }, [leadStats])
-
-  useEffect(() => {
-    return () => {
-      if (hideNewTimerRef.current.demo) window.clearTimeout(hideNewTimerRef.current.demo)
-      if (hideNewTimerRef.current.quote) window.clearTimeout(hideNewTimerRef.current.quote)
-    }
-  }, [])
+  const displayLeadStats = leadStats
+    ? {
+        ...leadStats,
+        demoChangePercent: calcChangePercent(leadStats.demoThisWeek, leadStats.demoLastWeek),
+        quoteChangePercent: calcChangePercent(leadStats.quoteThisWeek, leadStats.quoteLastWeek),
+      }
+    : null
 
   return (
     <div>
@@ -199,14 +89,7 @@ export function MonitoringDashboard({ leadStats, engagementStats }: MonitoringDa
                     <tbody>
                       <tr className="border-b border-gray-50">
                         <td className="py-4 pr-4 font-medium text-slate-800">
-                          <div className="inline-flex items-center gap-2">
-                            <span>시연 신청</span>
-                            {newFlags.demo && (
-                              <span className="inline-flex items-center rounded-full bg-[#00c4b4] px-2 py-0.5 text-[10px] font-bold text-white">
-                                NEW
-                              </span>
-                            )}
-                          </div>
+                          <span>상담 신청(시연)</span>
                         </td>
                         <td className="py-4 pr-4 text-right text-slate-700">{displayLeadStats.demoThisWeek.toLocaleString()}건</td>
                         <td className="py-4 pr-4 text-right text-slate-700">{displayLeadStats.demoThisMonth.toLocaleString()}건</td>
@@ -216,14 +99,7 @@ export function MonitoringDashboard({ leadStats, engagementStats }: MonitoringDa
                       </tr>
                       <tr className="border-b border-gray-50">
                         <td className="py-4 pr-4 font-medium text-slate-800">
-                          <div className="inline-flex items-center gap-2">
-                            <span>견적 문의</span>
-                            {newFlags.quote && (
-                              <span className="inline-flex items-center rounded-full bg-[#00c4b4] px-2 py-0.5 text-[10px] font-bold text-white">
-                                NEW
-                              </span>
-                            )}
-                          </div>
+                          <span>상담 신청(견적)</span>
                         </td>
                         <td className="py-4 pr-4 text-right text-slate-700">{displayLeadStats.quoteThisWeek.toLocaleString()}건</td>
                         <td className="py-4 pr-4 text-right text-slate-700">{displayLeadStats.quoteThisMonth.toLocaleString()}건</td>
@@ -244,13 +120,13 @@ export function MonitoringDashboard({ leadStats, engagementStats }: MonitoringDa
                 </div>
                 <div className="flex items-center justify-between pt-3">
                   <p className="text-xs text-slate-500">
-                    학원장·강사님이 시연·견적을 신청한 실시간 집계
+                    학원장·강사님의 상담신청 실데이터 집계
                   </p>
                   <Link
-                    href="/leads/demo"
+                    href="/leads/consultation"
                     className="inline-flex items-center gap-1 text-sm font-medium text-[#00c4b4] hover:underline"
                   >
-                    시연 예약하기 <ChevronRight className="w-4 h-4" />
+                    상담신청 바로가기 <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
               </>
