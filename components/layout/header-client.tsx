@@ -178,9 +178,10 @@ export function HeaderClient() {
   useEffect(() => setMobileMenuOpen(false), [pathname])
 
   const isActive = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(href))
+  const isExternalHref = (href: string) => /^https?:\/\//.test(href)
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-sm">
+    <header className="w-full bg-white border-b border-slate-200 shadow-sm">
       {/* 1. 상단 유틸리티 바 - 모바일: 압축, 웹: 그대로 */}
       <div className="bg-slate-50 border-b border-slate-100 py-2 md:py-3 mb-2">
         <div className="container mx-auto px-3 md:px-4 flex items-center justify-between gap-2 md:gap-4">
@@ -245,7 +246,7 @@ export function HeaderClient() {
       </Link>
 
       {/* 3. 메뉴 바 - 개별 드롭다운 (호버 시 해당 메뉴만) */}
-      <div className="bg-slate-800 pt-2 pb-2 mt-2">
+      <div className="sticky top-0 z-50 bg-slate-800 py-1.5 md:py-2 mt-2">
         <div className="container mx-auto px-4">
           <div className="flex items-center">
             <nav className="hidden lg:flex items-center flex-1 gap-0">
@@ -328,76 +329,77 @@ export function HeaderClient() {
             {/* 모바일 메뉴 버튼 */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-3 text-slate-200 hover:text-white"
+              className="lg:hidden p-2.5 text-slate-200 hover:text-white"
               aria-label="메뉴"
             >
               <Menu className="w-5 h-5" />
             </button>
           </div>
         </div>
-      </div>
-
-      {/* 모바일 메뉴 (펼침) */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-600 bg-slate-800 py-4">
-          <div className="container px-4">
-            {/* 로그인/마이페이지 - 모바일에서 최상단 노출 */}
-            <div className="flex gap-2 mb-4 pb-4 border-b border-slate-600">
-              {loading ? (
-                <span className="px-4 py-3 text-sm text-slate-400">로딩 중...</span>
-              ) : isLoggedIn ? (
-                <Link
-                  href="/mypage"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex-1 px-4 py-3 text-sm font-semibold rounded-lg text-center min-h-[44px] flex items-center justify-center bg-[#00c4b4] text-white hover:bg-[#00a396]"
-                >
-                  마이페이지
-                </Link>
-              ) : (
-                <>
+        {/* 모바일 메뉴 (펼침) */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t border-slate-600 bg-slate-800 py-4">
+            <div className="container px-4">
+              {/* 로그인/마이페이지 - 모바일에서 최상단 노출 */}
+              <div className="flex gap-2 mb-4 pb-4 border-b border-slate-600">
+                {loading ? (
+                  <span className="px-4 py-3 text-sm text-slate-400">로딩 중...</span>
+                ) : isLoggedIn ? (
                   <Link
-                    href="/login"
+                    href="/mypage"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex-1 px-4 py-3 text-sm font-semibold rounded-lg text-center min-h-[44px] flex items-center justify-center bg-[#00c4b4] text-white hover:bg-[#00a396]"
+                  >
+                    마이페이지
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={cn(
+                        'flex-1 px-4 py-3 text-sm font-semibold rounded-lg text-center min-h-[44px] flex items-center justify-center',
+                        pathname === '/login' ? 'text-[#00c4b4] bg-slate-600' : 'bg-[#00c4b4] text-white hover:bg-[#00a396]'
+                      )}
+                    >
+                      로그인
+                    </Link>
+                    <Link
+                      href="/signup"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex-1 px-4 py-3 text-sm font-semibold rounded-lg text-center min-h-[44px] flex items-center justify-center border border-slate-500 text-slate-200 hover:bg-slate-600"
+                    >
+                      회원가입
+                    </Link>
+                  </>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {ALL_NAV_LINKS.map((item, i) => (
+                  <Link
+                    key={`${item.href}-${item.name}-${i}`}
+                    href={item.href}
+                    target={isExternalHref(item.href) ? '_blank' : undefined}
+                    rel={isExternalHref(item.href) ? 'noopener noreferrer' : undefined}
                     onClick={() => setMobileMenuOpen(false)}
                     className={cn(
-                      'flex-1 px-4 py-3 text-sm font-semibold rounded-lg text-center min-h-[44px] flex items-center justify-center',
-                      pathname === '/login' ? 'text-[#00c4b4] bg-slate-600' : 'bg-[#00c4b4] text-white hover:bg-[#00a396]'
+                      'px-4 py-3 text-sm font-medium rounded-lg',
+                      isActive(item.href) ? 'text-[#00c4b4] bg-slate-600' : 'text-slate-200 hover:bg-slate-600'
                     )}
                   >
-                    로그인
+                    {item.name}
                   </Link>
-                  <Link
-                    href="/signup"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 px-4 py-3 text-sm font-semibold rounded-lg text-center min-h-[44px] flex items-center justify-center border border-slate-500 text-slate-200 hover:bg-slate-600"
-                  >
-                    회원가입
-                  </Link>
-                </>
+                ))}
+              </div>
+              {!loading && isAdmin && (
+                <div className="mt-4 pt-4 border-t border-slate-600">
+                  <AdminMenu variant="dark" />
+                </div>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              {ALL_NAV_LINKS.map((item, i) => (
-                <Link
-                  key={`${item.href}-${item.name}-${i}`}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    'px-4 py-3 text-sm font-medium rounded-lg',
-                    isActive(item.href) ? 'text-[#00c4b4] bg-slate-600' : 'text-slate-200 hover:bg-slate-600'
-                  )}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-            {!loading && isAdmin && (
-              <div className="mt-4 pt-4 border-t border-slate-600">
-                <AdminMenu variant="dark" />
-              </div>
-            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <style jsx>{`
         .smartstore-glow {
