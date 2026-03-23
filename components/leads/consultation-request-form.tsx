@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createConsultationRequest } from '@/app/actions/leads'
 import { Button } from '@/components/ui/button'
@@ -8,10 +8,27 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 
-export function ConsultationRequestForm() {
+type ConsultationRequestType = '상담신청' | '시연상담' | '견적상담'
+
+interface ConsultationRequestFormProps {
+  initialRequestType?: ConsultationRequestType
+  sourceLabel?: string
+}
+
+export function ConsultationRequestForm({
+  initialRequestType = '상담신청',
+  sourceLabel,
+}: ConsultationRequestFormProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const campaign = searchParams.get('campaign') || ''
+  const typeFromQuery = searchParams.get('type')
+  const normalizedType =
+    typeFromQuery === 'demo'
+      ? '시연상담'
+      : typeFromQuery === 'quote'
+        ? '견적상담'
+        : initialRequestType
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
@@ -20,11 +37,15 @@ export function ConsultationRequestForm() {
     phone: '',
     academy_name: '',
     region: '',
-    request_type: '상담신청',
+    request_type: normalizedType,
     preferred_visit_date: '',
     preferred_visit_time: '',
     message: '',
   })
+
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, request_type: normalizedType }))
+  }, [normalizedType])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -38,6 +59,7 @@ export function ConsultationRequestForm() {
     try {
       const metaLines = [
         `[신청유형] ${formData.request_type}`,
+        sourceLabel ? `[유입페이지] ${sourceLabel}` : '',
         formData.region ? `[지역] ${formData.region}` : '',
         formData.preferred_visit_date ? `[희망일] ${formData.preferred_visit_date}` : '',
         formData.preferred_visit_time ? `[희망시간] ${formData.preferred_visit_time}` : '',
@@ -53,7 +75,9 @@ export function ConsultationRequestForm() {
         email: formData.email,
         phone: formData.phone || undefined,
         academy_name: formData.academy_name || undefined,
+        region: formData.region || undefined,
         message: fullMessage,
+        referrer_code: campaign || sourceLabel || undefined,
       })
 
       if (!result.success) {

@@ -26,7 +26,7 @@ const MEGA_NAV = [
         { name: '현장 소식', href: '/field' },
       ]},
       { title: 'NEXO 체험', items: [
-        { name: '시연 신청', href: '/leads/demo' },
+        { name: '상담 신청', href: '/leads/consultation' },
         { name: '세미나', href: '/seminar' },
         { name: '스마트상점 모집', href: '/smartstore' },
       ]},
@@ -78,13 +78,14 @@ const MEGA_NAV = [
     ],
   },
   {
-    name: '시연신청',
-    href: '/leads/demo',
+    name: '상담신청',
+    href: '/leads/consultation',
     highlight: true,
     columns: [
-      { title: '시연신청', items: [
-        { name: '시연 신청', href: '/leads/demo' },
-        { name: '견적 요청', href: '/leads/quote' },
+      { title: '상담신청', items: [
+        { name: '통합 상담신청', href: '/leads/consultation' },
+        { name: '시연 상담', href: '/leads/consultation?type=demo' },
+        { name: '견적 상담', href: '/leads/consultation?type=quote' },
       ]},
     ],
   },

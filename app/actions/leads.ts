@@ -37,7 +37,9 @@ interface ConsultationRequestData {
   email: string
   phone?: string
   academy_name?: string
+  region?: string
   message?: string
+  referrer_code?: string
 }
 
 /**
@@ -97,9 +99,9 @@ export async function createConsultationRequest(
       email: data.email,
       phone: data.phone || null,
       academy_name: data.academy_name || null,
-      region: null,
+      region: data.region || null,
       message: data.message || null,
-      referrer_code: null,
+      referrer_code: data.referrer_code || null,
       status: 'pending',
     }
 
@@ -221,4 +223,3 @@ export async function updateLeadStatus(
     return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
   }
 }
-

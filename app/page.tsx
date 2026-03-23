@@ -393,7 +393,7 @@ export default async function HomePage() {
 
       {/* 메인 프로모션 배너 */}
       <section className="hidden sm:block bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
-        <Link href="/leads/quote" className="block">
+        <Link href="/leads/consultation?type=quote" className="block">
           <div className="relative aspect-[180/51] bg-gray-50">
             <video
               className="absolute inset-0 h-full w-full object-cover"

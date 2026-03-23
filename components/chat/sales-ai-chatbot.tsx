@@ -72,10 +72,10 @@ export function SalesAIChatbot() {
     return (
       <>
         <Link
-          href="/leads/quote"
+          href="/leads/consultation?type=quote"
           className="fixed right-4 sm:right-6 z-40 px-4 py-3 sm:py-2 rounded-lg bg-[#00c4b4] text-white text-sm font-medium shadow-lg hover:bg-[#00a396] transition-colors min-h-[44px] sm:min-h-0 flex items-center [touch-action:manipulation] bottom-[max(6rem,calc(5rem+env(safe-area-inset-bottom)))] sm:bottom-24"
         >
-          전자칠판 10% 할인가 견적 받기
+          전자칠판 상담 신청
         </Link>
         <button
           type="button"
@@ -121,16 +121,16 @@ export function SalesAIChatbot() {
             </div>
             <div className="flex flex-wrap gap-2">
               <Link
-                href="/leads/demo"
+                href="/leads/consultation?type=demo"
                 className="inline-flex items-center px-3 py-1.5 rounded-full bg-[#00c4b4]/10 text-[#00c4b4] text-xs font-medium hover:bg-[#00c4b4]/20 transition-colors"
               >
-                시연 신청
+                시연 상담
               </Link>
               <Link
-                href="/leads/quote"
+                href="/leads/consultation?type=quote"
                 className="inline-flex items-center px-3 py-1.5 rounded-full bg-[#00c4b4]/10 text-[#00c4b4] text-xs font-medium hover:bg-[#00c4b4]/20 transition-colors"
               >
-                견적 요청
+                견적 상담
               </Link>
               {!contactSubmitted && (
                 <button
@@ -230,17 +230,17 @@ export function SalesAIChatbot() {
       <div className="px-4 pb-3 space-y-2 bg-white">
         <div className="flex flex-wrap gap-2 justify-center">
           <Link
-            href="/leads/demo"
+            href="/leads/consultation?type=demo"
             className="text-xs text-[#00c4b4] hover:underline font-medium"
           >
-            시연 신청
+            시연 상담
           </Link>
           <span className="text-slate-300">|</span>
           <Link
-            href="/leads/quote"
+            href="/leads/consultation?type=quote"
             className="text-xs text-[#00c4b4] hover:underline font-medium"
           >
-            견적 요청
+            견적 상담
           </Link>
           {!contactSubmitted && (
             <>
@@ -256,10 +256,10 @@ export function SalesAIChatbot() {
           )}
         </div>
         <Link
-          href="/leads/quote"
+          href="/leads/consultation?type=quote"
           className="block text-center py-2 text-sm font-medium text-[#00c4b4] hover:underline"
         >
-          전자칠판 10% 할인가 견적 받기 →
+          상담신청으로 빠르게 안내받기 →
         </Link>
       </div>
     </div>
