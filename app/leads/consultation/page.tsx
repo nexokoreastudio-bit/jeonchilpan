@@ -1,8 +1,12 @@
 import { ConsultationRequestForm } from '@/components/leads/consultation-request-form'
 
 export const metadata = {
-  title: '상담신청 | NEXO Daily',
-  description: '전자칠판 도입 상담을 하나의 상담신청으로 간편하게 접수하세요.',
+  title: '상담신청 - 시연·견적·도입 상담 한 번에',
+  description: '넥소 전자칠판 시연, 견적, 도입 상담을 한 번에 접수하세요. 영업일 1일 이내 연락드립니다.',
+  openGraph: {
+    title: '전자칠판 상담신청 | 시연·견적·도입 한 번에',
+    description: '넥소 전자칠판 상담을 간편하게 접수하세요. 무료 상담, 빠른 응답.',
+  },
 }
 
 export default function ConsultationRequestPage() {

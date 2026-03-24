@@ -5,6 +5,7 @@ import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { Database } from '@/types/database'
 import { sanitizeHtml } from '@/lib/utils/sanitize'
+import { ShareBar } from '@/components/social/share-bar'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { incrementFieldNewsViews } from '@/app/actions/field-news'
@@ -182,6 +183,14 @@ export default async function FieldNewsDetailPage({ params }: PageProps) {
           </div>
         </div>
       </article>
+
+      <div className="px-4 py-3">
+        <ShareBar
+          title={news.title}
+          description={news.content.replace(/<[^>]*>/g, '').substring(0, 100)}
+          image={news.images?.[0] || undefined}
+        />
+      </div>
 
       <div className={styles.detailActions}>
         <Link href="/field">

@@ -48,10 +48,10 @@ export const metadata: Metadata = {
     description: '전국 학원장·선생님·공부방 운영자를 위한 전자칠판 소통·정보 교환 포털. 자료 공유, 실시간 뉴스, AI 상담.',
     images: [
       {
-        url: '/assets/images/og-image.png',
+        url: '/assets/images/jeonchilpan_og_logo.png',
         width: 1200,
-        height: 1200,
-        alt: '전칠판 커뮤니티 로고',
+        height: 630,
+        alt: '전칠판 - 전자칠판 사용자 소통·정보 포털',
       },
     ],
   },
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '전칠판 - 전자칠판 사용자 소통·정보 포털',
     description: '전국 학원장·선생님·공부방 운영자를 위한 전자칠판 소통·정보 교환 포털. 자료 공유, 실시간 뉴스, AI 상담.',
-    images: ['/assets/images/og-image.png'],
+    images: ['/assets/images/jeonchilpan_og_logo.png'],
   },
   alternates: {
     canonical: '/',

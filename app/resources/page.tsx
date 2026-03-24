@@ -6,7 +6,17 @@ import { FileText, FileSpreadsheet, File, FileImage, Search } from 'lucide-react
 import { DownloadResourceButton } from '@/components/resources/download-button'
 import { PageSection } from '@/components/layout/page-section'
 import { classifyResourceCategory, RESOURCE_CATEGORY_LABELS, type ResourceCategoryKey } from '@/lib/utils/resource-category'
+import type { Metadata } from 'next'
 import styles from './resources.module.css'
+
+export const metadata: Metadata = {
+  title: '자료실 - 학부모 상담·수업에 바로 쓰는 실무 자료',
+  description: '입시 자료, 학부모 상담 템플릿, 수업 설계 자료를 무료로 다운로드하세요. 전칠판 회원 전용.',
+  openGraph: {
+    title: '전칠판 자료실 | 실무 자료 무료 다운로드',
+    description: '입시 자료, 상담 템플릿, 수업 자료를 바로 다운로드하세요.',
+  },
+}
 
 const FILE_TYPE_ICONS = {
   pdf: FileText,
