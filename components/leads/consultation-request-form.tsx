@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { CheckCircle2, Loader2 } from 'lucide-react'
 
 type ConsultationRequestType = '상담신청' | '시연상담' | '견적상담'
 
@@ -30,6 +31,7 @@ export function ConsultationRequestForm({
         ? '견적상담'
         : initialRequestType
   const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
     name: '',
@@ -49,6 +51,7 @@ export function ConsultationRequestForm({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    if (error) setError('')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,113 +89,142 @@ export function ConsultationRequestForm({
         return
       }
 
-      alert('상담 신청이 완료되었습니다. 빠른 시일 내에 안내드리겠습니다.')
-      router.push('/')
+      setSuccess(true)
+      setLoading(false)
     } catch (err: any) {
       setError(err.message || '상담 신청 중 오류가 발생했습니다.')
       setLoading(false)
     }
   }
 
+  // 성공 화면
+  if (success) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center animate-fade-in">
+        <div className="w-16 h-16 rounded-full bg-[#00c4b4]/10 flex items-center justify-center mb-5">
+          <CheckCircle2 className="w-8 h-8 text-[#00c4b4]" />
+        </div>
+        <h3 className="text-xl font-bold text-slate-900 mb-2">상담 신청이 완료되었습니다</h3>
+        <p className="text-sm text-slate-500 mb-1">영업일 1일 이내 담당자가 연락드리겠습니다.</p>
+        <p className="text-xs text-slate-400 mb-6">
+          {formData.name}님, {formData.phone || formData.email}로 안내드립니다.
+        </p>
+        <Button variant="outline" onClick={() => router.push('/')}>
+          홈으로 돌아가기
+        </Button>
+      </div>
+    )
+  }
+
+  const inputClass = 'transition-colors focus:border-[#00c4b4] focus:ring-1 focus:ring-[#00c4b4]/30'
+  const selectClass = `flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ${inputClass}`
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600 animate-fade-in">
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="name">이름 *</Label>
-          <Input id="name" name="name" value={formData.name} onChange={handleChange} required disabled={loading} />
+      {/* 필수 정보 */}
+      <fieldset className="space-y-4">
+        <legend className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">필수 정보</legend>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="name">이름 <span className="text-red-400">*</span></Label>
+            <Input id="name" name="name" placeholder="홍길동" value={formData.name} onChange={handleChange} required disabled={loading} className={inputClass} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="phone">연락처 <span className="text-red-400">*</span></Label>
+            <Input id="phone" name="phone" type="tel" placeholder="010-0000-0000" value={formData.phone} onChange={handleChange} required disabled={loading} className={inputClass} />
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">이메일 *</Label>
-          <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required disabled={loading} />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="email">이메일 <span className="text-red-400">*</span></Label>
+            <Input id="email" name="email" type="email" placeholder="example@email.com" value={formData.email} onChange={handleChange} required disabled={loading} className={inputClass} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="academy_name">학원명</Label>
+            <Input id="academy_name" name="academy_name" placeholder="OO학원" value={formData.academy_name} onChange={handleChange} disabled={loading} className={inputClass} />
+          </div>
         </div>
-      </div>
+      </fieldset>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="phone">연락처 *</Label>
-          <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleChange} required disabled={loading} />
+      {/* 상담 정보 */}
+      <fieldset className="space-y-4">
+        <legend className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">상담 정보</legend>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="request_type">문의 유형 <span className="text-red-400">*</span></Label>
+            <select id="request_type" name="request_type" value={formData.request_type} onChange={handleChange} disabled={loading} className={selectClass}>
+              <option value="상담신청">상담신청</option>
+              <option value="시연상담">시연상담</option>
+              <option value="견적상담">견적상담</option>
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="region">지역</Label>
+            <Input id="region" name="region" placeholder="서울, 경기 등" value={formData.region} onChange={handleChange} disabled={loading} className={inputClass} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="preferred_visit_time">희망 시간대</Label>
+            <select id="preferred_visit_time" name="preferred_visit_time" value={formData.preferred_visit_time} onChange={handleChange} disabled={loading} className={selectClass}>
+              <option value="">선택하세요</option>
+              <option value="오전">오전</option>
+              <option value="오후">오후</option>
+              <option value="협의 후 결정">협의 후 결정</option>
+            </select>
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="academy_name">학원명</Label>
-          <Input id="academy_name" name="academy_name" value={formData.academy_name} onChange={handleChange} disabled={loading} />
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="space-y-2">
-          <Label htmlFor="request_type">문의 유형 *</Label>
-          <select
-            id="request_type"
-            name="request_type"
-            value={formData.request_type}
+        <div className="space-y-1.5">
+          <Label htmlFor="preferred_visit_date">희망 날짜</Label>
+          <Input
+            id="preferred_visit_date"
+            name="preferred_visit_date"
+            type="date"
+            value={formData.preferred_visit_date}
             onChange={handleChange}
             disabled={loading}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="상담신청">상담신청</option>
-            <option value="시연상담">시연상담</option>
-            <option value="견적상담">견적상담</option>
-          </select>
+            min={new Date().toISOString().split('T')[0]}
+            className={inputClass}
+          />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="region">지역</Label>
-          <Input id="region" name="region" value={formData.region} onChange={handleChange} disabled={loading} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="preferred_visit_time">희망 시간대</Label>
-          <select
-            id="preferred_visit_time"
-            name="preferred_visit_time"
-            value={formData.preferred_visit_time}
+
+        <div className="space-y-1.5">
+          <Label htmlFor="message">추가 요청사항</Label>
+          <Textarea
+            id="message"
+            name="message"
+            rows={3}
+            value={formData.message}
             onChange={handleChange}
             disabled={loading}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="">선택하세요</option>
-            <option value="오전">오전</option>
-            <option value="오후">오후</option>
-            <option value="협의 후 결정">협의 후 결정</option>
-          </select>
+            placeholder="교실 수, 희망 화면 크기(65/75/86인치) 등을 남겨주시면 더 빠르게 안내해드립니다."
+            className={inputClass}
+          />
         </div>
-      </div>
+      </fieldset>
 
-      <div className="space-y-2">
-        <Label htmlFor="preferred_visit_date">희망 날짜</Label>
-        <Input
-          id="preferred_visit_date"
-          name="preferred_visit_date"
-          type="date"
-          value={formData.preferred_visit_date}
-          onChange={handleChange}
-          disabled={loading}
-          min={new Date().toISOString().split('T')[0]}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="message">추가 요청사항</Label>
-        <Textarea
-          id="message"
-          name="message"
-          rows={4}
-          value={formData.message}
-          onChange={handleChange}
-          disabled={loading}
-          placeholder="상담 시 필요한 내용을 입력해주세요."
-        />
-      </div>
-
-      <Button type="submit" className="w-full" size="lg" disabled={loading}>
-        {loading ? '신청 중...' : '상담신청'}
+      <Button
+        type="submit"
+        className="w-full bg-[#00c4b4] hover:bg-[#00a396] hover:shadow-lg hover:shadow-[#00c4b4]/20 transition-all duration-200"
+        size="lg"
+        disabled={loading}
+      >
+        {loading ? (
+          <span className="flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            신청 처리 중...
+          </span>
+        ) : (
+          '상담신청'
+        )}
       </Button>
 
-      <p className="text-center text-xs text-gray-500">
+      <p className="text-center text-xs text-gray-400">
         제출하신 정보는 상담 안내 목적으로만 사용됩니다.
       </p>
     </form>
