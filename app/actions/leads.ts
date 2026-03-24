@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { writeAuditLog } from '@/lib/actions/audit'
 import { revalidatePath } from 'next/cache'
 import { Database } from '@/types/database'
 
@@ -213,6 +214,16 @@ export async function updateLeadStatus(
       console.error('리드 상태 업데이트 실패:', error)
       return { success: false, error: '상태 업데이트에 실패했습니다.' }
     }
+
+    // 감사 로그
+    writeAuditLog({
+      admin_id: user.id,
+      admin_email: user.email || '',
+      action: 'lead.status_update',
+      target_type: 'lead',
+      target_id: String(leadId),
+      detail: { status, admin_notes: adminNotes || null },
+    })
 
     // 관리자 페이지 캐시 무효화
     revalidatePath('/admin/leads')
