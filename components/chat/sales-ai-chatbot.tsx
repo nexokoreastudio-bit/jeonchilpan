@@ -73,7 +73,7 @@ export function SalesAIChatbot() {
       <>
         <Link
           href="/leads/consultation?type=quote"
-          className="fixed right-4 sm:right-6 z-40 px-4 py-3 sm:py-2 rounded-lg bg-[#00c4b4] text-white text-sm font-medium shadow-lg hover:bg-[#00a396] transition-colors min-h-[44px] sm:min-h-0 flex items-center [touch-action:manipulation] bottom-[max(6rem,calc(5rem+env(safe-area-inset-bottom)))] sm:bottom-24"
+          className="fixed right-4 sm:right-6 z-40 px-4 py-3 sm:py-2 rounded-lg bg-[#00c4b4] text-white text-sm font-semibold shadow-lg hover:bg-[#00a396] hover:shadow-xl hover:shadow-[#00c4b4]/20 transition-all duration-200 min-h-[44px] sm:min-h-0 flex items-center [touch-action:manipulation] bottom-[max(6rem,calc(5rem+env(safe-area-inset-bottom)))] sm:bottom-24"
         >
           전자칠판 상담 신청
         </Link>

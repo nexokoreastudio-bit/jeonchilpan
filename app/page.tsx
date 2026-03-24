@@ -414,7 +414,7 @@ export default async function HomePage() {
       )}
 
       {/* 자료실 유입 특화 섹션 */}
-      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm card-hover">
         <div className="border-b border-gray-100 bg-slate-50/70 px-4 sm:px-5 py-4">
           <div className="flex items-end justify-between gap-4">
             <div>
@@ -540,7 +540,7 @@ export default async function HomePage() {
         postsByBoard.bamboo.length > 0 ||
         postsByBoard.materials.length > 0 ||
         postsByBoard.resources.length > 0) && (
-        <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+        <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm card-hover">
           <div className="border-b border-gray-100 bg-slate-50/50 px-3 sm:px-4 py-3">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-sm font-bold text-slate-800">
@@ -602,7 +602,7 @@ export default async function HomePage() {
               <p className="mt-3 text-sm text-white/60">{formatEditionDate(latestArticle.edition_id)}</p>
               <Link
                 href={`/news/${latestArticle.edition_id}`}
-                className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition-colors text-sm"
+                className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-50 hover:shadow-lg transition-all duration-200 text-sm"
               >
                 인사이트 읽기
                 <ArrowRight className="w-4 h-4" />
@@ -613,7 +613,7 @@ export default async function HomePage() {
       )}
 
       {/* 오늘의 교육 뉴스 (실시간 큐레이션) */}
-      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm card-hover">
         <CrawledNewsSection limit={3} embedded />
       </section>
 
@@ -621,7 +621,7 @@ export default async function HomePage() {
       <CenterBanner variant="outline" />
 
       {/* 큐레이션 인사이트 - 학부모 상담에 활용 */}
-      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm card-hover">
         <div className="border-b border-gray-100 bg-slate-50/50 px-5 py-4">
           <div className="flex items-end justify-between">
             <div>
@@ -745,7 +745,7 @@ export default async function HomePage() {
             href="https://invite.kakao.com/tc/OYA6XOhnGN"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-[#FEE500] text-[#1a1a1a] font-bold text-sm hover:bg-[#f5dc00] transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-[#FEE500] text-[#1a1a1a] font-bold text-sm hover:bg-[#f5dc00] hover:shadow-lg hover:shadow-[#FEE500]/30 transition-all duration-200"
           >
             카톡 정보방 입장하기
             <ArrowRight className="w-5 h-5" />
@@ -754,7 +754,7 @@ export default async function HomePage() {
       </section>
 
       {/* 메인 콘텐츠 - 현장 소식 & 고객 후기 */}
-      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">
+      <section className="bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm card-hover">
         <div className="border-b border-gray-100 bg-slate-50/50 px-5 py-4">
           <h2 className="text-base font-bold text-slate-800">현장 소식 & 고객 후기</h2>
           <p className="text-slate-500 text-sm mt-1">전국 학원들의 변화 스토리와 원장님·강사님 후기</p>
