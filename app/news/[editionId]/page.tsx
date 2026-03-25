@@ -10,7 +10,7 @@ import { EditionSelector } from '@/components/edition-selector'
 import { SafeImage } from '@/components/safe-image'
 import { Database } from '@/types/database'
 import { NewsArticleJsonLd } from '@/components/seo/json-ld'
-import { ShareButtons } from '@/components/social/share-buttons'
+import { ShareBar } from '@/components/social/share-bar'
 import { InsightsSection } from '@/components/insights/insights-section'
 import { createClient } from '@/lib/supabase/server'
 import styles from '../../page.module.css'
@@ -278,7 +278,7 @@ export default async function EditionPage({
           {/* 소셜 공유 버튼 */}
           {mainArticle && (
             <div className="mb-6">
-              <ShareButtons
+              <ShareBar
                 title={displayArticle.title || 'NEXO Daily'}
                 description={displayArticle.subtitle || undefined}
                 url={currentUrl}

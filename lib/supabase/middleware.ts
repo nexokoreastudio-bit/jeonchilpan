@@ -70,7 +70,31 @@ export async function updateSession(request: NextRequest) {
   )
 
   // 세션 새로고침
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const pathname = request.nextUrl.pathname
+
+  // /admin 경로 보호: 로그인 + admin role 필수
+  if (pathname.startsWith('/admin')) {
+    if (!user) {
+      const loginUrl = request.nextUrl.clone()
+      loginUrl.pathname = '/login'
+      return NextResponse.redirect(loginUrl)
+    }
+
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    const typedProfile = profile as { role: string | null } | null
+    if (typedProfile?.role !== 'admin') {
+      const homeUrl = request.nextUrl.clone()
+      homeUrl.pathname = '/'
+      return NextResponse.redirect(homeUrl)
+    }
+  }
 
   return supabaseResponse
 }

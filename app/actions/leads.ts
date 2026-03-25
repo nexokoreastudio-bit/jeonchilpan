@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { writeAuditLog } from '@/lib/actions/audit'
 import { revalidatePath } from 'next/cache'
 import { Database } from '@/types/database'
 
@@ -37,7 +38,9 @@ interface ConsultationRequestData {
   email: string
   phone?: string
   academy_name?: string
+  region?: string
   message?: string
+  referrer_code?: string
 }
 
 /**
@@ -97,9 +100,9 @@ export async function createConsultationRequest(
       email: data.email,
       phone: data.phone || null,
       academy_name: data.academy_name || null,
-      region: null,
+      region: data.region || null,
       message: data.message || null,
-      referrer_code: null,
+      referrer_code: data.referrer_code || null,
       status: 'pending',
     }
 
@@ -212,6 +215,16 @@ export async function updateLeadStatus(
       return { success: false, error: '상태 업데이트에 실패했습니다.' }
     }
 
+    // 감사 로그
+    writeAuditLog({
+      admin_id: user.id,
+      admin_email: user.email || '',
+      action: 'lead.status_update',
+      target_type: 'lead',
+      target_id: String(leadId),
+      detail: { status, admin_notes: adminNotes || null },
+    })
+
     // 관리자 페이지 캐시 무효화
     revalidatePath('/admin/leads')
 
@@ -221,4 +234,3 @@ export async function updateLeadStatus(
     return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
   }
 }
-

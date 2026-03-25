@@ -3,6 +3,7 @@
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { Database } from '@/types/database'
+import { writeAuditLog } from '@/lib/actions/audit'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 type UserUpdate = Database['public']['Tables']['users']['Update']
@@ -201,6 +202,16 @@ export async function setSubscriberStatus(
       console.error('구독자 상태 업데이트 실패:', updateError)
       return { success: false, error: '구독자 상태 업데이트 중 오류가 발생했습니다.' }
     }
+
+    // 감사 로그
+    writeAuditLog({
+      admin_id: user.id,
+      admin_email: user.email || '',
+      action: verified ? 'subscriber.verify' : 'subscriber.revoke',
+      target_type: 'user',
+      target_id: targetUserId,
+      detail: { verified, serial_number: serialNumber || null },
+    })
 
     // 캐시 무효화 (승인된 사용자의 마이페이지도 무효화)
     revalidatePath('/admin/users')

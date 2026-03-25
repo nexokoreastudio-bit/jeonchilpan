@@ -1,4 +1,34 @@
 /** @type {import('next').NextConfig} */
+const isDev = process.env.NODE_ENV !== 'production'
+
+function buildContentSecurityPolicy() {
+  const scriptSrc = [
+    "'self'",
+    "'unsafe-inline'",
+    'https://t1.kakaocdn.net',
+    'https://developers.kakao.com',
+  ]
+
+  if (isDev) {
+    scriptSrc.push("'unsafe-eval'")
+  }
+
+  return [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'self'",
+    `script-src ${scriptSrc.join(' ')}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data: https:",
+    "connect-src 'self' https://*.supabase.co https://*.supabase.in https://generativelanguage.googleapis.com https://*.googleapis.com https://*.netlify.app ws: wss:",
+    "frame-src 'self' https://www.youtube.com https://player.vimeo.com",
+  ].join('; ')
+}
+
+const contentSecurityPolicy = buildContentSecurityPolicy()
+
 const nextConfig = {
   // 성능 최적화 설정
   compress: true, // gzip 압축 활성화
@@ -37,6 +67,10 @@ const nextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()'
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: contentSecurityPolicy
           }
         ],
       },

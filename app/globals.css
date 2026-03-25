@@ -92,6 +92,45 @@
   }
 }
 
+/* ── 공통 카드/섹션 유틸리티 ── */
+
+/* 카드 호버 리프트 효과 */
+.card-hover {
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  border-color: rgba(0, 196, 180, 0.3);
+}
+
+/* 섹션 진입 애니메이션 */
+.section-enter {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+/* CTA 버튼 강조 펄스 */
+.cta-pulse {
+  position: relative;
+}
+.cta-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: rgba(0, 196, 180, 0.15);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.cta-pulse:hover::after {
+  opacity: 1;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* NEXO Weekly 뉴스레터 콘텐츠 */
 .newsletter-content {
   color: #1a1a1a;

@@ -9,6 +9,9 @@ import { KakaoSDKLoader } from '@/components/kakao/kakao-sdk-loader'
 import { SalesAIChatbot } from '@/components/chat/sales-ai-chatbot'
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
+// SEO 검증 코드는 서버 전용 환경변수만 사용
+const googleVerification = process.env.GOOGLE_SITE_VERIFICATION
+const naverVerification = process.env.NAVER_SITE_VERIFICATION
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -45,10 +48,10 @@ export const metadata: Metadata = {
     description: '전국 학원장·선생님·공부방 운영자를 위한 전자칠판 소통·정보 교환 포털. 자료 공유, 실시간 뉴스, AI 상담.',
     images: [
       {
-        url: '/assets/images/og-image.png',
+        url: '/assets/images/jeonchilpan_og_logo.png',
         width: 1200,
-        height: 1200,
-        alt: '전칠판 커뮤니티 로고',
+        height: 630,
+        alt: '전칠판 - 전자칠판 사용자 소통·정보 포털',
       },
     ],
   },
@@ -56,7 +59,10 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '전칠판 - 전자칠판 사용자 소통·정보 포털',
     description: '전국 학원장·선생님·공부방 운영자를 위한 전자칠판 소통·정보 교환 포털. 자료 공유, 실시간 뉴스, AI 상담.',
-    images: ['/assets/images/og-image.png'],
+    images: ['/assets/images/jeonchilpan_og_logo.png'],
+  },
+  alternates: {
+    canonical: '/',
   },
   robots: {
     index: true,
@@ -70,9 +76,12 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // Google Search Console, Naver Search Advisor 등에서 제공받은 코드 추가 가능
-    // google: 'your-google-verification-code',
-    // naver: 'your-naver-verification-code',
+    google: googleVerification || undefined,
+    other: naverVerification
+      ? {
+          'naver-site-verification': naverVerification,
+        }
+      : undefined,
   },
 }
 
@@ -104,4 +113,3 @@ export default function RootLayout({
     </html>
   )
 }
-

@@ -15,6 +15,7 @@ import { checkUserLiked } from '@/app/actions/likes'
 import { Database } from '@/types/database'
 import { JsonLd } from '@/components/seo/json-ld'
 import { getNewsById } from '@/lib/supabase/news'
+import { ShareBar } from '@/components/social/share-bar'
 import styles from '../community.module.css'
 
 const BOARD_TYPE_INFO = {
@@ -214,6 +215,13 @@ export default async function PostDetailPage({ params }: PageProps) {
 
           <div className={styles.postDetailContent}>
             <HtmlContent html={post.content} />
+          </div>
+
+          <div className="px-4 py-3 border-t border-slate-100">
+            <ShareBar
+              title={post.title}
+              description={post.content.replace(/<[^>]*>/g, '').substring(0, 100)}
+            />
           </div>
 
           <div className={styles.postDetailFooter}>

@@ -19,6 +19,38 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      admin_audit_logs: {
+        Row: {
+          id: number
+          admin_id: string | null
+          admin_email: string | null
+          action: string
+          target_type: string | null
+          target_id: string | null
+          detail: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          admin_id?: string | null
+          admin_email?: string | null
+          action: string
+          target_type?: string | null
+          target_id?: string | null
+          detail?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          admin_id?: string | null
+          admin_email?: string | null
+          action?: string
+          target_type?: string | null
+          target_id?: string | null
+          detail?: Json | null
+          created_at?: string
+        }
+      }
       users: {
         Row: {
           id: string // UUID (auth.users 참조)

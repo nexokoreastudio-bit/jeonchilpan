@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { updateLeadStatus } from '@/app/actions/leads'
+import { parseLeadMetadata } from '@/lib/utils/lead-metadata'
 import { Database } from '@/types/database'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
@@ -15,7 +16,8 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Mail, Phone, ChevronDown, ChevronUp, Building2 } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Mail, Phone, ChevronDown, ChevronUp, Building2, Megaphone, CalendarClock, Flag } from 'lucide-react'
 
 type LeadRow = Database['public']['Tables']['leads']['Row']
 
@@ -85,10 +87,31 @@ export function LeadsList({ leads }: LeadsListProps) {
   const [adminNotes, setAdminNotes] = useState<Record<number, string>>({})
   const [statusFilter, setStatusFilter] = useState<LeadStatus | 'all'>('all')
   const [typeFilter, setTypeFilter] = useState<string>('all')
+  const [requestTypeFilter, setRequestTypeFilter] = useState<string>('all')
+  const [campaignQuery, setCampaignQuery] = useState('')
 
-  const filteredLeads = leads.filter((lead) => {
+  const leadsWithMeta = leads.map((lead) => ({
+    ...lead,
+    meta: parseLeadMetadata(lead.message),
+  }))
+
+  const requestTypeOptions = Array.from(
+    new Set(
+      leadsWithMeta
+        .map((lead) => lead.meta.requestType)
+        .filter((value): value is string => Boolean(value))
+    )
+  )
+
+  const filteredLeads = leadsWithMeta.filter((lead) => {
     if (statusFilter !== 'all' && lead.status !== statusFilter) return false
     if (typeFilter !== 'all' && lead.type !== typeFilter) return false
+    if (requestTypeFilter !== 'all' && lead.meta.requestType !== requestTypeFilter) return false
+    if (campaignQuery.trim()) {
+      const keyword = campaignQuery.trim().toLowerCase()
+      const target = `${lead.meta.campaign || ''} ${lead.meta.sourcePage || ''} ${lead.referrer_code || ''}`.toLowerCase()
+      if (!target.includes(keyword)) return false
+    }
     return true
   })
 
@@ -119,7 +142,7 @@ export function LeadsList({ leads }: LeadsListProps) {
 
   return (
     <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-      {/* 필터 - 드롭다운 2개만 */}
+      {/* 필터 */}
       <div className="px-4 py-3 border-b border-slate-100 flex flex-wrap items-center gap-3">
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as LeadStatus | 'all')}>
           <SelectTrigger className="w-[140px] h-8 text-sm border-slate-200">
@@ -142,18 +165,37 @@ export function LeadsList({ leads }: LeadsListProps) {
             ))}
           </SelectContent>
         </Select>
+        <Select value={requestTypeFilter} onValueChange={setRequestTypeFilter}>
+          <SelectTrigger className="w-[140px] h-8 text-sm border-slate-200">
+            <SelectValue placeholder="문의 유형" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">전체 문의유형</SelectItem>
+            {requestTypeOptions.map((value) => (
+              <SelectItem key={value} value={value}>{value}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Input
+          value={campaignQuery}
+          onChange={(e) => setCampaignQuery(e.target.value)}
+          placeholder="캠페인/유입페이지 검색"
+          className="h-8 w-[180px] text-sm border-slate-200"
+        />
         <span className="text-xs text-slate-400 ml-auto">{filteredLeads.length}건</span>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px]">
+        <table className="w-full min-w-[920px]">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50/50">
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-10">ID</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-20">유형</th>
+              <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-24">문의유형</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500">이름</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 min-w-[160px]">연락처</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-16">지역</th>
+              <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-20">지역</th>
+              <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 min-w-[180px]">캠페인/유입</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-28">상태 변경</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-24">신청일</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-16">상세</th>
@@ -162,7 +204,7 @@ export function LeadsList({ leads }: LeadsListProps) {
           <tbody className="divide-y divide-slate-100">
             {filteredLeads.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-slate-500 text-sm">
+                <td colSpan={10} className="px-4 py-12 text-center text-slate-500 text-sm">
                   조건에 맞는 리드가 없습니다.
                 </td>
               </tr>
@@ -173,6 +215,11 @@ export function LeadsList({ leads }: LeadsListProps) {
                 <td className="px-4 py-2">
                   <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${TYPE_STYLES[lead.type] ?? 'bg-slate-100 text-slate-600'}`}>
                     {TYPE_LABELS[lead.type] ?? lead.type}
+                  </span>
+                </td>
+                <td className="px-4 py-2">
+                  <span className="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                    {lead.meta.requestType || '—'}
                   </span>
                 </td>
                 <td className="px-4 py-2 text-sm font-medium text-slate-900">{lead.name}</td>
@@ -190,7 +237,17 @@ export function LeadsList({ leads }: LeadsListProps) {
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-2 text-sm text-slate-600">{lead.region || '—'}</td>
+                <td className="px-4 py-2 text-sm text-slate-600">{lead.meta.region || lead.region || '—'}</td>
+                <td className="px-4 py-2">
+                  <div className="space-y-1 text-xs text-slate-600">
+                    <div className="truncate" title={lead.meta.campaign || lead.referrer_code || ''}>
+                      {lead.meta.campaign || lead.referrer_code || '—'}
+                    </div>
+                    <div className="truncate text-slate-400" title={lead.meta.sourcePage || ''}>
+                      {lead.meta.sourcePage || '직접 유입'}
+                    </div>
+                  </div>
+                </td>
                 <td className="px-4 py-2">
                   <Select
                     value={lead.status}
@@ -232,7 +289,10 @@ export function LeadsList({ leads }: LeadsListProps) {
         <div className="border-t border-slate-100 bg-slate-50/30 p-4">
           {leads
             .filter((lead) => lead.id === expandedId)
-            .map((lead) => (
+            .map((lead) => {
+              const meta = parseLeadMetadata(lead.message)
+
+              return (
               <div key={lead.id} className="space-y-4">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="flex items-start gap-2">
@@ -240,6 +300,31 @@ export function LeadsList({ leads }: LeadsListProps) {
                     <div>
                       <Label className="text-xs text-slate-500 font-medium">학원명</Label>
                       <div className="text-sm text-slate-900 mt-0.5">{lead.academy_name || '—'}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Flag className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                    <div>
+                      <Label className="text-xs text-slate-500 font-medium">문의유형</Label>
+                      <div className="text-sm text-slate-900 mt-0.5">{meta.requestType || '—'}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Megaphone className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                    <div>
+                      <Label className="text-xs text-slate-500 font-medium">캠페인/유입</Label>
+                      <div className="text-sm text-slate-900 mt-0.5">{meta.campaign || lead.referrer_code || '—'}</div>
+                      <div className="text-xs text-slate-500 mt-0.5">{meta.sourcePage || '직접 유입'}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CalendarClock className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                    <div>
+                      <Label className="text-xs text-slate-500 font-medium">희망 일정</Label>
+                      <div className="text-sm text-slate-900 mt-0.5">
+                        {meta.preferredDate || '미정'}
+                        {meta.preferredTime ? ` / ${meta.preferredTime}` : ''}
+                      </div>
                     </div>
                   </div>
                   {lead.type === 'quote' && (
@@ -268,11 +353,11 @@ export function LeadsList({ leads }: LeadsListProps) {
                   )}
                 </div>
 
-                {lead.message && (
+                {meta.body && (
                   <div>
                     <Label className="text-xs text-slate-500 font-medium">추가 요청사항</Label>
                     <div className="mt-1.5 text-sm text-slate-800 bg-white p-4 rounded-lg border border-slate-200 whitespace-pre-wrap leading-relaxed">
-                      {lead.message}
+                      {meta.body}
                     </div>
                   </div>
                 )}
@@ -329,10 +414,9 @@ export function LeadsList({ leads }: LeadsListProps) {
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
         </div>
       )}
     </div>
   )
 }
-
