@@ -1,6 +1,8 @@
 import { QuizClient } from '@/components/quiz/quiz-client'
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-static'
+
 export const metadata: Metadata = {
   title: '학원장 유형 테스트 | 나는 어떤 학원장일까?',
   description: '5가지 질문으로 알아보는 나의 학원 운영 스타일. 학원장님의 강점과 성장 포인트를 확인해보세요.',

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { LEGAL_EFFECTIVE_DATE, LEGAL_VERSION, BUSINESS_INFO } from '@/lib/legal'
 
+export const dynamic = 'force-static'
+
 export const metadata: Metadata = {
   title: '이용약관',
   description: '전칠판 서비스 이용약관 안내',

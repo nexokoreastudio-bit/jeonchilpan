@@ -1,6 +1,7 @@
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+
+export const revalidate = 120 // 2분 캐시
 import { getAllResources } from '@/lib/supabase/resources'
 import { FileText, FileSpreadsheet, File, FileImage, Search } from 'lucide-react'
 import { DownloadResourceButton } from '@/components/resources/download-button'
@@ -11,7 +12,7 @@ import styles from './resources.module.css'
 
 export const metadata: Metadata = {
   title: '자료실 - 학부모 상담·수업에 바로 쓰는 실무 자료',
-  description: '입시 자료, 학부모 상담 템플릿, 수업 설계 자료를 무료로 다운로드하세요. 전칠판 회원 전용.',
+  description: '입시 자료, 학부모 상담 템플릿, 수업 설계 자료를 무료로 다운로드하세요. 회원가입 후 다운로드 가능.',
   openGraph: {
     title: '전칠판 자료실 | 실무 자료 무료 다운로드',
     description: '입시 자료, 상담 템플릿, 수업 자료를 바로 다운로드하세요.',
@@ -44,11 +45,7 @@ export default async function ResourcesPage({
   // 현재 사용자 확인
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
-
-  const resources = await getAllResources('bronze', user.id)
+  const resources = await getAllResources('bronze', user?.id)
   const selectedCategory = (searchParams?.category || 'all') as 'all' | ResourceCategoryKey
   const query = (searchParams?.q || '').trim()
   const queryLower = query.toLowerCase()
@@ -197,12 +194,22 @@ export default async function ResourcesPage({
                   </div>
                 </div>
                 <div className={styles.cardFooter}>
-                  <DownloadResourceButton
-                    resourceId={resource.id}
-                    hasDownloaded={resource.hasDownloaded}
-                    compact
-                    className="min-w-[112px]"
-                  />
+                  {user ? (
+                    <DownloadResourceButton
+                      resourceId={resource.id}
+                      hasDownloaded={resource.hasDownloaded}
+                      compact
+                      className="min-w-[112px]"
+                    />
+                  ) : (
+                    <Link
+                      href="/login?redirect=/resources"
+                      className="inline-flex items-center justify-center gap-2 min-w-[112px] h-9 px-3 text-sm font-medium rounded-md bg-nexo-navy text-white hover:opacity-90 transition-opacity"
+                    >
+                      <FileText className="w-4 h-4" />
+                      로그인 후 다운로드
+                    </Link>
+                  )}
                 </div>
               </div>
             )

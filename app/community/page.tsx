@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getPostsByBoardType, type BoardType } from '@/lib/supabase/posts'
 import { format } from 'date-fns'
+
+export const revalidate = 30 // 30초 캐시
 import { ko } from 'date-fns/locale'
 import { FileStack, MessageSquare, FileText, Library } from 'lucide-react'
 import type { Metadata } from 'next'

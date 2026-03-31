@@ -3,6 +3,8 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getPostById } from '@/lib/supabase/posts'
+
+export const revalidate = 30 // 30초 캐시 (댓글 반영 위해 짧게)
 import { deletePost } from '@/app/actions/posts'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'

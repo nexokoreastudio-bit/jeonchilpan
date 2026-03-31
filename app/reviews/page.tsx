@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import { getBestReviews, getReviews, getAverageRating, getRatingStats } from '@/lib/supabase/reviews'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -45,6 +46,12 @@ export default async function ReviewsPage({ searchParams }: PageProps) {
   const ratingStats = await getRatingStats()
 
   const totalReviews = Object.values(ratingStats).reduce((sum, count) => sum + count, 0)
+
+  // 리뷰 5개 미만이면 현장소식 페이지로 리다이렉트 (빈 리뷰 페이지 역효과 방지)
+  if (totalReviews < 5) {
+    redirect('/field')
+  }
+
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://jeonchilpan.netlify.app'
   
   // 구조화된 데이터 (AggregateRating 및 Review 스키마)
@@ -321,5 +328,4 @@ export default async function ReviewsPage({ searchParams }: PageProps) {
     </>
   )
 }
-
 

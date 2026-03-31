@@ -162,10 +162,10 @@ export function MonitoringDashboard({ leadStats, engagementStats }: MonitoringDa
                 실제 사용자들의 후기와 활동
               </p>
               <Link
-                href="/reviews"
+                href="/field"
                 className="inline-flex items-center gap-1 text-sm font-medium text-[#00c4b4] hover:underline"
               >
-                후기 보기 <ChevronRight className="w-4 h-4" />
+                현장 후기 보기 <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

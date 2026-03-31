@@ -32,8 +32,7 @@ const MEGA_NAV = [
         { name: '전체 기사 보기', href: '/news/crawled' },
       ]},
       { title: 'NEXO 신뢰', items: [
-        { name: '고객 후기', href: '/reviews' },
-        { name: '현장 소식', href: '/field' },
+        { name: '설치 현장 & 후기', href: '/field' },
       ]},
       { title: 'NEXO 체험', items: [
         { name: '상담 신청', href: '/leads/consultation' },
@@ -89,7 +88,7 @@ const MEGA_NAV = [
         { name: '로그인', href: '/login' },
         { name: '회원가입', href: '/signup' },
         { name: '세미나', href: '/seminar' },
-        { name: '고객 후기', href: '/reviews' },
+        { name: '설치 현장 & 후기', href: '/field' },
         { name: '구독자 할인', href: '/benefits' },
         { name: '오시는 길', href: '/location' },
       ]},

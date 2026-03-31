@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { SafeImage } from '@/components/safe-image'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
+
+export const revalidate = 120 // 2분 캐시 (현장소식은 자주 안 바뀜)
 import { Database } from '@/types/database'
 import styles from './field.module.css'
 

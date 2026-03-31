@@ -20,8 +20,7 @@ function buildSystemPrompt(): string {
 - 자료실: /resources (입시 자료, 다운로드)
 - 레벨별 혜택: /benefits (구독자 할인 혜택)
 - 오시는 길: /location (쇼룸 주소, 연락처)
-- 고객 후기: /reviews
-- 현장 소식: /field (설치 사례)
+- 설치 현장 & 후기: /field (설치 사례, 후기)
 - 커뮤니티: /community (원장님 소통)
 
 ※ 링크는 반드시 [텍스트](/leads/consultation) 형태로 작성. 예: [상담 신청하기](/leads/consultation)

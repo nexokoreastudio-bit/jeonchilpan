@@ -3,6 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getArticleByEditionId, getArticlesByEditionId, getAllEditions } from '@/lib/supabase/articles'
+
+export const revalidate = 300 // 5분 캐시 (발행된 기사는 자주 안 바뀜)
 import { HtmlContent } from '@/components/html-content'
 import { DiscountBanner } from '@/components/promotion/discount-banner'
 import { EditionNavigation } from '@/components/edition-navigation'
@@ -56,9 +58,6 @@ interface PageProps {
     preview?: string
   }
 }
-
-// 정적 생성 및 재검증 설정 (성능 최적화)
-export const revalidate = 0 // 항상 최신 데이터 가져오기 (예약 발행 즉시 반영)
 
 export default async function EditionPage({ 
   params,

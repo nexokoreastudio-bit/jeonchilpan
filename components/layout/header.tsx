@@ -98,10 +98,10 @@ export async function Header() {
               세미나
             </Link>
             <Link
-              href="/reviews"
+              href="/field"
               className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
             >
-              고객 후기
+              설치 현장 & 후기
             </Link>
             <Link
               href="/resources"

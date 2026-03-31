@@ -74,7 +74,7 @@ function formatEditionDate(editionId: string | null): string {
 }
 
 // 정적 생성 및 재검증 설정
-export const revalidate = 0 // 항상 최신 데이터 가져오기 (예약 발행 즉시 반영)
+export const revalidate = 60 // 60초 캐시 (성능 최적화, 콘텐츠는 1분 내 반영)
 
 export default async function HomePage() {
   let latestArticle: Awaited<ReturnType<typeof getLatestArticle>> = null
@@ -797,7 +797,7 @@ export default async function HomePage() {
                     <p className="text-slate-500 text-sm mb-5">실제 사용 후 솔직하게 써주신 생생한 이야기</p>
                     <div className="space-y-6">
                       {latestReviews.map((review) => (
-                        <Link key={review.id} href={`/reviews#review-${review.id}`} className="block group">
+                        <Link key={review.id} href="/field" className="block group">
                           <article className="p-4 border border-gray-100 rounded-lg hover:border-[#00c4b4]/30 hover:shadow-sm transition-all duration-200 bg-white">
                             <div className="flex items-start justify-between gap-2 mb-2">
                               <h4 className="text-sm font-semibold text-gray-900 group-hover:text-[#00c4b4] transition-colors line-clamp-1 flex-1">

@@ -2,6 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, FileText, Users, ClipboardList } from 'lucide-react'
 
+export const dynamic = 'force-static'
+
 const SMARTSTORE_EXTERNAL_URL =
   'https://2026-nexo-polic-y-fund.netlify.app/?partner_code=johanju'
 const SMARTSTORE_REGIONAL_CONTACT_URL = 'https://sminfo.mss.go.kr/cm/sv/CSV001R9.do'

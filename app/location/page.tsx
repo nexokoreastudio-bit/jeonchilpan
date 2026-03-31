@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Metadata } from 'next'
+
+export const dynamic = 'force-static'
 import { ShareButton, CopyButton } from '@/components/location/share-button'
 import styles from './location.module.css'
 

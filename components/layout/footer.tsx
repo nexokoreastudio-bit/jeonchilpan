@@ -37,11 +37,8 @@ export function Footer() {
                 <Link href="/resources" className="text-sm text-slate-400 hover:text-white transition-colors">
                   자료실
                 </Link>
-                <Link href="/reviews" className="text-sm text-slate-400 hover:text-white transition-colors">
-                  고객 후기
-                </Link>
                 <Link href="/field" className="text-sm text-slate-400 hover:text-white transition-colors">
-                  현장 소식
+                  설치 현장 & 후기
                 </Link>
                 <Link
                   href="/leads/consultation"

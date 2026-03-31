@@ -5,8 +5,7 @@ import { SafeImage } from '@/components/safe-image'
 import { Calendar, ArrowRight, Lightbulb } from 'lucide-react'
 import styles from './archive.module.css'
 
-// 정적 생성 및 재검증 설정 (성능 최적화)
-export const revalidate = 0 // 항상 최신 데이터 가져오기 (예약 발행 즉시 반영)
+export const revalidate = 60 // 1분 캐시
 
 // 날짜 포맷팅 함수
 function formatEditionDate(editionId: string | null): string {
