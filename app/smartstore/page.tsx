@@ -5,7 +5,7 @@ export const dynamic = 'force-static'
 
 export const metadata = {
   title: '소상공인 스마트상점 모집 마감 안내',
-  description: '2026년 1차 소상공인 스마트상점 모집이 마감되었습니다. 다음 모집 일정을 안내드립니다.',
+  description: '2026년 소상공인 스마트상점 모집이 마감되었습니다.',
 }
 
 /* ==========================================================================
@@ -28,7 +28,7 @@ export default function SmartstoreCampaignPage() {
         <div className="bg-white border border-gray-200/80 rounded-lg shadow-sm overflow-hidden">
           <div className="px-5 sm:px-8 py-8 sm:py-12 text-center">
             <span className="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 px-4 py-1.5 text-sm font-semibold text-slate-600">
-              2026년 1차 모집 마감
+              2026 소상공인 스마트상점 모집 마감
             </span>
 
             <h1 className="mt-5 text-2xl sm:text-3xl font-bold text-slate-800 leading-tight">
@@ -37,8 +37,8 @@ export default function SmartstoreCampaignPage() {
             </h1>
 
             <p className="mt-4 text-base text-slate-500 max-w-lg mx-auto leading-relaxed">
-              2026년 1차 모집은 <strong className="text-slate-700">4월 1일</strong>부로 마감되었습니다.<br />
-              다음 모집 일정이 확정되면 가장 먼저 안내드리겠습니다.
+              2026년 소상공인 스마트상점 모집은 <strong className="text-slate-700">4월 1일</strong>부로 마감되었습니다.<br />
+              넥소가 우수기업으로 재선정되면 다시 안내드리겠습니다.
             </p>
 
             <div className="mt-6 p-4 rounded-lg bg-slate-50 border border-slate-100 max-w-md mx-auto">

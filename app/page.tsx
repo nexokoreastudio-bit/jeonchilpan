@@ -404,8 +404,8 @@ export default async function HomePage() {
             소상공인 스마트상점 모집에<br className="sm:hidden" /> 관심 가져주신 모든 분께 감사드립니다
           </h2>
           <p className="mt-2 text-sm sm:text-base text-slate-500 max-w-xl mx-auto">
-            2026년 1차 모집은 4월 1일부로 마감되었습니다.<br />
-            다음 모집 일정이 확정되면 가장 먼저 안내드리겠습니다.
+            2026년 소상공인 스마트상점 모집은 4월 1일부로 마감되었습니다.<br />
+            넥소가 우수기업으로 재선정되면 다시 안내드리겠습니다.
           </p>
           <div className="mt-4">
             <a
