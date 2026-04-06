@@ -382,14 +382,41 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#f4f6f8]">
+      {/* [2026-04-01 마감] 스마트상점 팝업 숨김 - 내년 재사용 예정
       <SmartstorePopupBanner />
+      */}
       {/* 포털형 2단: 콘텐츠 | 우측 사이드바 */}
       <div className="flex flex-col lg:flex-row container mx-auto max-w-7xl px-3 sm:px-4 md:px-6 py-5 sm:py-8 md:py-10 gap-4 sm:gap-6 xl:gap-8">
         <div className="flex-1 min-w-0 flex flex-col gap-4 md:gap-6">
           {/* 콘텐츠 영역 - 배너와 공간을 나누지 않음, 항상 full width */}
           <div className="flex-1 min-w-0 space-y-2 md:space-y-3">
-      {/* 소상공인 스마트상점 모집 히어로 */}
+      {/* [2026-04-01 마감] 스마트상점 히어로 숨김 - 내년 재사용 예정
       <SmartstoreHeroSection />
+      */}
+
+      {/* 소상공인 스마트상점 캠페인 감사 메시지 */}
+      <section className="bg-gradient-to-br from-slate-50 to-blue-50/50 border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+        <div className="px-4 sm:px-6 py-6 sm:py-8 text-center">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#00c4b4]/10 text-[#00a396] border border-[#00c4b4]/20">
+            2026 소상공인 스마트상점 모집 마감
+          </span>
+          <h2 className="mt-3 text-lg sm:text-xl md:text-2xl font-bold text-slate-800 leading-tight">
+            소상공인 스마트상점 모집에<br className="sm:hidden" /> 관심 가져주신 모든 분께 감사드립니다
+          </h2>
+          <p className="mt-2 text-sm sm:text-base text-slate-500 max-w-xl mx-auto">
+            2026년 1차 모집은 4월 1일부로 마감되었습니다.<br />
+            다음 모집 일정이 확정되면 가장 먼저 안내드리겠습니다.
+          </p>
+          <div className="mt-4">
+            <a
+              href="/leads/consultation"
+              className="inline-flex items-center gap-2 rounded-md bg-[#00c4b4] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#00a99a] transition-colors"
+            >
+              도입 상담은 언제든 가능합니다
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* 메인 프로모션 배너 */}
       <section className="hidden sm:block bg-white border border-gray-200/80 overflow-hidden rounded-lg shadow-sm">

@@ -11,6 +11,7 @@ import { ChevronDown, Menu, Home, Star, Sun, Moon } from 'lucide-react'
 
 // 전칠판 커뮤니티 스타일: 메가메뉴 구조 (2단계 네비)
 const MEGA_NAV = [
+  /* [2026-04-01 마감] 스마트상점 메가메뉴 숨김 - 내년 재사용 예정
   {
     name: '2026년 소상공인스마트 상점',
     href: '/smartstore',
@@ -21,6 +22,7 @@ const MEGA_NAV = [
       ]},
     ],
   },
+  */
   {
     name: 'NEXO',
     href: '/',
@@ -37,7 +39,7 @@ const MEGA_NAV = [
       { title: 'NEXO 체험', items: [
         { name: '상담 신청', href: '/leads/consultation' },
         { name: '세미나', href: '/seminar' },
-        { name: '스마트상점 모집', href: '/smartstore' },
+        // { name: '스마트상점 모집', href: '/smartstore' }, // [2026-04-01 마감] 숨김
       ]},
       { title: 'NEXO 혜택', items: [
         { name: '구독자 할인', href: '/benefits' },
@@ -251,7 +253,7 @@ export function HeaderClient() {
         </div>
       </div>
 
-      {/* 2.5 전광판 광고 바 */}
+      {/* [2026-04-01 마감] 전광판 광고 바 숨김 - 내년 재사용 예정
       <Link
         href="/smartstore"
         className="block border-y border-[#8a6a00] bg-[#2a2200] hover:bg-[#3a2f00] transition-colors"
@@ -264,6 +266,7 @@ export function HeaderClient() {
           </div>
         </div>
       </Link>
+      */}
 
       {/* 3. 메뉴 바 - 개별 드롭다운 (호버 시 해당 메뉴만) */}
       <div className="sticky top-0 z-50 bg-slate-800 py-1.5 md:py-2 mt-2">

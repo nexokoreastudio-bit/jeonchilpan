@@ -109,12 +109,14 @@ export async function Header() {
             >
               자료실
             </Link>
+            {/* [2026-04-01 마감] 스마트상점 링크 숨김 - 내년 재사용 예정
             <Link
               href="/smartstore"
               className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
             >
               스마트상점 모집
             </Link>
+            */}
             <Link
               href="/field"
               className="text-sm font-medium text-gray-700 transition-colors hover:text-nexo-navy whitespace-nowrap"
