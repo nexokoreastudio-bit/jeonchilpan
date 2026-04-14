@@ -1,5 +1,6 @@
 name: Daily News Crawling
 
+# Last keepalive: 2026-04-14 (60일 비활성 자동 disable 방지)
 on:
   schedule:
     # 매일 한국 시간 오전 9시 (UTC 0시)
