@@ -7,6 +7,9 @@ import { UserGrowthChart } from '@/components/admin/user-growth-chart'
 import { PostActivityChart } from '@/components/admin/post-activity-chart'
 import { ReviewRatingChart } from '@/components/admin/review-rating-chart'
 import { LeadStatsChart } from '@/components/admin/lead-stats-chart'
+import { getAuditLogs } from '@/lib/actions/audit'
+import { format } from 'date-fns'
+import { ko } from 'date-fns/locale'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 
@@ -36,6 +39,16 @@ export default async function AdminDashboardPage() {
 
   if (profile?.role !== 'admin') {
     redirect('/')
+  }
+
+  // 최근 감사 로그
+  const { logs: auditLogs } = await getAuditLogs({ limit: 10 })
+
+  const ACTION_LABELS: Record<string, string> = {
+    'lead.status_update': '리드 상태 변경',
+    'post.pin': '게시글 고정',
+    'post.unpin': '게시글 고정 해제',
+    'post.delete': '게시글 삭제',
   }
 
   return (
@@ -100,9 +113,46 @@ export default async function AdminDashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* 최근 운영 로그 */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>최근 운영 로그</CardTitle>
+            <CardDescription>관리자 액션 감사 이력</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {auditLogs.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center py-4">기록된 로그가 없습니다.</p>
+            ) : (
+              <div className="space-y-2">
+                {auditLogs.map((log: any) => (
+                  <div key={log.id} className="flex items-center gap-3 text-sm py-2 border-b border-gray-100 last:border-0">
+                    <span className="text-xs text-gray-400 tabular-nums shrink-0">
+                      {format(new Date(log.created_at), 'MM.dd HH:mm', { locale: ko })}
+                    </span>
+                    <span className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs font-medium">
+                      {ACTION_LABELS[log.action] || log.action}
+                    </span>
+                    <span className="text-gray-600 truncate">
+                      {log.admin_email?.split('@')[0] || '관리자'}
+                    </span>
+                    {log.target_type && (
+                      <span className="text-gray-400 text-xs">
+                        #{log.target_id}
+                      </span>
+                    )}
+                    {log.detail?.status && (
+                      <span className="text-xs text-gray-500">
+                        → {log.detail.status}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
 }
-
-

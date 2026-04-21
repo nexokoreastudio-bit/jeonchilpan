@@ -2,16 +2,18 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getPostsByBoardType, type BoardType } from '@/lib/supabase/posts'
+import { searchPosts } from '@/app/actions/posts'
 import { format } from 'date-fns'
 
 export const revalidate = 30 // 30초 캐시
 import { ko } from 'date-fns/locale'
-import { FileStack, MessageSquare, FileText, Library } from 'lucide-react'
+import { FileStack, MessageSquare, FileText, Library, Pin } from 'lucide-react'
 import type { Metadata } from 'next'
 import { ForumJsonLd } from '@/components/seo/json-ld'
 import styles from './community.module.css'
 import { Megaphone } from 'lucide-react'
 import { CenterBanner } from '@/components/shared/center-banner'
+import { CommunitySearch } from '@/components/community/community-search'
 
 /** 최근 7일 이내 작성된 글인지 (NEW 배지용) */
 function isNewPost(createdAt: string): boolean {
@@ -33,6 +35,7 @@ const VALID_BOARD_TYPES: BoardType[] = ['notice', 'bamboo', 'materials']
 interface PageProps {
   searchParams: {
     board?: string
+    q?: string
   }
 }
 
@@ -62,8 +65,11 @@ export default async function CommunityPage({ searchParams }: PageProps) {
     ? (requestedBoard as BoardType)
     : null
 
-  // 게시글 목록 가져오기
-  const posts = await getPostsByBoardType(boardType)
+  // 검색어가 있으면 검색, 없으면 일반 목록
+  const searchQuery = searchParams.q?.trim() || ''
+  const posts = searchQuery
+    ? await searchPosts(searchQuery, boardType)
+    : await getPostsByBoardType(boardType)
 
   const selectedBoard = BOARD_TYPES.find(b => b.type === boardType) || BOARD_TYPES[0]
 
@@ -116,14 +122,22 @@ export default async function CommunityPage({ searchParams }: PageProps) {
         })}
       </div>
 
-      {/* 게시글 작성 버튼 */}
-      <div className={styles.actions}>
-        {user && (
-          <Link href="/community/write" className={styles.writeButton}>
-            ✍️ 글쓰기
-          </Link>
-        )}
+      {/* 검색 + 글쓰기 */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <CommunitySearch />
+        <div className={styles.actions} style={{ marginBottom: 0 }}>
+          {user && (
+            <Link href="/community/write" className={styles.writeButton}>
+              ✍️ 글쓰기
+            </Link>
+          )}
+        </div>
       </div>
+      {searchQuery && (
+        <p className="text-sm text-slate-500 mb-4">
+          &quot;{searchQuery}&quot; 검색 결과 <strong className="text-slate-700">{posts.length}</strong>건
+        </p>
+      )}
 
       {/* 중앙 배너 - 콘텐츠와 사이드바 사이 */}
       <div className="mb-6">
@@ -149,6 +163,12 @@ export default async function CommunityPage({ searchParams }: PageProps) {
               className={styles.postRow}
             >
               <div className={styles.postRowLeft}>
+                {(post as any).is_pinned && (
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded shrink-0">
+                    <Pin className="w-2.5 h-2.5" />
+                    고정
+                  </span>
+                )}
                 <h2 className={styles.postTitle}>
                   {post.title}
                   {post.comments_count > 0 && (

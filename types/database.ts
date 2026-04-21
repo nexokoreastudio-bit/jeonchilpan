@@ -162,6 +162,7 @@ export interface Database {
           is_best: boolean
           is_verified_review: boolean
           news_id: number | null
+          is_pinned: boolean
           created_at: string
           updated_at: string
         }
@@ -178,6 +179,7 @@ export interface Database {
           is_best?: boolean
           is_verified_review?: boolean
           news_id?: number | null
+          is_pinned?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -194,8 +196,31 @@ export interface Database {
           is_best?: boolean
           is_verified_review?: boolean
           news_id?: number | null
+          is_pinned?: boolean
           created_at?: string
           updated_at?: string
+        }
+      }
+      post_reports: {
+        Row: {
+          id: number
+          post_id: number
+          reporter_id: string
+          reason: string
+          status: 'pending' | 'reviewed' | 'dismissed'
+          admin_notes: string | null
+          created_at: string
+        }
+        Insert: {
+          post_id: number
+          reporter_id: string
+          reason: string
+          status?: 'pending' | 'reviewed' | 'dismissed'
+          admin_notes?: string | null
+        }
+        Update: {
+          status?: 'pending' | 'reviewed' | 'dismissed'
+          admin_notes?: string | null
         }
       }
       comments: {

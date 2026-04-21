@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { updateLeadStatus } from '@/app/actions/leads'
+import { getLeadAuditHistory } from '@/app/actions/leads'
 import { parseLeadMetadata } from '@/lib/utils/lead-metadata'
 import { Database } from '@/types/database'
 import { format } from 'date-fns'
@@ -17,7 +18,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Mail, Phone, ChevronDown, ChevronUp, Building2, Megaphone, CalendarClock, Flag } from 'lucide-react'
+import { Mail, Phone, ChevronDown, ChevronUp, Building2, Megaphone, CalendarClock, Flag, Clock, CalendarCheck } from 'lucide-react'
 
 type LeadRow = Database['public']['Tables']['leads']['Row']
 
@@ -85,10 +86,24 @@ export function LeadsList({ leads }: LeadsListProps) {
   const [updatingId, setUpdatingId] = useState<number | null>(null)
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [adminNotes, setAdminNotes] = useState<Record<number, string>>({})
+  const [followUpDates, setFollowUpDates] = useState<Record<number, string>>({})
+  const [auditHistory, setAuditHistory] = useState<Record<number, any[]>>({})
+  const [loadingHistory, setLoadingHistory] = useState<Record<number, boolean>>({})
   const [statusFilter, setStatusFilter] = useState<LeadStatus | 'all'>('all')
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [requestTypeFilter, setRequestTypeFilter] = useState<string>('all')
   const [campaignQuery, setCampaignQuery] = useState('')
+
+  // 상세 패널 열릴 때 이력 로드
+  useEffect(() => {
+    if (expandedId && !auditHistory[expandedId] && !loadingHistory[expandedId]) {
+      setLoadingHistory((prev) => ({ ...prev, [expandedId]: true }))
+      getLeadAuditHistory(expandedId).then((history) => {
+        setAuditHistory((prev) => ({ ...prev, [expandedId]: history }))
+        setLoadingHistory((prev) => ({ ...prev, [expandedId]: false }))
+      })
+    }
+  }, [expandedId])
 
   const leadsWithMeta = leads.map((lead) => ({
     ...lead,
@@ -118,7 +133,12 @@ export function LeadsList({ leads }: LeadsListProps) {
   const handleStatusChange = async (leadId: number, newStatus: LeadRow['status']) => {
     setUpdatingId(leadId)
     try {
-      const result = await updateLeadStatus(leadId, newStatus, adminNotes[leadId] || null)
+      const followUp = followUpDates[leadId] || null
+      const notes = adminNotes[leadId] || null
+      const notesWithFollowUp = followUp
+        ? `${notes || ''}${notes ? '\n' : ''}[팔로업] ${followUp}`
+        : notes
+      const result = await updateLeadStatus(leadId, newStatus, notesWithFollowUp)
       if (result.success) {
         alert('상태가 업데이트되었습니다.')
         window.location.reload()
@@ -195,6 +215,7 @@ export function LeadsList({ leads }: LeadsListProps) {
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500">이름</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 min-w-[160px]">연락처</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-20">지역</th>
+              <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-28">희망일정</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 min-w-[180px]">캠페인/유입</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-28">상태 변경</th>
               <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 w-24">신청일</th>
@@ -204,7 +225,7 @@ export function LeadsList({ leads }: LeadsListProps) {
           <tbody className="divide-y divide-slate-100">
             {filteredLeads.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-4 py-12 text-center text-slate-500 text-sm">
+                <td colSpan={11} className="px-4 py-12 text-center text-slate-500 text-sm">
                   조건에 맞는 리드가 없습니다.
                 </td>
               </tr>
@@ -238,6 +259,12 @@ export function LeadsList({ leads }: LeadsListProps) {
                   </div>
                 </td>
                 <td className="px-4 py-2 text-sm text-slate-600">{lead.meta.region || lead.region || '—'}</td>
+                <td className="px-4 py-2">
+                  <div className="text-xs text-slate-600">
+                    {lead.meta.preferredDate || '—'}
+                    {lead.meta.preferredTime && <div className="text-slate-400">{lead.meta.preferredTime}</div>}
+                  </div>
+                </td>
                 <td className="px-4 py-2">
                   <div className="space-y-1 text-xs text-slate-600">
                     <div className="truncate" title={lead.meta.campaign || lead.referrer_code || ''}>
@@ -372,20 +399,37 @@ export function LeadsList({ leads }: LeadsListProps) {
                 )}
 
                 <div className="border-t border-slate-200 pt-4 space-y-3">
-                  <div>
-                    <Label htmlFor={`notes-${lead.id}`} className="text-xs font-medium text-slate-600">
-                      관리자 메모
-                    </Label>
-                    <Textarea
-                      id={`notes-${lead.id}`}
-                      value={adminNotes[lead.id] ?? lead.admin_notes ?? ''}
-                      onChange={(e) =>
-                        setAdminNotes({ ...adminNotes, [lead.id]: e.target.value })
-                      }
-                      placeholder="메모를 입력하세요"
-                      rows={3}
-                      className="mt-2 border-slate-200 focus:ring-slate-500"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor={`notes-${lead.id}`} className="text-xs font-medium text-slate-600">
+                        관리자 메모
+                      </Label>
+                      <Textarea
+                        id={`notes-${lead.id}`}
+                        value={adminNotes[lead.id] ?? lead.admin_notes ?? ''}
+                        onChange={(e) =>
+                          setAdminNotes({ ...adminNotes, [lead.id]: e.target.value })
+                        }
+                        placeholder="메모를 입력하세요"
+                        rows={3}
+                        className="mt-2 border-slate-200 focus:ring-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor={`followup-${lead.id}`} className="text-xs font-medium text-slate-600 flex items-center gap-1">
+                        <CalendarCheck className="w-3.5 h-3.5" />
+                        팔로업 예정일
+                      </Label>
+                      <Input
+                        id={`followup-${lead.id}`}
+                        type="date"
+                        value={followUpDates[lead.id] ?? ''}
+                        onChange={(e) =>
+                          setFollowUpDates({ ...followUpDates, [lead.id]: e.target.value })
+                        }
+                        className="mt-2 border-slate-200"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3">
@@ -410,6 +454,37 @@ export function LeadsList({ leads }: LeadsListProps) {
                     </Select>
                     {updatingId === lead.id && (
                       <span className="text-sm text-slate-500">저장 중...</span>
+                    )}
+                  </div>
+
+                  {/* 상태 변경 이력 */}
+                  <div className="border-t border-slate-100 pt-3">
+                    <Label className="text-xs font-medium text-slate-600 flex items-center gap-1 mb-2">
+                      <Clock className="w-3.5 h-3.5" />
+                      상태 변경 이력
+                    </Label>
+                    {loadingHistory[lead.id] ? (
+                      <p className="text-xs text-slate-400">불러오는 중...</p>
+                    ) : (auditHistory[lead.id] || []).length === 0 ? (
+                      <p className="text-xs text-slate-400">변경 이력이 없습니다.</p>
+                    ) : (
+                      <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+                        {(auditHistory[lead.id] || []).map((log: any) => (
+                          <div key={log.id} className="flex items-start gap-2 text-xs">
+                            <span className="text-slate-400 tabular-nums shrink-0">
+                              {format(new Date(log.created_at), 'MM.dd HH:mm', { locale: ko })}
+                            </span>
+                            <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${STATUS_STYLES[log.detail?.status] || 'bg-slate-100 text-slate-600'}`}>
+                              {STATUS_LABELS[log.detail?.status] || log.detail?.status}
+                            </span>
+                            {log.detail?.admin_notes && (
+                              <span className="text-slate-500 truncate" title={log.detail.admin_notes}>
+                                {log.detail.admin_notes}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>

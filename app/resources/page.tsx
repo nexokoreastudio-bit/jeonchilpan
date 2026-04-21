@@ -11,11 +11,12 @@ import type { Metadata } from 'next'
 import styles from './resources.module.css'
 
 export const metadata: Metadata = {
-  title: '자료실 - 학부모 상담·수업에 바로 쓰는 실무 자료',
-  description: '입시 자료, 학부모 상담 템플릿, 수업 설계 자료를 무료로 다운로드하세요. 회원가입 후 다운로드 가능.',
+  title: '자료실 - 전자칠판 수업자료·학부모 상담 템플릿',
+  description: '전자칠판·스마트보드 활용 수업 자료, 학부모 상담 템플릿, 입시 자료를 무료로 다운로드하세요.',
+  keywords: ['전자칠판 자료', '스마트보드 수업자료', '학원 상담 템플릿', '입시 자료 다운로드', '수업 설계'],
   openGraph: {
-    title: '전칠판 자료실 | 실무 자료 무료 다운로드',
-    description: '입시 자료, 상담 템플릿, 수업 자료를 바로 다운로드하세요.',
+    title: '전칠판 자료실 | 전자칠판 수업 자료 무료 다운로드',
+    description: '전자칠판·스마트보드 활용 수업 자료, 학부모 상담 템플릿을 바로 다운로드하세요.',
   },
 }
 

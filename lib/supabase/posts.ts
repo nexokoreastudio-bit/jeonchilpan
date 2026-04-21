@@ -98,15 +98,21 @@ export async function getPostsByBoardType(
     const notices = (noticeRes.data || []) as PostWithAuthor[]
     let boardPosts = (boardRes.data || []) as PostWithAuthor[]
 
-    // 전체 탭: 공지 제외한 나머지만 (boardPosts에 이미 공지 포함 가능성 낮음)
+    // 전체 탭: 공지 제외한 나머지만
     if (boardType === null) {
       boardPosts = boardPosts.filter((p) => p.board_type !== 'notice')
     }
 
+    // pinned 게시글을 상단에 배치
+    const pinnedPosts = boardPosts.filter((p) => (p as any).is_pinned)
+    const unpinnedPosts = boardPosts.filter((p) => !(p as any).is_pinned)
+
     const noticeIds = new Set(notices.map((p) => p.id))
+    const pinnedIds = new Set(pinnedPosts.map((p) => p.id))
     const merged = [
       ...notices,
-      ...boardPosts.filter((p) => !noticeIds.has(p.id)),
+      ...pinnedPosts.filter((p) => !noticeIds.has(p.id)),
+      ...unpinnedPosts.filter((p) => !noticeIds.has(p.id) && !pinnedIds.has(p.id)),
     ]
     return merged.slice(offset, offset + limit) as PostWithAuthor[]
   }

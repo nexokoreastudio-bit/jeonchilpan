@@ -1,11 +1,12 @@
 import { ConsultationRequestForm } from '@/components/leads/consultation-request-form'
 
 export const metadata = {
-  title: '상담신청 - 시연·견적·도입 상담 한 번에',
-  description: '넥소 전자칠판 시연, 견적, 도입 상담을 한 번에 접수하세요. 영업일 1일 이내 연락드립니다.',
+  title: '전자칠판 상담신청 - 시연·견적·도입 무료 상담',
+  description: '전자칠판·스마트보드 시연, 견적, 도입 상담을 한 번에 접수하세요. 영업일 1일 이내 연락드립니다.',
+  keywords: ['전자칠판 상담', '스마트보드 견적', '전자칠판 가격', '전자칠판 시연', '학원 전자칠판 도입'],
   openGraph: {
-    title: '전자칠판 상담신청 | 시연·견적·도입 한 번에',
-    description: '넥소 전자칠판 상담을 간편하게 접수하세요. 무료 상담, 빠른 응답.',
+    title: '전자칠판 상담신청 | 시연·견적·도입 무료 상담',
+    description: '넥소 전자칠판·스마트보드 무료 상담. 시연부터 견적까지 한 번에 접수하세요.',
   },
 }
 

@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { writeAuditLog } from '@/lib/actions/audit'
 import { revalidatePath } from 'next/cache'
 import { Database } from '@/types/database'
@@ -232,5 +232,26 @@ export async function updateLeadStatus(
   } catch (error: any) {
     console.error('리드 상태 업데이트 오류:', error)
     return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
+  }
+}
+
+/**
+ * 리드별 상태 변경 이력 조회 (감사 로그에서)
+ */
+export async function getLeadAuditHistory(leadId: number) {
+  try {
+    const supabase = await createAdminClient()
+    const { data, error } = await (supabase
+      .from('admin_audit_logs') as any)
+      .select('*')
+      .eq('action', 'lead.status_update')
+      .eq('target_id', String(leadId))
+      .order('created_at', { ascending: false })
+      .limit(20)
+
+    if (error) return []
+    return data || []
+  } catch {
+    return []
   }
 }

@@ -1,7 +1,8 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { createPost as createPostQuery, deletePost as deletePostQuery, updatePost as updatePostQuery, type BoardType } from '@/lib/supabase/posts'
+import { writeAuditLog } from '@/lib/actions/audit'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
@@ -130,6 +131,128 @@ export async function deletePost(postId: number): Promise<{ success: boolean; er
   } catch (error: any) {
     console.error('게시글 삭제 오류:', error)
     return { success: false, error: error.message || '알 수 없는 오류가 발생했습니다.' }
+  }
+}
+
+/**
+ * 게시글 고정/해제 (관리자 전용)
+ */
+export async function togglePinPost(
+  postId: number
+): Promise<{ success: boolean; pinned?: boolean; error?: string }> {
+  try {
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) return { success: false, error: '로그인이 필요합니다.' }
+
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    if ((profile as { role?: string } | null)?.role !== 'admin') {
+      return { success: false, error: '관리자 권한이 필요합니다.' }
+    }
+
+    const { data: post } = await supabase
+      .from('posts')
+      .select('is_pinned')
+      .eq('id', postId)
+      .single()
+    if (!post) return { success: false, error: '게시글을 찾을 수 없습니다.' }
+
+    const newPinned = !(post as any).is_pinned
+    const adminClient = await createAdminClient()
+    const { error } = await (adminClient.from('posts') as any)
+      .update({ is_pinned: newPinned })
+      .eq('id', postId)
+
+    if (error) return { success: false, error: error.message }
+
+    writeAuditLog({
+      admin_id: user.id,
+      admin_email: user.email || '',
+      action: newPinned ? 'post.pin' : 'post.unpin',
+      target_type: 'post',
+      target_id: String(postId),
+    })
+
+    revalidatePath('/community')
+    revalidatePath(`/community/${postId}`)
+    return { success: true, pinned: newPinned }
+  } catch (error: any) {
+    return { success: false, error: error.message || '오류가 발생했습니다.' }
+  }
+}
+
+/**
+ * 게시글 신고
+ */
+export async function reportPost(
+  postId: number,
+  reason: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) return { success: false, error: '로그인이 필요합니다.' }
+
+    if (!reason.trim()) return { success: false, error: '신고 사유를 입력해주세요.' }
+
+    const { error } = await (supabase.from('post_reports') as any).insert({
+      post_id: postId,
+      reporter_id: user.id,
+      reason: reason.trim(),
+    })
+
+    if (error) {
+      if (error.code === '23505') return { success: false, error: '이미 신고한 게시글입니다.' }
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message || '오류가 발생했습니다.' }
+  }
+}
+
+/**
+ * 커뮤니티 검색
+ */
+export async function searchPosts(
+  query: string,
+  boardType?: BoardType | null,
+  limit: number = 20
+) {
+  try {
+    const supabase = await createClient()
+    const keyword = `%${query.trim()}%`
+
+    let q = supabase
+      .from('posts')
+      .select(`
+        *,
+        author:users!posts_author_id_fkey (
+          id,
+          nickname,
+          avatar_url
+        )
+      `)
+      .or(`title.ilike.${keyword},content.ilike.${keyword}`)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (boardType) {
+      q = q.eq('board_type', boardType)
+    } else {
+      q = q.in('board_type', ['notice', 'bamboo', 'materials'])
+    }
+
+    const { data, error } = await q
+    if (error) return []
+    return data || []
+  } catch {
+    return []
   }
 }
 

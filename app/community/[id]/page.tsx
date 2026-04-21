@@ -13,6 +13,8 @@ import { HtmlContent } from '@/components/html-content'
 import { DeletePostButton } from '@/components/community/delete-post-button'
 import { LikeButton } from '@/components/community/like-button'
 import { CommentsSection } from '@/components/community/comments-section'
+import { PinButton } from '@/components/community/pin-button'
+import { ReportButton } from '@/components/community/report-button'
 import { checkUserLiked } from '@/app/actions/likes'
 import { Database } from '@/types/database'
 import { JsonLd } from '@/components/seo/json-ld'
@@ -238,6 +240,11 @@ export default async function PostDetailPage({ params }: PageProps) {
                 <MessageSquare className="w-5 h-5" />
                 <span>{post.comments_count}</span>
               </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <PinButton postId={post.id} isPinned={(post as any).is_pinned || false} isAdmin={isAdmin} />
+              <ReportButton postId={post.id} userId={user?.id} />
             </div>
 
             {(canEdit || canDelete) && (
